@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target='_top'>
+  <style>
+    body { 
+      font-family: 'Segoe UI', -apple-system, sans-serif; 
+      padding: 0 !important; 
+      margin: 0 !important; 
+      background-color: #e8f0fe !important; 
+      color: #202124; 
+      font-size: 13px; 
+      overflow: hidden !important; 
+      box-sizing: border-box; 
+    }
+
+    .form-group { margin-bottom: 2px; display: flex; flex-direction: column; position: relative; }
+    .form-group label { display: block; margin-bottom: 2px; font-weight: 800 !important; font-size: 11px !important; color: #ff0000 !important; text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    .form-group input, .form-group select { 
+      width: 100% !important; 
+      padding: 2px 10px !important; 
+      border: 2px solid #000000 !important; 
+      border-radius: 8px !important; 
+      box-sizing: border-box !important; 
+      font-size: 13px !important; 
+      font-weight: bold !important; 
+      outline: none !important; 
+      background-color: #ffffff !important; 
+      color: #000000 !important; 
+      height: 36px !important; 
+      transition: all 0.15s ease-in-out !important; 
+    }
+    
+    .form-group input[readonly] { 
+      background-color: #e9ecef !important; 
+      color: #202124 !important; 
+      cursor: not-allowed; 
+      border: 2px solid #000000 !important; 
+    }
+    
+    input.campo-erro { border: 2px solid #d32f2f !important; background-color: #fce8e6 !important; color: #c5221f !important; }
+
+    .linha-flex { 
+      display: flex !important; 
+      gap: 8px; 
+      width: 100%; 
+      box-sizing: border-box; 
+      align-items: flex-end; 
+      flex-wrap: wrap !important; 
+    }
+
+    .coluna { flex: 1 1 150px; min-width: 100px; }
+    .col-con-data       { flex: 1 1 110px !important; min-width: 90px !important; }        
+    .col-con-cpf        { flex: 1 1 140px !important; min-width: 120px !important; }         
+    .col-con-carteira   { flex: 1 1 145px !important; min-width: 125px !important; }    
+    .col-con-ddd        { flex: 0 1 55px !important;  min-width: 45px !important; }     
+    .col-con-fone       { flex: 1 1 115px !important; min-width: 105px !important; }        
+    .col-con-status     { flex: 2 1 250px !important; min-width: 180px !important; } 
+    .col-con-id         { flex: 1 1 160px !important; min-width: 130px !important; }    
+    .col-con-busca-val  { flex: 1 1 180px !important; min-width: 140px !important; }
+    .col-con-busca-aud  { flex: 2 1 200px !important; min-width: 150px !important; } 
+
+    .btn-busca { background-color: #1a73e8 !important; color: white !important; padding: 0 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; height: 36px; box-shadow: 0 4px 6px rgba(26,115,232,0.15); transition: background 0.2s; }
+    .btn-busca:hover { background-color: #1557b0 !important; }
+    
+    .grupo-botoes-rodape { display: flex !important; gap: 16px !important; margin-top: 6px !important; width: 100% !important; box-sizing: border-box !important; align-items: stretch !important; }
+    .btn-voltar-menu { flex: 1 !important; background-color: #5f6368 !important; color: white !important; padding: 6px !important; font-size: 14px !important; height: 38px !important; border: none !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important; transition: background 0.2s !important; display: block !important; margin: 0 !important; box-sizing: border-box !important; text-align: center; line-height: 24px; }
+    .btn-voltar-menu:hover { background-color: #3c4043 !important; }
+    
+    .secao-titulo { font-size: 11px !important; font-weight: 800; color: #ffffff !important; background-color: #1a73e8 !important; margin: 4px 0 3px 0; padding: 2px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; border: none !important; }
+   
+    .secao-busca, .cartao-resultado { display: block; background-color: #fdfaf4 !important; padding: 5px 12px; border: 2px solid #000000 !important; border-radius: 12px !important; box-sizing: border-box; }
+    .secao-busca { margin: 6px 12px 4px 12px; position: relative; }
+    .cartao-resultado { margin: 0 12px 6px 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+    #statusConsultaGeral { margin-top: 4px; text-align: center; font-size: 12px; font-weight: bold; padding: 4px; border-radius: 4px; }
+    .sucesso { color: #137333; background-color: #e6f4ea; border: 1px solid #b7e1cd; }
+    .erro { color: #c5221f; background-color: #fce8e6; border: 1px solid #fad2cf; }
+
+    .lista-sugestoes-autocomplete { position: absolute; top: 100%; left: 0; width: 100%; background-color: #ffffff !important; border: 2px solid #000000; border-radius: 0 0 8px 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 999999 !important; max-height: 200px !important; overflow-y: auto; margin: 1px 0 0 0; padding: 0; list-style: none; display: none; box-sizing: border-box; }
+    .lista-sugestoes-autocomplete li { padding: 6px 12px; font-weight: bold; font-size: 13px; color: #202124; cursor: pointer; border-bottom: 1px solid #f1f3f4; text-transform: uppercase; background-color: #ffffff !important; }
+    .lista-sugestoes-autocomplete li:hover, .lista-sugestoes-autocomplete li.selecionado { background-color: #e8f0fe !important; color: #1a73e8 !important; }
+  </style>
+</head>
+<body>
+
+  <!-- 🔍 GAVETA SUPERIOR DE CONSULTA -->
+  <div class="secao-busca">
+    <div class="linha-flex">
+      <div class="form-group coluna">
+        <label>🔎 PESQUISAR POR:</label>
+        <select id='conFiltro' onchange="INTERFACE_CON_ajustarPlaceholder(this.value)">
+          <option value='nome'>👤 NOME COMPLETO DO PACIENTE</option>
+          <option value='carteira'>📇 NÚMERO DA CARTEIRA</option>
+          <option value='CPF'>💳 NÚMERO DO CPF</option>
+          <option value='id'>🆔 NÚMERO DO ID EXCLUSIVO</option>
+        </select>
+      </div>
+      <div class="form-group coluna" style="flex: 2; position: relative;">
+        <label>🔎 TERMO DE BUSCA:</label>
+        <input type="text" id="conTermo" placeholder="Digite no mínimo 5 letras para buscar..." autocomplete="off" oninput="this.value = this.value.toUpperCase(); INTERFACE_CON_interceptarTeclado(this)" onkeyup="CON_monitorarTecladoDrop(event)">
+        <ul id="listaSugestoesConDrop" class="lista-sugestoes-autocomplete"></ul>
+      </div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <button type="button" class="btn-busca" style="padding: 0 25px;" onclick="CON_executarFiltroGeralMestre()">🔍 Consultar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="statusConsultaGeral"></div>
+  <form id="formConsultaGeralReal" class="cartao-resultado" autocomplete="off" style="display:none;">
+    <div class='secao-titulo' style="margin-top: 0;">📇 Dados Cadastrais Básicos</div>
+    
+    <div class="form-group" style="width: 100% !important; margin-bottom: 8px !important; box-sizing: border-box;">
+      <label>👤 NOME COMPLETO</label>
+      <input type='text' id='conB' readonly style="width: 100% !important;">
+    </div>
+
+    <div class="linha-flex">
+      <div class="form-group col-con-data"><label>📅 DATA SOLICITAÇÃO</label><input type='text' id='conA' readonly></div>
+      <div class="form-group col-con-cpf"><label>💳 CPF DO PACIENTE</label><input type='text' id='conCPF' readonly style="color: #1a73e8 !important; background-color: #e8f0fe !important;"></div>
+      <div class="form-group col-con-carteira"><label>📇 NÚMERO DA CARTEIRA</label><input type='text' id='conC' readonly></div>
+      <div class="form-group col-con-ddd"><label>📞 DDD</label><input type='text' id='conD' readonly style="text-align: center;"></div>
+      <div class="form-group col-con-fone"><label>📱 TELEFONE</label><input type='text' id='conE' readonly></div>
+      <div class="form-group col-con-user"><label>👥 CADASTRADO POR</label><input type='text' id='conU' readonly></div>
+      <div class="form-group col-con-id"><label>🆔 ID EXCLUSIVO 🔒</label><input type='text' id='conW' readonly style="text-align: center; background-color: #e8eaed !important;"></div>
+    </div>
+
+    <div class='secao-titulo'>🩺 Informações Complementares e Situação Clínica</div>
+    <div class="linha-flex">
+      <div class="form-group coluna"><label>🩺 ESPECIALIDADE</label><input type='text' id='conF' readonly></div>
+      <div class="form-group coluna"><label>🚨 PRIORIDADE</label><input type='text' id='conG' readonly></div>
+      <div class="form-group coluna"><label>📋 TIPO DE ATENDIMENTO</label><input type='text' id='conH' readonly></div>
+      <div class="form-group coluna"><label>⚡ SITUAÇÃO DO CASO</label><input type='text' id='conI' readonly></div>
+      <div class="form-group col-con-status"><label>🚩 STATUS ATUAL DO ATENDIMENTO</label><input type='text' id='conJ' readonly style="color:#137333 !important; background-color:#e6f4ea !important; text-align: center;"></div>
+    </div>
+
+    <div class='secao-titulo'>📝 Histórico de Acionamentos Operacionais</div>
+    <div class="linha-flex" style="margin-bottom: 6px;">
+      <div class="form-group col-con-busca-val"><label>🔎 BUSCA 1</label><input type='text' id='conK' readonly></div>
+      <div class="form-group col-con-busca-aud"><label>📅 DATA/HORA E OPERADOR - BUSCA 1</label><input type='text' id='conL' readonly></div>
+    </div>
+    <div class="linha-flex" style="margin-bottom: 6px;">
+      <div class="form-group col-con-busca-val"><label>🔎 BUSCA 2</label><input type='text' id='conN' readonly></div>
+      <div class="form-group col-con-busca-aud"><label>🕒 DATA/HORA E OPERADOR - BUSCA 2</label><input type='text' id='conO' readonly></div>
+    </div>
+    <div class="linha-flex" style="margin-bottom: 6px;">
+      <div class="form-group col-con-busca-val"><label>🔎 BUSCA 3</label><input type='text' id='conQ' readonly></div>
+      <div class="form-group col-con-busca-aud"><label>👥 DATA/HORA E OPERADOR - BUSCA 3</label><input type='text' id='conR' readonly></div>
+    </div>
+
+    <!-- 🎯 NOVA SEÇÃO: DADOS DO AGENDAMENTO (SOMENTE LEITURA) -->
+    <div class='secao-titulo' style="background-color: #137333 !important;">🎯 Dados do Agendamento (Êxito Registrado)</div>
+    <div class="linha-flex" style="margin-bottom: 6px;">
+      <div class="form-group coluna"><label>📅 Data da Consulta</label><input type='text' id='conDataAgendamento' readonly style="text-align: center;"></div>
+      <div class="form-group coluna"><label>⏰ Horário da Consulta</label><input type='text' id='conHoraAgendamento' readonly style="text-align: center;"></div>
+      <div class="form-group coluna" style="flex: 2;"><label>🩺 Profissional / Especialista</label><input type='text' id='conProfissionalAgendamento' readonly></div>
+    </div>
+
+    <div class='secao-titulo'>📋 Observações Gerais Administrativas</div>
+    <div class="form-group" style="width: 100%;"><input type='text' id='conT' readonly></div>
+
+    <div class="grupo-botoes-rodape" style="margin-top: 12px;">
+      <button type="button" class="btn-voltar-menu" onclick="var f=document.getElementById('formConsultaGeralReal'); if(f) { f.reset(); f.style.display='none'; } if(typeof PAINEL_CONSULTA_limparCampos === 'function') PAINEL_CONSULTA_limparCampos(); var status=document.getElementById('statusConsultaGeral'); if(status){ status.style.display='none'; status.innerHTML=''; } var t=document.getElementById('conTermo'); if(t) t.value='';">↩️ Menu Principal (Voltar)</button>
+    </div>
+  </form>
+
+  <script>
+    var INDICE_SELECIONADO_KEYBOARD = -1;
+
+    async function CON_monitorarTecladoDrop(event) {
+      var filtro = document.getElementById("conFiltro").value;
+      var termo = document.getElementById("conTermo").value.trim().toUpperCase();
+      var list = document.getElementById("listaSugestoesConDrop");
+      
+      if (filtro !== "nome") { CON_fecharDropdownSugestoes(); return; }
+      var itens = list.getElementsByTagName("li");
+      
+      if (event.key === "ArrowDown") {
+        event.preventDefault(); INDICE_SELECIONADO_KEYBOARD++;
+        if (INDICE_SELECIONADO_KEYBOARD >= itens.length) INDICE_SELECIONADO_KEYBOARD = 0;
+        CON_destacarItemDropdown(itens); return;
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault(); INDICE_SELECIONADO_KEYBOARD--;
+        if (INDICE_SELECIONADO_KEYBOARD < 0) INDICE_SELECIONADO_KEYBOARD = itens.length - 1;
+        CON_destacarItemDropdown(itens); return;
+      } else if (event.key === "Enter") {
+        event.preventDefault();
+        if (INDICE_SELECIONADO_KEYBOARD > -1 && itens[INDICE_SELECIONADO_KEYBOARD]) { 
+          CON_selecionarNomeDropdown(itens[INDICE_SELECIONADO_KEYBOARD].innerText);
+        } else { CON_executarFiltroGeralMestre(); } return;
+      } else if (event.key === "Escape") { CON_fecharDropdownSugestoes(); return; }
+
+      INDICE_SELECIONADO_KEYBOARD = -1;
+      if (termo.length < 5) { CON_fecharDropdownSugestoes(); return; }
+
+      try {
+        const req = await fetch('/api/pacientes/sugestoes?termo=' + encodeURIComponent(termo));
+        const res = await req.json();
+        if (!res.sucesso || !res.sugestoes || res.sugestoes.length === 0) { CON_fecharDropdownSugestoes(); return; }
+
+        var htmlDrop = "";
+        res.sugestoes.forEach(function(nome) {
+          htmlDrop += '<li onmousedown="CON_selecionarNomeDropdown(\'' + nome.replace(/'/g, "\\'") + '\')">' + nome + '</li>';
+        });
+        list.innerHTML = htmlDrop; list.style.display = "block";
+      } catch(err) {
+        console.error("Erro no autocomplete:", err);
+      }
+    }
+
+    function CON_destacarItemDropdown(itens) {
+      for (var i = 0; i < itens.length; i++) {
+        if (i === INDICE_SELECIONADO_KEYBOARD) itens[i].classList.add("selecionado");
+        else itens[i].classList.remove("selecionado");
+      }
+    }
+
+    function CON_selecionarNomeDropdown(nome) {
+      document.getElementById("conTermo").value = nome;
+      CON_fecharDropdownSugestoes(); CON_executarFiltroGeralMestre(); 
+    }
+
+    function CON_fecharDropdownSugestoes() {
+      var list = document.getElementById("listaSugestoesConDrop");
+      if (list) { list.style.display = "none"; list.innerHTML = ""; }
+      INDICE_SELECIONADO_KEYBOARD = -1;
+    }
+
+    document.addEventListener("mousedown", function(e) {
+      var list = document.getElementById("listaSugestoesConDrop");
+      if (e.target !== document.getElementById("conTermo") && e.target !== list && e.target.tagName !== "LI") CON_fecharDropdownSugestoes();
+    });
+
+    function PAINEL_CONSULTA_limparCampos() {
+      var ids = ['conA','conB','conCPF','conC','conD','conE','conF','conG','conH','conI','conJ','conK','conL','conN','conO','conQ','conR','conT','conU','conW','conDataAgendamento','conHoraAgendamento','conProfissionalAgendamento'];
+      for (var i = 0; i < ids.length; i++) { if(document.getElementById(ids[i])) document.getElementById(ids[i]).value = ''; }
+    }
+
+    function INTERFACE_CON_interceptarTeclado(campo) {
+      if (document.getElementById("conFiltro").value === "CPF") {
+        var v = campo.value.replace(/[^0-9]/g, "");
+        if (v.length > 3 && v.length <= 6) campo.value = v.substring(0,3) + "." + v.substring(3);
+        else if (v.length > 6 && v.length <= 9) campo.value = v.substring(0,3) + "." + v.substring(3,6) + "." + v.substring(6);
+        else if (v.length > 9) campo.value = v.substring(0,3) + "." + v.substring(3,6) + "." + v.substring(6,9) + "-" + v.substring(9,11);
+      } else if (document.getElementById("conFiltro").value !== "id" && document.getElementById("conFiltro").value !== "carteira") campo.value = campo.value.toUpperCase();
+    }
+
+    function INTERFACE_CON_ajustarPlaceholder(vF) {
+      var txt = document.getElementById("conTermo"); txt.value = ""; CON_fecharDropdownSugestoes();
+      if(vF === "CPF") { txt.placeholder = "000.000.000-00"; txt.maxLength = 14; } 
+      else if(vF === "carteira") { txt.placeholder = "Digite entre 14 e 16 números..."; txt.maxLength = 16; } 
+      else if(vF === "id") { txt.placeholder = "Digite o ID Exclusivo..."; txt.maxLength = 50; } 
+      else { txt.placeholder = "Digite no mínimo 5 letras para buscar..."; txt.removeAttribute("maxlength"); }
+    }
+
+    async function CON_executarFiltroGeralMestre() {
+      var status = document.getElementById('statusConsultaGeral');
+      var termoOriginal = document.getElementById('conTermo').value.trim();
+      var filtro = document.getElementById('conFiltro').value.trim();
+      
+      if(!termoOriginal) { 
+        status.style.display='block'; status.className='erro'; status.innerHTML='⚠️ Insira o termo para realizar a consulta.'; return; 
+      }
+      if (filtro === "nome" && termoOriginal.length < 5) {
+        status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ Erro: A pesquisa exige no mínimo 5 letras.'; return;
+      }
+      
+      status.style.display='block'; status.className=''; status.innerHTML='⚙️ Consultando base de dados Supabase...';
+      document.getElementById('formConsultaGeralReal').style.display = 'none';
+
+      var termoEnvio = termoOriginal;
+      if (filtro === "CPF" || filtro === "carteira") { 
+        var digitosPuros = termoOriginal.replace(/[^0-9]/g, "");
+        termoEnvio = (filtro === "carteira") ? digitosPuros.toString().padStart(16, '0') : digitosPuros;
+      }
+
+      try {
+        const req = await fetch('/api/pacientes/busca-completa?filtro=' + encodeURIComponent(filtro) + '&termo=' + encodeURIComponent(termoEnvio));
+        const res = await req.json();
+
+        var st = document.getElementById('statusConsultaGeral');
+        if(res && res.sucesso && res.dados) {
+          st.style.display = 'block'; st.className = 'sucesso'; st.innerHTML = '🎯 Consulta realizada com sucesso!';
+          document.getElementById('formConsultaGeralReal').style.display = 'block';
+          
+          var d = res.dados;
+          document.getElementById('conA').value = d.data_cadastro || "";
+          document.getElementById('conB').value = d.nome || "";
+          if(document.getElementById('conCPF')) document.getElementById('conCPF').value = d.cpf || "";
+          document.getElementById('conC').value = d.carteira || "";
+          document.getElementById('conD').value = d.ddd || "";
+          document.getElementById('conE').value = d.telefone || "";
+          document.getElementById('conU').value = d.atendente || "Não auditado";
+          document.getElementById('conW').value = d.id || "";
+          document.getElementById('conF').value = d.especialidade || "";
+          document.getElementById('conG').value = d.prioridade || "";
+          document.getElementById('conH').value = d.tipo || "";
+          document.getElementById('conI').value = d.situacao || "";
+          document.getElementById('conJ').value = d.status_atendimento || "";
+          
+          document.getElementById('conK').value = d.busca1 || "";
+          document.getElementById('conL').value = (d.data_busca1 ? d.data_busca1 + ' - ' : '') + (d.auditor1 || '');
+          
+          document.getElementById('conN').value = d.busca2 || "";
+          document.getElementById('conO').value = (d.data_busca2 ? d.data_busca2 + ' - ' : '') + (d.auditor2 || '');
+          
+          document.getElementById('conQ').value = d.busca3 || "";
+          document.getElementById('conR').value = (d.data_busca3 ? d.data_busca3 + ' - ' : '') + (d.auditor3 || '');
+          
+          // 🎯 PREENCHIMENTO DOS CAMPOS DE AGENDAMENTO NA CONSULTA
+          document.getElementById('conDataAgendamento').value = d.data_agendamento || "";
+          document.getElementById('conHoraAgendamento').value = d.hora_agendamento || "";
+          document.getElementById('conProfissionalAgendamento').value = d.profissional || "";
+
+          document.getElementById('conT').value = d.observacao || "";
+
+          setTimeout(function() { if (st) { st.style.display = 'none'; st.innerHTML = ''; } }, 4000);
+        } else { 
+          st.style.display='block'; st.className='erro'; st.innerHTML = "⚠️ Nenhum registro localizado com esse termo."; 
+          PAINEL_CONSULTA_limparCampos();
+        }
+      } catch(err) {
+        var st = document.getElementById('statusConsultaGeral');
+        st.style.display='block'; st.className='erro'; st.innerHTML='❌ Falha na conexão: '+err.message; 
+        PAINEL_CONSULTA_limparCampos();
+      }
+    }
+  </script>
+</body>
+</html>

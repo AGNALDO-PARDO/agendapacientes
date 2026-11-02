@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target='_top'>
+  <style>
+    body { 
+      font-family: 'Segoe UI', -apple-system, sans-serif; 
+      padding: 0 !important; 
+      margin: 0 !important; 
+      background-color: #e8f0fe !important; 
+      color: #202124; 
+      font-size: 13px; 
+      box-sizing: border-box; 
+      overflow-x: hidden !important; 
+      overflow-y: auto !important;   
+    }
+
+    .form-group { margin-bottom: 2px; position: relative; display: flex; flex-direction: column; }
+    label { display: block; margin-bottom: 2px; font-weight: 800 !important; font-size: 11px !important; color: #000000 !important; text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    input, select { width: 100% !important; padding: 2px 10px !important; border: 2px solid #000000 !important; border-radius: 8px !important; box-sizing: border-box !important; font-size: 13px !important; height: 36px !important; background-color: #ffffff !important; color: #000000 !important; font-weight: bold !important; transition: all 0.15s ease-in-out !important; }
+    
+    input:focus, select:focus { border-color: #ff0000 !important; background-color: #e9ecef !important; color: #000000 !important; outline: none !important; box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.15) !important; }
+    input[readonly] { background-color: #e9ecef !important; color: #202124 !important; cursor: not-allowed; border: 2px solid #000000 !important; }
+    input.campo-erro { border: 2px solid #d32f2f !important; background-color: #fce8e6 !important; color: #c5221f !important; }
+    
+    .linha-flex { display: flex !important; gap: 8px; width: 100%; box-sizing: border-box; align-items: flex-end; margin-bottom: 2px; flex-wrap: wrap !important; }
+    .coluna { flex: 1 1 180px !important; min-width: 140px !important; }
+    
+    .col-mas-data           { flex: 1 1 110px !important; min-width: 95px !important; }        
+    .col-mas-cpf            { flex: 1 1 140px !important; min-width: 125px !important; }        
+    .col-mas-carteira       { flex: 1 1 155px !important; min-width: 135px !important; }    
+    .col-mas-ddd            { flex: 1 1 55px !important;  min-width: 50px !important; }        
+    .col-mas-fone           { flex: 1 1 115px !important; min-width: 105px !important; }        
+    .col-mas-status         { flex: 2 1 250px !important; min-width: 180px !important; } 
+    .col-mas-id             { flex: 1 1 160px !important; min-width: 130px !important; }    
+    
+    .col-mas-busca-seletor  { flex: 1 1 180px !important; min-width: 140px !important; }        
+    .col-mas-busca-data     { flex: 1 1 200px !important; min-width: 150px !important; } 
+    .col-mas-busca-operador { flex: 2 1 200px !important; min-width: 150px !important; }
+    
+    .btn-busca { background-color: #1a73e8 !important; color: white !important; padding: 0 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; height: 36px; box-shadow: 0 4px 6px rgba(26,115,232,0.15); transition: background 0.2s; }
+    .btn-busca:hover { background-color: #1557b0 !important; }
+    
+    .grupo-botoes-rodape { display: flex !important; gap: 16px !important; margin-top: 6px !important; width: 100% !important; box-sizing: border-box !important; align-items: center !important; flex-wrap: wrap !important; }
+    .grupo-botoes-rodape button { min-width: 180px; }
+    
+    .btn-salvar { flex: 2 !important; background-color: #137333 !important; color: white !important; padding: 8px !important; font-size: 14px !important; height: 38px !important; border: none !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; box-shadow: 0 4px 8px rgba(19,115,51,0.2) !important; margin-top: 0 !important; }
+    .btn-salvar:hover { background-color: #0b5123 !important; }
+    
+    .btn-voltar-menu { flex: 1 !important; background-color: #5f6368 !important; color: white !important; padding: 8px !important; font-size: 14px !important; height: 38px !important; border: none !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important; transition: background 0.2s !important; display: block !important; margin: 0 !important; box-sizing: border-box !important; text-align: center; line-height: 22px; }
+    .btn-voltar-menu:hover { background-color: #3c4043 !important; }
+    
+    .secao-titulo { font-size: 11px !important; font-weight: 800; color: #ffffff !important; background-color: #1a73e8 !important; margin: 4px 0 3px 0; padding: 2px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; border: none !important; width: 100%; box-sizing: border-box; }
+    
+    .secao-busca, .cartao-resultado { display: block; background-color: #fdfaf4 !important; padding: 6px 12px; border: 2px solid #000000 !important; border-radius: 12px !important; box-sizing: border-box; }
+    .secao-busca { margin: 6px 12px 4px 12px; position: relative; }
+    .cartao-resultado { margin: 0 12px 6px 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: none; }
+    
+    #statusMaster { margin-top: 4px; text-align: center; font-size: 12px; font-weight: bold; padding: 4px; border-radius: 4px; }
+    .sucesso { color: #137333; background-color: #e6f4ea; border: 1px solid #b7e1cd; }
+    .erro { color: #c5221f; background-color: #fce8e6; border: 1px solid #fad2cf; }
+
+    .lista-sugestoes-autocomplete { position: absolute; top: 100%; left: 0; width: 100%; background-color: #ffffff !important; border: 2px solid #000000; border-radius: 0 0 8px 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 999999 !important; max-height: 200px !important; overflow-y: auto; margin: 1px 0 0 0; padding: 0; list-style: none; display: none; box-sizing: border-box; }
+    .lista-sugestoes-autocomplete li { padding: 6px 12px; font-weight: bold; font-size: 13px; color: #202124; cursor: pointer; border-bottom: 1px solid #f1f3f4; text-transform: uppercase; background-color: #ffffff !important; }
+    .lista-sugestoes-autocomplete li:hover, .lista-sugestoes-autocomplete li.selecionado { background-color: #e8f0fe !important; color: #1a73e8 !important; }
+  </style>
+</head>
+<body>
+
+  <!-- 🔎 GAVETA DE PESQUISA MASTER -->
+  <div class="secao-busca">
+    <div class="linha-flex">
+      <div class="form-group coluna">
+        <label>🔎 PESQUISAR POR:</label>
+        <select id='masFiltro' onchange="INTERFACE_MASTER_ajustarPlaceholder(this.value)">
+          <option value='nome'>👤 NOME COMPLETO DO PACIENTE</option>
+          <option value='carteira'>📇 NÚMERO DA CARTEIRA</option>
+          <option value='CPF'>💳 NÚMERO DO CPF</option>
+          <option value='id'>🆔 NÚMERO DO ID EXCLUSIVO</option>
+        </select>
+      </div>
+      <div class="form-group coluna" style="flex: 2; position: relative;">
+        <label>🔎 TERMO DE BUSCA MASTER:</label>
+        <input type="text" id="masTermo" placeholder="Digite no mínimo 5 letras..." autocomplete="off" oninput="INTERFACE_MASTER_interceptarTeclado(this)" onkeyup="LAB_monitorarTecladoMas(event)">
+        <ul id="listaSugestoesMasDrop" class="lista-sugestoes-autocomplete"></ul>
+      </div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <button type="button" class="btn-busca" onclick="SISTEMA_MASTER_buscarMestre()">🔍 Buscar Master</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="statusMaster"></div>
+
+  <!-- FORMULÁRIO DE EDIÇÃO MASTER -->
+  <form id="formMasterReal" class="cartao-resultado" autocomplete="off">
+    <input type="hidden" id="masLinhaFisica">
+
+    <div class='secao-titulo' style="margin-top: 0;">📇 Edição Master - Dados Cadastrais</div>
+    
+    <div class="linha-flex">
+      <div class="form-group col-mas-data"><label>📅 DATA (DD/MM/AAAA)</label><input type='text' id='masA' onblur="VALIDAR_MASCARA_data(this)"></div>
+      <div class="form-group coluna"><label>👤 NOME COMPLETO</label><input type='text' id='masB' oninput="this.value = this.value.toUpperCase();"></div>
+      <div class="form-group col-mas-cpf"><label>💳 CPF</label><input type='text' id='masCPF' maxlength="14" oninput="VALIDAR_MASCARA_cpf(this)" onblur="VALIDAR_ESTRITA_cpf(this)"></div>
+      <div class="form-group col-mas-carteira"><label>📇 CARTEIRA</label><input type='text' id='masC' maxlength="16" onblur="VALIDAR_MASCARA_carteira(this)"></div>
+      <div class="form-group col-mas-ddd"><label>📞 DDD</label><input type='text' id='masD' maxlength="2" onblur="VALIDAR_MASCARA_ddd(this)" style="text-align: center;"></div>
+      <div class="form-group col-mas-fone"><label>📱 TELEFONE</label><input type='text' id='masE' maxlength="9" onblur="VALIDAR_MASCARA_telefone(this)"></div>
+      <div class="form-group col-mas-id"><label>🆔 ID EXCLUSIVO 🔒</label><input type='text' id='masW' readonly style="text-align: center; background-color: #e8eaed !important;"></div>
+    </div>
+
+    <div class='secao-titulo'>🩺 Informações Clínicas e Administrativas</div>
+    <div class="linha-flex">
+      <div class="form-group coluna">
+        <label>🩺 ESPECIALIDADE</label>
+        <select id='masF'><option value="">-- Selecione --</option><option value="CARDIOLOGIA">CARDIOLOGIA</option><option value="ORTOPEDIA">ORTOPEDIA</option><option value="PEDIATRIA">PEDIATRIA</option><option value="NEUROLOGIA">NEUROLOGIA</option><option value="OFTALMOLOGIA">OFTALMOLOGIA</option><option value="GINECOLOGIA">GINECOLOGIA</option><option value="DERMATOLOGIA">DERMATOLOGIA</option><option value="ENDOCRINOLOGIA">ENDOCRINOLOGIA</option><option value="GASTROENTEROLOGIA">GASTROENTEROLOGIA</option><option value="UROLOGIA">UROLOGIA</option><option value="PSIQUIATRIA">PSIQUIATRIA</option><option value="REUMATOLOGIA">REUMATOLOGIA</option><option value="GERIATRIA">GERIATRIA</option><option value="ONCOLOGIA">ONCOLOGIA</option><option value="NEFROLOGIA">NEFROLOGIA</option><option value="PNEUMOLOGIA">PNEUMOLOGIA</option><option value="INFECTOLOGIA">INFECTOLOGIA</option><option value="OTORRINOLARINGOLOGIA">OTORRINOLARINGOLOGIA</option><option value="CIRURGIA GERAL">CIRURGIA GERAL</option><option value="VASCULAR">VASCULAR</option></select>
+      </div>
+      <div class="form-group coluna">
+        <label>🚨 PRIORIDADE</label>
+        <select id='masG'><option value="">-- Selecione --</option><option value="NORMAL">NORMAL</option><option value="URGENTE">URGENTE</option><option value="EMERGÊNCIA">EMERGÊNCIA</option><option value="PREFERENCIAL">PREFERENCIAL</option></select>
+      </div>
+      <div class="form-group coluna">
+        <label>📋 TIPO ATENDIMENTO</label>
+        <select id='masH'><option value="">-- Selecione --</option><option value="CONSULTA">CONSULTA</option><option value="EXAME">EXAME</option><option value="CIRURGIA">CIRURGIA</option><option value="RETORNO">RETORNO</option></select>
+      </div>
+      <div class="form-group coluna">
+        <label>🚩 SITUAÇÃO CASO</label>
+        <select id='masI'><option value="">-- Selecione --</option><option value="PENDENTE">PENDENTE</option><option value="EM ANDAMENTO">EM ANDAMENTO</option><option value="CONCLUÍDO">CONCLUÍDO</option><option value="CANCELADO">CANCELADO</option></select>
+      </div>
+      <div class="form-group col-mas-status">
+        <label>⚡ STATUS ATUAL</label>
+        <select id='masJ'><option value="">-- Selecione --</option><option value="AGENDADO">AGENDADO</option><option value="ENCERRADO">ENCERRADO</option><option value="AGUARDANDO CONTATO">AGUARDANDO CONTATO</option><option value="EM BUSCA">EM BUSCA</option></select>
+      </div>
+    </div>
+
+    <!-- 🎯 SEÇÃO MASTER: EDIÇÃO DOS DADOS DE AGENDAMENTO -->
+    <div class='secao-titulo' style="background-color: #137333 !important;">🎯 Edição Master - Dados do Agendamento</div>
+    <div class="linha-flex" style="margin-bottom: 4px;">
+      <div class="form-group coluna">
+        <label>📅 Data da Consulta</label>
+        <input type='text' id='masDataAgendamento' placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off" oninput="INTERFACE_mascaraDataMaster(this)" onblur="COMP_validarDataMasterInstantanea(this)">
+      </div>
+      <div class="form-group coluna">
+        <label>⏰ Horário da Consulta (HH:MM)</label>
+        <input type='text' id='masHoraAgendamento' placeholder="HH:MM" maxlength="5" autocomplete="off" oninput="INTERFACE_mascaraHoraMaster(this)" onblur="COMP_validarHoraMasterInstantanea(this)">
+      </div>
+      <div class="form-group coluna" style="flex: 2;">
+        <label>🩺 Profissional / Especialista</label>
+        <select id='masProfissionalAgendamento'>
+          <option value=''>-- Selecione o Profissional --</option>
+        </select>
+      </div>
+    </div>
+
+    <div class='secao-titulo'>✍️ Gestão Master do Histórico de Buscas e Auditoria</div>
+    
+    <div class="linha-flex" style="margin-bottom: 4px;">
+      <div class="form-group col-mas-busca-seletor">
+        <label>🔎 BUSCA 1</label>
+        <select id='masK'><option value="">-- Em Branco --</option><option value="CAIXA POSTAL">CAIXA POSTAL</option><option value="Nº INVÁLIDO/BLOQUEADO 2">Nº BLOQUEADO 2</option><option value="Nº INCORRETO - TERCEIRO DESCONHECE">Nº INCORRETO - TERCEIRO DESCONHECE</option><option value="SEM SUCESSO - 3ª TENTATIVA">SEM SUCESSO - 3ª TENTATIVA</option><option value="EXITO">EXITO</option></select>
+      </div>
+      <div class="form-group col-mas-busca-data"><label>📅 DATA/HORA BUSCA 1</label><input type='text' id='masL'></div>
+      <div class="form-group col-mas-busca-operador"><label>👥 OPERADOR 1</label><input type='text' id='masM'></div>
+    </div>
+
+    <div class="linha-flex" style="margin-bottom: 4px;">
+      <div class="form-group col-mas-busca-seletor">
+        <label>🛠️ BUSCA 2</label>
+        <select id='masN'><option value="">-- Em Branco --</option><option value="CAIXA POSTAL">CAIXA POSTAL</option><option value="Nº INVÁLIDO/BLOQUEADO 2">Nº BLOQUEADO 2</option><option value="Nº INCORRETO - TERCEIRO DESCONHECE">Nº INCORRETO - TERCEIRO DESCONHECE</option><option value="SEM SUCESSO - 3ª TENTATIVA">SEM SUCESSO - 3ª TENTATIVA</option><option value="EXITO">EXITO</option></select>
+      </div>
+      <div class="form-group col-mas-busca-data"><label>🕒 DATA/HORA BUSCA 2</label><input type='text' id='masO'></div>
+      <div class="form-group col-mas-busca-operador"><label>👥 OPERADOR 2</label><input type='text' id='masP'></div>
+    </div>
+
+    <div class="linha-flex" style="margin-bottom: 4px;">
+      <div class="form-group col-mas-busca-seletor">
+        <label>🔎 BUSCA 3</label>
+        <select id='masQ'><option value="">-- Em Branco --</option><option value="CAIXA POSTAL">CAIXA POSTAL</option><option value="Nº INVÁLIDO/BLOQUEADO 2">Nº BLOQUEADO 2</option><option value="Nº INCORRETO - TERCEIRO DESCONHECE">Nº INCORRETO - TERCEIRO DESCONHECE</option><option value="SEM SUCESSO - 3ª TENTATIVA">SEM SUCESSO - 3ª TENTATIVA</option><option value="EXITO">EXITO</option></select>
+      </div>
+      <div class="form-group col-mas-busca-data"><label>📅 DATA/HORA BUSCA 3</label><input type='text' id='masR'></div>
+      <div class="form-group col-mas-busca-operador"><label>👥 OPERADOR 3</label><input type='text' id='masS'></div>
+    </div>
+
+    <div class='secao-titulo'>📑 Observações Gerais Administrativas</div>
+    <div class="form-group" style="width: 100%; margin-bottom: 4px;"><input type='text' id='masT' autocomplete="off" oninput="this.value = this.value.toUpperCase();"></div>
+
+    <div class="grupo-botoes-rodape" style="margin-top: 8px;">
+      <button type="button" class="btn-voltar-menu" onclick="SISTEMA_MASTER_voltarMenu()">↩️ Menu Principal (Voltar)</button>
+      <button type="button" class="btn-salvar" onclick="MASTER_salvarDadosGerais()">💾 Gravar Alterações Master</button>
+    </div>
+  </form>
+
+  <script>
+    var INDICE_SELECIONADO_KEYBOARD = -1;
+    var bloqueandoLoopBlurMas = false;
+
+    async function MASTER_carregarProfissionais() {
+      try {
+        const req = await fetch('/api/profissionais');
+        const res = await req.json();
+        if (res.sucesso && res.dados) {
+          var sel = document.getElementById('masProfissionalAgendamento');
+          if (sel) {
+            var html = '<option value="">-- Selecione o Profissional --</option>';
+            res.dados.forEach(function(p) {
+              var nomeProf = p.nome || '';
+              var espProf = p.especialidade ? ' - ' + p.especialidade : '';
+              var textoOpcao = (nomeProf + espProf).toUpperCase();
+              html += '<option value="' + textoOpcao + '">' + textoOpcao + '</option>';
+            });
+            sel.innerHTML = html;
+          }
+        }
+      } catch (err) {
+        console.error("Erro ao carregar profissionais no Master:", err);
+      }
+    }
+
+    function INTERFACE_mascaraDataMaster(campo) {
+      var v = campo.value.replace(/[^0-9]/g, "");
+      if (v.length > 2 && v.length <= 4) {
+        campo.value = v.substring(0,2) + "/" + v.substring(2);
+      } else if (v.length > 4) {
+        campo.value = v.substring(0,2) + "/" + v.substring(2,4) + "/" + v.substring(4,8);
+      } else {
+        campo.value = v;
+      }
+    }
+
+    function INTERFACE_mascaraHoraMaster(campo) {
+      var v = campo.value.replace(/[^0-9]/g, "");
+      if (v.length > 2) {
+        campo.value = v.substring(0,2) + ":" + v.substring(2,4);
+      } else {
+        campo.value = v;
+      }
+    }
+
+    function COMP_validarDataMasterInstantanea(campo) {
+      if (bloqueandoLoopBlurMas) return;
+      var status = document.getElementById('statusMaster');
+      var val = campo.value.trim();
+      var v = val.replace(/[^0-9]/g, "");
+
+      if (v.length === 0) return;
+
+      if (v.length === 8) {
+        var dia = parseInt(v.substring(0,2), 10);
+        var mes = parseInt(v.substring(2,4), 10);
+        var ano = parseInt(v.substring(4,8), 10);
+
+        if (mes < 1 || mes > 12 || dia < 1 || dia > 31) {
+          bloqueandoLoopBlurMas = true;
+          campo.classList.add("campo-erro");
+          if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ Data incorreta ou dia/mês inválido.'; }
+          alert('⚠️ Data incorreta ou dia/mês inválido.');
+          setTimeout(function() { campo.value = ''; campo.focus(); bloqueandoLoopBlurMas = false; }, 100);
+          return;
+        }
+
+        var dataInformada = new Date(ano, mes - 1, dia);
+        var hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+
+        if (dataInformada < hoje) {
+          bloqueandoLoopBlurMas = true;
+          campo.classList.add("campo-erro");
+          if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ A Data do Agendamento deve ser maior ou igual à data atual!'; }
+          alert('⚠️ A Data do Agendamento deve ser maior ou igual à data atual!');
+          setTimeout(function() { campo.value = ''; campo.focus(); bloqueandoLoopBlurMas = false; }, 100);
+        } else {
+          campo.value = v.substring(0,2) + "/" + v.substring(2,4) + "/" + v.substring(4,8);
+          campo.classList.remove("campo-erro");
+          if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+        }
+      } else {
+        bloqueandoLoopBlurMas = true;
+        campo.classList.add("campo-erro");
+        if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ Digite a data completa com 8 números (DD/MM/AAAA).'; }
+        setTimeout(function() { campo.focus(); bloqueandoLoopBlurMas = false; }, 100);
+      }
+    }
+
+    function COMP_validarHoraMasterInstantanea(campo) {
+      if (bloqueandoLoopBlurMas) return;
+      var status = document.getElementById('statusMaster');
+      var val = campo.value.trim();
+      var regexHora = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+      if (val === '') return;
+
+      if (!regexHora.test(val)) {
+        bloqueandoLoopBlurMas = true;
+        campo.classList.add("campo-erro");
+        if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ Horário inválido! Use o formato HH:MM (ex: 08:30).'; }
+        alert('⚠️ Horário inválido! Use o formato HH:MM.');
+        setTimeout(function() { campo.value = ''; campo.focus(); bloqueandoLoopBlurMas = false; }, 100);
+      } else {
+        campo.classList.remove("campo-erro");
+        if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+      }
+    }
+
+    async function LAB_monitorarTecladoMas(event) {
+      var filtro = document.getElementById("masFiltro").value;
+      var termo = document.getElementById("masTermo").value.trim().toUpperCase();
+      var list = document.getElementById("listaSugestoesMasDrop");
+      if (filtro !== "nome" && filtro !== "NOME COMPLETO DO PACIENTE") { LAB_fecharDropdownSugestoesMas(); return; }
+      var itens = list.getElementsByTagName("li");
+      
+      if (event.key === "ArrowDown") {
+        event.preventDefault(); INDICE_SELECIONADO_KEYBOARD++;
+        if (INDICE_SELECIONADO_KEYBOARD >= itens.length) INDICE_SELECIONADO_KEYBOARD = 0;
+        LAB_destacarItemDropdownMas(itens); return;
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault(); INDICE_SELECIONADO_KEYBOARD--;
+        if (INDICE_SELECIONADO_KEYBOARD < 0) INDICE_SELECIONADO_KEYBOARD = itens.length - 1;
+        LAB_destacarItemDropdownMas(itens); return;
+      } else if (event.key === "Enter") {
+        event.preventDefault();
+        if (INDICE_SELECIONADO_KEYBOARD > -1 && itens[INDICE_SELECIONADO_KEYBOARD]) { 
+          LAB_selecionarNomeDropdownMas(itens[INDICE_SELECIONADO_KEYBOARD].innerText);
+        } else { SISTEMA_MASTER_buscarMestre(); } return;
+      } else if (event.key === "Escape") { LAB_fecharDropdownSugestoesMas(); return; }
+
+      INDICE_SELECIONADO_KEYBOARD = -1;
+      if (termo.length < 5) { LAB_fecharDropdownSugestoesMas(); return; }
+
+      try {
+        const req = await fetch('/api/pacientes/sugestoes?termo=' + encodeURIComponent(termo));
+        const res = await req.json();
+        if (!res.sucesso || !res.sugestoes || res.sugestoes.length === 0) { LAB_fecharDropdownSugestoesMas(); return; }
+
+        var htmlDrop = "";
+        res.sugestoes.forEach(function(nome) {
+          htmlDrop += '<li onmousedown="LAB_selecionarNomeDropdownMas(\'' + nome.replace(/'/g, "\\'") + '\')">' + nome + '</li>';
+        });
+        list.innerHTML = htmlDrop; list.style.display = "block";
+      } catch(err) {
+        console.error("Erro no autocomplete Master:", err);
+      }
+    }
+
+    function LAB_destacarItemDropdownMas(itens) {
+      for (var i = 0; i < itens.length; i++) {
+        if (i === INDICE_SELECIONADO_KEYBOARD) itens[i].classList.add("selecionado");
+        else itens[i].classList.remove("selecionado");
+      }
+    }
+
+    function LAB_selecionarNomeDropdownMas(nome) {
+      document.getElementById("masTermo").value = nome;
+      LAB_fecharDropdownSugestoesMas(); SISTEMA_MASTER_buscarMestre(); 
+    }
+
+    function LAB_fecharDropdownSugestoesMas() {
+      var list = document.getElementById("listaSugestoesMasDrop");
+      if (list) { list.style.display = "none"; list.innerHTML = ""; }
+      INDICE_SELECIONADO_KEYBOARD = -1;
+    }
+
+    document.addEventListener("mousedown", function(e) {
+      var list = document.getElementById("listaSugestoesMasDrop");
+      if (e.target !== document.getElementById("masTermo") && e.target !== list && e.target.tagName !== "LI") LAB_fecharDropdownSugestoesMas();
+    });
+
+    function VALIDAR_MASCARA_data(campo) {
+      var v = campo.value.replace(/[^0-9]/g, "");
+      if (v.length === 8) { campo.value = v.substring(0,2) + "/" + v.substring(2,4) + "/" + v.substring(4,8); campo.classList.remove("campo-erro"); }
+      else if (v.length > 0 && v.length !== 8 && campo.value.indexOf("/") === -1) { campo.classList.add("campo-erro"); alert("⚠️ Formato de data inválido! Digite os 8 números corridos (Ex: 04092026)."); }
+      else if (campo.value.length === 10) { campo.classList.remove("campo-erro"); }
+    }
+
+    function VALIDAR_MASCARA_cpf(campo) {
+      var v = campo.value.replace(/[^0-9]/g, "");
+      if (v.length > 3 && v.length <= 6) campo.value = v.substring(0,3) + "." + v.substring(3);
+      else if (v.length > 6 && v.length <= 9) campo.value = v.substring(0,3) + "." + v.substring(3,6) + "." + v.substring(6);
+      else if (v.length > 9) campo.value = v.substring(0,3) + "." + v.substring(3,6) + "." + v.substring(6,9) + "-" + v.substring(9,11);
+    }
+
+    function VALIDAR_ESTRITA_cpf(campo) { var numBrutos = campo.value.replace(/[^0-9]/g, ""); if (numBrutos.length > 0 && numBrutos.length !== 11) { campo.classList.add("campo-erro"); alert("⚠️ CPF incorreto! O documento exige exatamente 11 números."); } else { campo.classList.remove("campo-erro"); } }
+    
+    function VALIDAR_MASCARA_carteira(campo) { var v = campo.value.replace(/[^0-9]/g, ""); if (v.length > 0 && (v.length < 14 || v.length > 16)) { campo.classList.add("campo-erro"); alert("⚠️ A carteira exige entre 14 e 16 dígitos!"); } else { campo.classList.remove("campo-erro"); } }
+    
+    function VALIDAR_MASCARA_ddd(campo) { var v = campo.value.replace(/[^0-9]/g, ""); if (v.length > 0 && v.length !== 2) { campo.classList.add("campo-erro"); alert("⚠️ O DDD exige exatamente 2 números!"); } else { campo.classList.remove("campo-erro"); } }
+    function VALIDAR_MASCARA_telefone(campo) { var v = campo.value.replace(/[^0-9]/g, ""); if (v.length > 0 && v.length !== 9 && v.length !== 8) { campo.classList.add("campo-erro"); alert("⚠️ O telefone exige 8 ou 9 números!"); } else { campo.classList.remove("campo-erro"); } }
+
+    async function SISTEMA_MASTER_buscarMestre() {
+      var status = document.getElementById('statusMaster'); 
+      var termoOriginal = document.getElementById('masTermo').value.trim();
+      var filtroOriginal = document.getElementById('masFiltro').value.trim();
+      
+      if (!termoOriginal) { if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ Insira o termo para pesquisa master.'; } return; }
+
+      if ((filtroOriginal === "nome" || filtroOriginal === "NOME COMPLETO DO PACIENTE") && termoOriginal.length < 5) {
+        if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ Erro: A pesquisa por nome exige no mínimo 5 letras.'; } return;
+      }
+
+      if (status) { status.style.display = 'block'; status.className = ''; status.innerHTML = '⚙️ Consultando Supabase (Master)...'; }
+      document.getElementById('formMasterReal').style.display = 'none';
+
+      // 🩺 Garante que a lista de profissionais está carregada
+      await MASTER_carregarProfissionais();
+
+      var termoEnvio = termoOriginal;
+      if (filtroOriginal === "CPF" || filtroOriginal === "carteira" || filtroOriginal === "NÚMERO DO CPF" || filtroOriginal === "NÚMERO DA CARTEIRA") { 
+        var digitosPuros = termoOriginal.replace(/[^0-9]/g, "");
+        termoEnvio = (filtroOriginal === "carteira" || filtroOriginal === "NÚMERO DA CARTEIRA") ? digitosPuros.toString().padStart(16, '0') : digitosPuros;
+      }
+
+      var filtroServidor = filtroOriginal;
+      if (filtroOriginal === "nome" || filtroOriginal === "NOME COMPLETO DO PACIENTE") { filtroServidor = "nome"; } 
+      else if (filtroOriginal === "carteira" || filtroOriginal === "NÚMERO DA CARTEIRA") { filtroServidor = "carteira"; } 
+      else if (filtroOriginal === "CPF" || filtroOriginal === "NÚMERO DO CPF") { filtroServidor = "CPF"; } 
+      else if (filtroOriginal === "id" || filtroOriginal === "NÚMERO DO ID EXCLUSIVO") { filtroServidor = "id"; }
+
+      try {
+        const req = await fetch('/api/pacientes/busca-completa?filtro=' + encodeURIComponent(filtroServidor) + '&termo=' + encodeURIComponent(termoEnvio));
+        const res = await req.json();
+        MASTER_tratarRetornoBusca(res);
+      } catch(err) {
+        MASTER_tratarErro(err);
+      }
+    }
+
+    function MASTER_tratarRetornoBusca(res) {
+      var status = document.getElementById('statusMaster');
+      if(res && res.sucesso && res.dados) {
+        var d = res.dados;
+        if (status) status.style.display = 'none';
+        
+        document.getElementById('masA').classList.remove("campo-erro");
+        if(document.getElementById('masCPF')) document.getElementById('masCPF').classList.remove("campo-erro");
+        document.getElementById('masC').classList.remove("campo-erro");
+        document.getElementById('masD').classList.remove("campo-erro");
+        document.getElementById('masE').classList.remove("campo-erro");
+
+        document.getElementById('masA').value = d.data_cadastro || "";
+        document.getElementById('masB').value = d.nome || "";
+        if(document.getElementById('masCPF')) document.getElementById('masCPF').value = d.cpf || "";
+        document.getElementById('masC').value = d.carteira || "";
+        document.getElementById('masD').value = d.ddd || "";
+        document.getElementById('masE').value = d.telefone || "";
+        document.getElementById('masW').value = d.id || "";
+        document.getElementById('masT').value = d.observacao || "";
+        document.getElementById('masLinhaFisica').value = d.id || "";
+
+        // 🎯 PREENCHIMENTO DOS CAMPOS DE AGENDAMENTO NO MASTER
+        document.getElementById('masDataAgendamento').value = d.data_agendamento || "";
+        document.getElementById('masHoraAgendamento').value = d.hora_agendamento || "";
+        
+        var selectProfMas = document.getElementById('masProfissionalAgendamento');
+        if (selectProfMas && d.profissional) {
+          var profSalvoMas = d.profissional.trim().toUpperCase();
+          selectProfMas.value = profSalvoMas;
+          if (selectProfMas.value === "") {
+            for (var ip = 0; ip < selectProfMas.options.length; ip++) {
+              if (selectProfMas.options[ip].text.includes(profSalvoMas) || profSalvoMas.includes(selectProfMas.options[ip].text)) {
+                selectProfMas.selectedIndex = ip;
+                break;
+              }
+            }
+          }
+        }
+
+       var sincronizarSelectMaster = function(idSelect, valorPlanilha) {
+          var sel = document.getElementById(idSelect);
+          var v = String(valorPlanilha || "").toUpperCase().trim();
+          if(sel && v) {
+            var existe = Array.from(sel.options).some(function(opt) {
+              return opt.value.toUpperCase() === v;
+            });
+            if (!existe) {
+              var novaOpt = document.createElement("option");
+              novaOpt.value = v;
+              novaOpt.text = v;
+              sel.appendChild(novaOpt);
+            }
+            sel.value = v;
+          }
+        };
+        sincronizarSelectMaster('masJ', d.status_atendimento);
+        sincronizarSelectMaster('masF', d.especialidade);
+        sincronizarSelectMaster('masG', d.prioridade);
+        sincronizarSelectMaster('masH', d.tipo);
+        sincronizarSelectMaster('masI', d.situacao);
+        sincronizarSelectMaster('masK', d.busca1);
+        sincronizarSelectMaster('masN', d.busca2);
+        sincronizarSelectMaster('masQ', d.busca3);
+
+        document.getElementById('masL').value = d.data_busca1 || d.usuario1 || ""; 
+        document.getElementById('masM').value = d.auditor1 || "";             
+        document.getElementById('masO').value = d.data_busca2 || d.usuario2 || ""; 
+        document.getElementById('masP').value = d.auditor2 || "";             
+        document.getElementById('masR').value = d.data_busca3 || d.usuario3 || ""; 
+        document.getElementById('masS').value = d.auditor3 || "";             
+        document.getElementById('formMasterReal').style.display = 'block';
+      } else {
+        if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = "⚠️ Registro não localizado nos arquivos operacionais."; }
+        document.getElementById("formMasterReal").reset();
+      }
+    }
+
+    function MASTER_tratarErro(err) { 
+      var status = document.getElementById('statusMaster'); 
+      if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = 'Erro de Conexão Master: ' + err.message; } 
+    }
+
+    document.addEventListener("DOMContentLoaded", function() { 
+      var f = document.getElementById('formMasterReal'); 
+      if(f) { f.addEventListener('submit', function(e) { e.preventDefault(); }); } 
+      MASTER_carregarProfissionais();
+    });
+    
+    function SISTEMA_MASTER_voltarMenu() {
+      var f = document.getElementById('formMasterReal');
+      if (f) { f.reset(); f.style.display = 'none'; }
+      var status = document.getElementById('statusMaster');
+      if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+      var termo = document.getElementById('masTermo');
+      if (termo) termo.value = '';
+    }
+
+    async function MASTER_salvarDadosGerais() {
+      var status = document.getElementById('statusMaster');
+      var idPaciente = document.getElementById('masLinhaFisica').value;
+      if(!idPaciente) { if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = 'Pesquise e carregue um registro primeiro.'; } return; }
+      
+      var dataCamp = document.getElementById('masA'); 
+      var cpfCamp = document.getElementById('masCPF');
+      var cartCamp = document.getElementById('masC'); 
+      var dddCamp = document.getElementById('masD'); 
+      var foneCamp = document.getElementById('masE');
+      var cpfNumeros = cpfCamp ? cpfCamp.value.replace(/[^0-9]/g, '') : '';
+      var carteiraNumeros = cartCamp.value.replace(/[^0-9]/g, '');
+
+      var esp = document.getElementById('masF').value;
+      var pri = document.getElementById('masG').value;
+      var tip = document.getElementById('masH').value;
+      var sit = document.getElementById('masI').value;
+      var sta = document.getElementById('masJ').value;
+
+      var dataAgMas = document.getElementById('masDataAgendamento').value.trim();
+      var horaAgMas = document.getElementById('masHoraAgendamento').value.trim();
+      var profAgMas = document.getElementById('masProfissionalAgendamento').value;
+
+      if(dataCamp.classList.contains("campo-erro") || dataCamp.value.length < 10) { if (status) { status.style.display='block'; status.className='erro'; status.innerHTML='⚠️ Corrija o campo DATA antes de salvar.'; } dataCamp.focus(); return; }
+      if(cpfCamp && (cpfCamp.classList.contains("campo-erro") || cpfNumeros.length !== 11)) { if (status) { status.style.display='block'; status.className='erro'; status.innerHTML='⚠️ Corrija o campo CPF (Exatamente 11 dígitos) antes de salvar.'; } cpfCamp.focus(); return; }
+      if(cartCamp.classList.contains("campo-erro") || carteiraNumeros.length < 14 || carteiraNumeros.length > 16) { if (status) { status.style.display='block'; status.className='erro'; status.innerHTML='⚠️ A CARTEIRA precisa ter entre 14 e 16 números.'; } cartCamp.focus(); return; }
+      if(dddCamp.classList.contains("campo-erro") || dddCamp.value.replace(/[^0-9]/g, '').length !== 2) { if (status) { status.style.display='block'; status.className='erro'; status.innerHTML='⚠️ O DDD precisa ter exatamente 2 números.'; } dddCamp.focus(); return; }
+      if(foneCamp.classList.contains("campo-erro") || foneCamp.value.length < 8) { if (status) { status.style.display='block'; status.className='erro'; status.innerHTML='⚠️ Corrija o campo TELEFONE antes de salvar.'; } foneCamp.focus(); return; }
+
+      if(!esp || !pri || !tip || !sit || !sta) {
+        if (status) { 
+          status.style.display='block'; 
+          status.className='erro'; 
+          status.innerHTML='⚠️ Falha de Auditoria: Selecione uma opção válida em todos os menus suspensos (Especialidade, Prioridade, Tipo, Situação e Status).'; 
+        } 
+        return; 
+      }
+
+      var valK = document.getElementById('masK').value; 
+      var valN = document.getElementById('masN').value; 
+      var valQ = document.getElementById('masQ').value;
+      if (valK.indexOf("BRANCO") !== -1 || valK.indexOf("--") !== -1) valK = "";
+      if (valN.indexOf("BRANCO") !== -1 || valN.indexOf("--") !== -1) valN = "";
+      if (valQ.indexOf("BRANCO") !== -1 || valQ.indexOf("--") !== -1) valQ = "";
+
+      var carteiraFormatada16 = carteiraNumeros.toString().padStart(16, '0');
+
+      var payload = {
+        id: idPaciente,
+        colA: dataCamp.value, 
+        colB: document.getElementById('masB') ? document.getElementById('masB').value : '',
+        colC: carteiraFormatada16, 
+        colD: dddCamp.value.replace(/[^0-9]/g, ''), 
+        colE: foneCamp.value.replace(/[^0-9]/g, ''),
+        colF: esp, colG: pri, colH: tip, colI: sit, colJ: sta,
+        colK: valK, colL: document.getElementById('masL').value, colM: document.getElementById('masM').value,
+        colN: valN, colO: document.getElementById('masO').value, colP: document.getElementById('masP').value,
+        colQ: valQ, colR: document.getElementById('masR').value, colS: document.getElementById('masS').value,
+        colT: document.getElementById('masT').value, 
+        colX: cpfCamp ? cpfCamp.value : "",
+        dataAgendamento: dataAgMas,
+        horaAgendamento: horaAgMas,
+        profissional: profAgMas
+      };
+
+      if (status) { status.style.display = 'block'; status.className = ''; status.innerHTML = '👑 Gravando alterações Master no Supabase...'; }
+      
+      try {
+        const req = await fetch('/api/pacientes/salvar-master', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const res = await req.json();
+
+        if (res.sucesso) {
+          MASTER_finalizarSalvamento(res.mensagem);
+        } else {
+          if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ Erro ao salvar: ' + res.mensagem; }
+        }
+      } catch(err) {
+        if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '❌ Falha de conexão ao gravar: ' + err.message; }
+      }
+    }
+
+    function MASTER_finalizarSalvamento(resposta) {
+      var s = document.getElementById("statusMaster"); 
+      if (s) { s.style.display = 'block'; s.className = "sucesso"; s.innerHTML = resposta || "Alterações administrativas gravadas com sucesso!"; }
+      var formulario = document.getElementById("formMasterReal"); 
+      if (formulario) { formulario.reset(); formulario.style.display = 'none'; }
+      if (document.getElementById('masTermo')) document.getElementById('masTermo').value = '';
+      if (document.getElementById('masLinhaFisica')) document.getElementById('masLinhaFisica').value = '';
+      setTimeout(function() { if (s) { s.style.display = 'none'; s.innerHTML = ''; } }, 4000);
+    }
+
+    function INTERFACE_MASTER_interceptarTeclado(campo) {
+      var filtro = document.getElementById("masFiltro").value;
+      if (filtro === "CPF" || filtro === "NÚMERO DO CPF") {
+        var v = campo.value.replace(/[^0-9]/g, "");
+        if (v.length > 3 && v.length <= 6) campo.value = v.substring(0,3) + "." + v.substring(3);
+        else if (v.length > 6 && v.length <= 9) campo.value = v.substring(0,3) + "." + v.substring(3,6) + "." + v.substring(6);
+        else if (v.length > 9) campo.value = v.substring(0,3) + "." + v.substring(3,6) + "." + v.substring(6,9) + "-" + v.substring(9,11);
+      } else if (filtro !== "id" && filtro !== "carteira") {
+        campo.value = campo.value.toUpperCase();
+      }
+    }
+
+    function INTERFACE_MASTER_ajustarPlaceholder(vF) {
+      var txt = document.getElementById("masTermo"); 
+      if (!txt) return;
+      txt.value = ""; 
+      if (typeof LAB_fecharDropdownSugestoesMas === "function") LAB_fecharDropdownSugestoesMas();
+      
+      if (vF === "CPF" || vF === "NÚMERO DO CPF") { txt.placeholder = "000.000.000-00"; txt.maxLength = 14; } 
+      else if (vF === "carteira" || vF === "NÚMERO DA CARTEIRA") { txt.placeholder = "Digite entre 14 e 16 números..."; txt.maxLength = 16; } 
+      else if (vF === "id" || vF === "NÚMERO DO ID EXCLUSIVO") { txt.placeholder = "Digite o ID Exclusivo..."; txt.maxLength = 50; } 
+      else { txt.placeholder = "Digite no mínimo 5 letras para buscar..."; txt.removeAttribute("maxlength"); }
+    }
+  </script>
+</body>
+</html>

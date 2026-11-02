@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target='_top'>
+  <style>
+    body { 
+      font-family: 'Segoe UI', sans-serif; 
+      padding: 0 !important; 
+      margin: 0 !important; 
+      background-color: #e8f0fe !important; 
+      color: #202124; 
+      font-size: 12px; 
+      box-sizing: border-box; 
+      overflow-x: hidden !important; 
+      overflow-y: auto !important;   
+    }
+
+    .form-group { margin-bottom: 3px; display: flex; flex-direction: column; }
+    label { display: block; margin-bottom: 2px; font-weight: 800 !important; font-size: 11px !important; color: #ff0000 !important; text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    input, select { width: 100% !important; padding: 2px 10px !important; border: 2px solid #000000 !important; border-radius: 8px !important; box-sizing: border-box !important; font-size: 14px !important; font-weight: bold !important; outline: none !important; background-color: #ffffff !important; color: #000000 !important; height: 34px !important; transition: all 0.15s ease-in-out !important; }
+    input[disabled], select[disabled], input[readonly] { background-color: #e9ecef !important; color: #202124 !important; cursor: not-allowed; border: 2px solid #000000 !important; }
+    
+    input:focus, select:focus { border-color: #ff0000 !important; background-color: #e9ecef !important; color: #000000 !important; outline: none !important; box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.15) !important; }
+
+    .linha-flex { 
+      display: flex !important; 
+      gap: 8px; 
+      width: 100%; 
+      box-sizing: border-box; 
+      align-items: flex-end; 
+      flex-wrap: wrap !important; 
+    }
+
+    .coluna { flex: 1 1 180px !important; min-width: 140px !important; }
+    .col-data             { flex: 1 1 110px !important; min-width: 95px !important; }
+    .col-alfa-cpf         { flex: 1 1 140px !important; min-width: 125px !important; } 
+    .col-carteira         { flex: 1 1 160px !important; min-width: 135px !important; } 
+    .col-ddd              { flex: 1 1 55px !important;  min-width: 50px !important; }
+    .col-fone             { flex: 1 1 115px !important; min-width: 105px !important; }
+    .col-id               { flex: 1 1 160px !important; min-width: 130px !important; }
+    .col-status           { flex: 2 1 240px !important; min-width: 180px !important; }
+    
+    .col-con-busca-val    { flex: 1 1 180px !important; min-width: 140px !important; }
+    .col-con-busca-aud    { flex: 2 1 200px !important; min-width: 150px !important; } 
+    
+    .secao-titulo { font-size: 11px !important; font-weight: 800; color: #ffffff !important; background-color: #1a73e8 !important; margin: 4px 0 3px 0; padding: 2px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; border: none !important; width: 100%; box-sizing: border-box; }
+    
+    .secao-walldrop { background-color: #fdfaf4 !important; padding: 6px 12px; border-radius: 12px !important; margin: 4px 12px 3px 12px; border: 2px solid #000000 !important; box-sizing: border-box; }
+    .cartao-resultado { background-color: #fdfaf4 !important; border: 2px solid #000000 !important; padding: 6px 12px; margin: 0 12px 4px 12px; border-radius: 12px !important; box-shadow: 0 4px 12px rgba(0,0,0,0.05); box-sizing: border-box; display: none; }
+    
+    .grupo-botoes-rodape { display: flex !important; gap: 12px !important; margin-top: 6px !important; width: 100% !important; box-sizing: border-box !important; align-items: center !important; flex-wrap: wrap !important; }
+    .grupo-botoes-rodape button { min-width: 180px; }
+    
+    .btn-voltar-menu { flex: 1 !important; background-color: #5f6368 !important; color: white !important; padding: 6px !important; font-size: 14px !important; height: 38px !important; border: none !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important; transition: background 0.2s !important; display: block !important; margin: 0 !important; box-sizing: border-box !important; text-align: center; line-height: 22px; }
+    .btn-voltar-menu:hover { background-color: #3c4043 !important; }
+    
+    #statusAlfabetico { margin-top: 2px; text-align: center; font-size: 11px; font-weight: bold; padding: 4px; border-radius: 4px; display: none; }
+    .sucesso { color: #137333; background-color: #e6f4ea; border: 1px solid #b7e1cd; }
+    .erro { color: #c5221f; background-color: #fce8e6; border: 1px solid #fad2cf; }
+    
+    .input-filtro-busca { background-color: #ffffff !important; border: 2px solid #000000 !important; margin-bottom: 2px; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+
+  <div class="secao-walldrop">
+    <div class="form-group">
+      <label>🔍 Digite o começo do nome para filtrar:</label>
+      <input type="text" id="txtFiltroNomePreco" class="input-filtro-busca" placeholder="Ex: MARIA..." oninput="this.value = this.value.toUpperCase(); ALFA_filtrarNomesEmTempoReal(this.value)">
+    </div>
+
+    <div class="form-group" style="margin-bottom: 0;">
+      <label>👉 Selecione o Paciente Cadastrado (Ordem Alfabética):</label>
+      <select id="dropNomesAlfabetico" onchange="ALFA_carregarDadosPaciente(this.value)" style="background-color: white;">
+        <option value="">📥 Aguardando conexão com o servidor...</option>
+      </select>
+    </div>
+  </div>
+  
+  <div id="statusAlfabetico"></div>
+
+  <!-- Painel de Leitura Pura -->
+  <form id="painelDadosAlfa" class="cartao-resultado" autocomplete="off">
+    <div class='secao-titulo' style="margin-top: 0;">Dados Cadastrais Básicos</div>
+    <div class="linha-flex">
+      <div class="form-group coluna"><label>👤 NOME COMPLETO</label><input type='text' id='alfaB' readonly></div>
+      <div class="form-group col-data"><label>📅 DATA SOLICITAÇÃO</label><input type='text' id='alfaA' readonly></div>
+      <div class="form-group col-alfa-cpf"><label>💳 CPF DO PACIENTE</label><input type='text' id='alfaCPF' readonly style="color: #1a73e8 !important; background-color: #e8f0fe !important;"></div>
+      <div class="form-group col-carteira"><label>📇 NÚMERO DA CARTEIRA</label><input type='text' id='alfaC' readonly></div>
+      <div class="form-group col-ddd"><label>📞 DDD</label><input type='text' id='alfaD' readonly style="text-align: center;"></div>
+      <div class="form-group col-fone"><label>📱 TELEFONE</label><input type='text' id='alfaE' readonly></div>
+      <div class="form-group col-id"><label>🆔 ID EXCLUSIVO 🔒</label><input type='text' id='alfaW' readonly style="text-align: center; background-color: #e8eaed !important;"></div>
+    </div>
+    
+    <div class='secao-titulo'>🩺 Informações Clínicas e de Atendimento</div>
+    <div class="linha-flex">
+      <div class="form-group coluna"><label>🩺 ESPECIALIDADE</label><input type='text' id='alfaF' readonly></div>
+      <div class="form-group coluna"><label>🚨 PRIORIDADE</label><input type='text' id='alfaG' readonly></div>
+      <div class="form-group coluna"><label>📋 TIPO DE ATENDIMENTO</label><input type='text' id='alfaH' readonly></div>
+      <div class="form-group coluna"><label>⚡ SITUAÇÃO DO CASO</label><input type='text' id='alfaI' readonly></div>
+      <div class="form-group col-status"><label>🚩 STATUS ATUAL</label><input type='text' id='alfaJ' readonly style="color:#137333 !important; background-color:#e6f4ea !important; text-align: center;"></div>
+    </div>
+
+    <div class='secao-titulo'>✍️ Histórico de Buscas e Auditoria</div>
+    
+    <div class="linha-flex" style="margin-bottom: 3px;">
+      <div class="form-group col-con-busca-val"><label>🔎 BUSCA 1</label><input type='text' id='alfaK' readonly></div>
+      <div class="form-group col-con-busca-aud"><label>📅 DATA/HORA E OPERADOR - BUSCA 1</label><input type='text' id='alfaL' readonly></div>
+    </div>
+    
+    <div class="linha-flex" style="margin-bottom: 3px;">
+      <div class="form-group col-con-busca-val"><label>🔎 BUSCA 2</label><input type='text' id='alfaN' readonly></div>
+      <div class="form-group col-con-busca-aud"><label>🕒 DATA/HORA E OPERADOR - BUSCA 2</label><input type='text' id='alfaO' readonly></div>
+    </div>
+    
+    <div class="linha-flex" style="margin-bottom: 3px;">
+      <div class="form-group col-con-busca-val"><label>🔎 BUSCA 3</label><input type='text' id='alfaQ' readonly></div>
+      <div class="form-group col-con-busca-aud"><label>👥 DATA/HORA E OPERADOR - BUSCA 3</label><input type='text' id='alfaR' readonly></div>
+    </div>
+
+    <!-- 🎯 NOVA SEÇÃO: DADOS DO AGENDAMENTO (SOMENTE LEITURA) -->
+    <div class='secao-titulo' style="background-color: #137333 !important;">🎯 Dados do Agendamento (Êxito Registrado)</div>
+    <div class="linha-flex" style="margin-bottom: 3px;">
+      <div class="form-group coluna"><label>📅 Data da Consulta</label><input type='text' id='alfaDataAgendamento' readonly style="text-align: center;"></div>
+      <div class="form-group coluna"><label>⏰ Horário da Consulta</label><input type='text' id='alfaHoraAgendamento' readonly style="text-align: center;"></div>
+      <div class="form-group coluna" style="flex: 2;"><label>🩺 Profissional / Especialista</label><input type='text' id='alfaProfissionalAgendamento' readonly></div>
+    </div>
+
+    <div class='secao-titulo'>📑 Observações Gerais Administrativas</div>
+    <div class="form-group" style="width: 100%; margin-bottom: 0;"><input type='text' id='alfaT' readonly></div>
+
+    <div class="grupo-botoes-rodape" style="margin-top: 6px;">
+      <button type="button" class="btn-voltar-menu" style="width: 100% !important; flex: none !important;" onclick="ALFA_executarBotaoVoltarMestre()">↩️ Menu Principal (Voltar)</button>
+    </div>
+  </form>
+
+  <script>
+    window.ARRAY_GLOBAL_PACIENTES = [];
+
+    // 🚀 Execução imediata e segura para carregamentos dinâmicos de tela
+    (function() {
+      setTimeout(function() {
+        ALFA_puxarListaNomesServidor();
+      }, 300);
+    })();
+
+    async function ALFA_puxarListaNomesServidor() {
+      var drop = document.getElementById("dropNomesAlfabetico");
+      if(drop) { drop.innerHTML = '<option value="">Carregando banco de dados de A-Z...</option>'; }
+      
+      try {
+        const req = await fetch('/api/pacientes/todos-nomes');
+        const res = await req.json();
+        
+        if (res.sucesso && res.dados) {
+          window.ARRAY_GLOBAL_PACIENTES = res.dados;
+          ALFA_renderizarDropFiltrado(window.ARRAY_GLOBAL_PACIENTES);
+        } else {
+          if(drop) drop.innerHTML = '<option value="">Nenhum registro encontrado.</option>';
+        }
+      } catch(e) {
+        var d = document.getElementById("dropNomesAlfabetico");
+        if(d) { d.innerHTML = '<option value="">Erro ao carregar lista de nomes.</option>'; }
+        console.error("Falha ao puxar nomes:", e);
+      }
+    }
+
+    function ALFA_filtrarNomesEmTempoReal(textoDigitado) {
+      var termo = textoDigitado.trim().toUpperCase();
+      var dadosOriginais = window.ARRAY_GLOBAL_PACIENTES;
+      
+      if (termo === "") {
+        ALFA_renderizarDropFiltrado(dadosOriginais);
+        return;
+      }
+      
+      var dadosFiltrados = dadosOriginais.filter(function(paciente) {
+        var n = paciente.nome || "";
+        return n.toUpperCase().includes(termo);
+      });
+      
+      ALFA_renderizarDropFiltrado(dadosFiltrados);
+    }
+
+    function ALFA_renderizarDropFiltrado(listaParaExibir) {
+      var d = document.getElementById("dropNomesAlfabetico");
+      if(!d) return;
+      
+      d.innerHTML = '<option value="">-- Selecione o Paciente da Lista (' + listaParaExibir.length + ' encontrados) --</option>';
+      
+      if(listaParaExibir && listaParaExibir.length > 0) {
+        for (var i = 0; i < listaParaExibir.length; i++) {
+          var opt = document.createElement("option");
+          opt.value = listaParaExibir[i].id;
+          
+          var nomeVisual = listaParaExibir[i].nome || "SEM NOME";
+          var carteiraVisual = listaParaExibir[i].carteira || "SEM CARTEIRA";
+          var idVisual = listaParaExibir[i].id || "SEM ID";
+          var espVisual = listaParaExibir[i].especialidade || "SEM ESPECIALIDADE";
+          
+          opt.text = nomeVisual + " | CARTEIRA: " + carteiraVisual + " | " + espVisual + " | " + idVisual;
+          d.appendChild(opt);
+        }
+      } else {
+        d.innerHTML = '<option value="">Nenhum paciente inicia com esse termo.</option>';
+      }
+    }
+
+    async function ALFA_carregarDadosPaciente(idPaciente) {
+      var painel = document.getElementById("painelDadosAlfa");
+      var status = document.getElementById("statusAlfabetico");
+      if(!idPaciente) { painel.style.display = "none"; status.style.display = "none"; return; }
+      
+      status.style.display = "block"; status.className = ""; status.innerHTML = "🗂️ Buscando prontuário e histórico no Supabase...";
+      
+      try {
+        const req = await fetch('/api/pacientes/busca-completa?filtro=id&termo=' + encodeURIComponent(idPaciente));
+        const res = await req.json();
+
+        if(res.sucesso && res.dados) {
+          status.style.display = "block";
+          status.className = "sucesso";
+          status.innerHTML = "🎯 Prontuário alfabético carregado com sucesso!";
+          painel.style.display = "block";
+          
+          var d = res.dados;
+          document.getElementById('alfaA').value = d.data_cadastro || "";
+          document.getElementById('alfaB').value = d.nome || "";
+          document.getElementById('alfaC').value = d.carteira || "";
+          document.getElementById('alfaD').value = d.ddd || "";
+          document.getElementById('alfaE').value = d.telefone || "";
+          document.getElementById('alfaCPF').value = d.cpf || "-";
+          
+          document.getElementById('alfaF').value = d.especialidade || "";
+          document.getElementById('alfaG').value = d.prioridade || "";
+          document.getElementById('alfaH').value = d.tipo || "";
+          document.getElementById('alfaI').value = d.situacao || "";
+          document.getElementById('alfaJ').value = d.status_atendimento || "";
+          
+          document.getElementById('alfaK').value = d.busca1 || "";
+          document.getElementById('alfaL').value = (d.data_busca1 ? d.data_busca1 + ' - ' : '') + (d.auditor1 || '');
+          
+          document.getElementById('alfaN').value = d.busca2 || "";
+          document.getElementById('alfaO').value = (d.data_busca2 ? d.data_busca2 + ' - ' : '') + (d.auditor2 || '');
+          
+          document.getElementById('alfaQ').value = d.busca3 || "";
+          document.getElementById('alfaR').value = (d.data_busca3 ? d.data_busca3 + ' - ' : '') + (d.auditor3 || '');
+          
+          // 🎯 PREENCHIMENTO DOS CAMPOS DE AGENDAMENTO NA CONSULTA ALFABÉTICA
+          document.getElementById('alfaDataAgendamento').value = d.data_agendamento || "";
+          document.getElementById('alfaHoraAgendamento').value = d.hora_agendamento || "";
+          document.getElementById('alfaProfissionalAgendamento').value = d.profissional || "";
+
+          document.getElementById('alfaT').value = d.observacao || "";
+          document.getElementById('alfaW').value = d.id || "";
+
+          setTimeout(function() {
+            if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+          }, 4000);
+
+        } else {
+          status.className = "erro"; status.innerHTML = res.mensagem || "Erro ao carregar prontuário.";
+          painel.style.display = "none";
+        }
+      } catch(err) {
+        status.className = "erro"; status.innerHTML = "Erro de conexão: " + err.message;
+        painel.style.display = "none";
+      }
+    }
+
+    function ALFA_executarBotaoVoltarMestre() {
+      var painel = document.getElementById("painelDadosAlfa");
+      if (painel) {
+        painel.style.display = "none";
+        var inputs = painel.querySelectorAll("input");
+        inputs.forEach(function(i) { i.value = ""; });
+      }
+      var status = document.getElementById("statusAlfabetico");
+      if (status) { status.style.display = "none"; status.innerHTML = ""; }
+      var filtroTexto = document.getElementById("txtFiltroNomePreco");
+      if (filtroTexto) { filtroTexto.value = ""; }
+      var dropNomes = document.getElementById("dropNomesAlfabetico");
+      if (dropNomes) { dropNomes.selectedIndex = 0; }
+      if (typeof window.ARRAY_GLOBAL_PACIENTES !== "undefined" && window.ARRAY_GLOBAL_PACIENTES.length > 0) {
+        ALFA_renderizarDropFiltrado(window.ARRAY_GLOBAL_PACIENTES);
+      }
+    }
+  </script>
+</body>
+</html>

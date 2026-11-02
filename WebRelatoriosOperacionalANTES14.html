@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target='_top'>
+  
+<style>
+    /* 🎯 ESTABILIDADE UNIVERSAL: Zerado e fluido para a barra lateral preta nunca mais se mover */
+    body { font-family: 'Segoe UI', sans-serif; padding: 0 !important; margin: 0 !important; background-color: #e8f0fe !important; color: #202124; font-size: 12px; overflow-y: auto !important; height: auto !important; box-sizing: border-box; }
+
+    /* 📦 CONTAINER DE FILTROS: Fundo BEGE AREIA NOBRE COUGAR idêntico ao WebGraficos */
+    .caixa-central-relatorio, .caixa-central-filtros, form { 
+      background: #eaddca !important; 
+      border: 2px solid #000000 !important; 
+      padding: 6px 12px 10px 12px !important; 
+      margin: 4px 15px !important; 
+      border-radius: 8px !important; 
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important; 
+    }
+    
+    /* 🔥 FORÇA A BARRA DE FERRAMENTAS EM LINHA ÚNICA HORIZONTAL */
+    .barra-ferramentas, .barra-filtros-graficos { 
+      display: flex !important; 
+      flex-direction: row !important; 
+      flex-wrap: nowrap !important;  
+      gap: 6px !important; 
+      align-items: flex-end !important; 
+      width: 100% !important; 
+      box-sizing: border-box !important; 
+    }
+    
+    .form-group, .form-group-grafico { 
+      flex: 1 !important; 
+      min-width: 0 !important; 
+      display: flex !important; 
+      flex-direction: column !important; 
+      margin: 0 !important;
+    }
+
+    br { display: none !important; }
+    
+    label { 
+      font-size: 9px !important; 
+      font-weight: 900 !important; 
+      color: #0044ff !important; 
+      text-transform: uppercase !important; 
+      margin-bottom: 2px !important; 
+      letter-spacing: -0.2px !important; 
+      display: block !important;
+      white-space: nowrap !important; 
+    }
+
+    select, input, .barra-ferramentas select { 
+      height: 28px !important; 
+      padding: 2px 6px !important; 
+      border: 2px solid #000000 !important; 
+      border-radius: 6px !important; 
+      font-weight: bold !important; 
+      font-size: 11px !important; 
+      background-color: #fdfaf4 !important; 
+      color: #000000 !important; 
+      box-sizing: border-box !important; 
+      transition: all 0.2s !important; 
+      width: 100% !important;
+    }
+    select:focus, input:focus { border-color: #ff0000 !important; background-color: #f7f0e4 !important; outline: none !important; }
+    
+    select option { 
+      background-color: #fff9c4 !important; 
+      color: #000000 !important; 
+      font-weight: bold !important; 
+    }
+    
+    .grid-indicadores-bi { 
+      display: grid !important; 
+      grid-template-columns: repeat(5, 1fr) !important; 
+      gap: 6px !important; 
+      margin: 4px 15px 2px 15px !important; 
+    }
+    
+    .card-indicador { 
+      background: #f1f3f4 !important; 
+      border: 2px solid #000000 !important; 
+      border-radius: 6px !important; 
+      padding: 3px 6px !important; 
+      text-align: center !important; 
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; 
+      border-top: 4px solid #1a73e8 !important; 
+    }
+    .card-indicador.busca { border-top-color: #e65100 !important; }
+    .card-indicador.agendado { border-top-color: #1e8449 !important; }
+    .card-indicador.aguarda { border-top-color: #2f80ed !important; }
+    .card-indicador.encerrado { border-top-color: #7928ca !important; }
+    
+    .card-indicador h3 { margin: 0 !important; font-size: 16px !important; font-weight: 800 !important; color: #202124 !important; }
+    .card-indicador p { margin: 0 !important; font-size: 9px !important; font-weight: bold !important; color: #5f6368 !important; text-transform: uppercase !important; }
+    
+    .grid-bi-cards, .card-cont { display: none !important; }
+
+    .linha-botoes-relatorio {
+      display: flex !important;
+      justify-content: space-between !important; 
+      align-items: center !important;
+      width: 100% !important;
+      margin-top: 10px !important;
+      flex-direction: row !important;
+    }
+    .bloco-exportacoes-direita { display: flex !important; gap: 6px !important; align-items: center !important; }
+
+    button, .btn-atualizar-indicadores { height: 28px !important; padding: 0 12px !important; border: 2px solid #000000 !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; font-size: 11px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important; color: white !important; }
+    .btn-blue { background-color: #1a73e8 !important; } .btn-blue:hover { background-color: #1557b0 !important; }
+    .btn-csv { background-color: #137333 !important; } .btn-csv:hover { background-color: #0b5123 !important; }
+    .btn-excel { background-color: #0f9d58 !important; } .btn-excel:hover { background-color: #0b7843 !important; }
+    .btn-pdf-rel { background-color: #c5221f !important; } .btn-pdf-rel:hover { background-color: #9e1c1a !important; }
+
+    .area-visualizacao-tabela { display: none; }
+
+    .area-visualizacao-tabela table, table { width: calc(100% - 30px) !important; margin: 15px !important; border-collapse: collapse !important; border: 2px solid #000000 !important; font-size: 11px !important; }
+    table th { background-color: #000000 !important; color: #ffffff !important; font-weight: bold !important; padding: 6px 10px !important; border: 1px solid #334155 !important; text-transform: uppercase !important; }
+    table td { padding: 6px 10px !important; border: 1px solid #cbd5e1 !important; font-weight: 600 !important; background-color: #fdfaf4 !important; color: #000000 !important; }
+    table tr:nth-child(even) td { background-color: #f4eee1 !important; }
+
+    .container-resumo-quadrados, #boxQuadradosBI {
+      display: grid !important;
+      grid-template-columns: repeat(5, 1fr) !important;
+      gap: 8px !important;
+      margin: 10px 15px !important;
+      width: calc(100% - 30px) !important;
+      box-sizing: border-box !important;
+    }
+
+    .bloco-categoria-card {
+      background-color: #f4eee1 !important;
+      border: 2px solid #000000 !important;
+      border-radius: 8px !important;
+      padding: 10px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      box-shadow: inset 0 0 6px rgba(0,0,0,0.02), 0 4px 6px rgba(0,0,0,0.06) !important;
+    }
+
+    .bloco-categoria-card h3 {
+      margin: 0 0 10px 0 !important;
+      font-size: 11px !important;
+      text-transform: uppercase !important;
+      color: #b22222 !important;
+      font-weight: 900 !important;
+      text-align: center !important;
+      width: 100% !important;
+      border-bottom: 2px dashed #000000 !important;
+      padding-bottom: 6px !important;
+      letter-spacing: 0.5px !important;
+    }
+
+    .linha-item-analitica {
+      display: flex !important;
+      flex-direction: row !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      width: 100% !important;
+      margin-bottom: 5px !important;
+      border-bottom: 1px dashed #cbd5e1 !important;
+      padding-bottom: 3px !important;
+    }
+
+    .linha-item-analitica > span {
+      color: #000000 !important;
+      font-weight: 800 !important;
+      font-size: 11px !important;
+    }
+
+    .linha-item-analitica .metricas {
+      display: flex !important;
+      flex-direction: row !important;
+      gap: 6px !important;
+      font-weight: 800 !important;
+      color: #000000 !important;
+    }
+
+    .linha-item-analitica .metricas .pct {
+      color: #1a73e8 !important;
+      font-size: 11px !important;
+      font-weight: bold !important;
+    }
+
+    .rodape-total-card {
+      display: flex !important;
+      justify-content: space-between !important;
+      font-weight: 900 !important;
+      color: #000000 !important;
+      border-top: 2px solid #000000 !important;
+      margin-top: auto !important;
+      padding-top: 5px !important;
+      text-transform: uppercase !important;
+      font-size: 11px !important;
+    }
+
+    @media print {
+      @page {
+        size: landscape !important;
+        margin: 0mm !important; 
+      }
+
+      div[style*="position: fixed"], 
+      div[style*="position:fixed"], 
+      [style*="background-color: rgb(197, 34, 31)"], 
+      [style*="background-color:#c5221f"], 
+      .sessao-expira, 
+      #timerSessao,
+      .barra-topo,
+      #buscaNomeCronologia, .no-print,
+      div[style*="top: 0"],
+      div[style*="bottom: 0"] {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0px !important;
+        width: 0px !important;
+        margin: 0px !important;
+        padding: 0px !important;
+      }
+
+      .barra-ferramentas, button, .btn-atualizar-indicadores, .bloco-exportacoes-direita, 
+      #txtStatusBI, #rotuloVersaoPainel, .janela-modal-overlay, .container-filtros {
+        display: none !important;
+        visibility: hidden !important;
+      }
+      
+      body, html, .conteudo-principal, #boxQuadradosBI, .container-resumo-quadrados, .area-visualizacao-tabela, #wrapperTabelaPadrao, table {
+        background-color: #ffffff !important;
+        margin: 0px !important;
+        padding: 0px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
+        left: 0px !important;
+        margin-left: 0px !important; 
+        right: 0px !important;
+        position: relative !important;
+        display: block !important;
+        float: none !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      table {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-collapse: collapse !important;
+        display: table !important;
+      }
+      th, td {
+        padding: 6px 4px !important;
+      }
+      
+      #boxQuadradosBI, .container-resumo-quadrados {
+        display: block !important;
+        white-space: nowrap !important;
+        width: 100% !important;
+        margin-top: 10px !important;
+        padding: 10mm !important; 
+      }
+      
+      .bloco-categoria-card {
+        display: inline-block !important;
+        background-color: #f4eee1 !important;
+        border: 2px solid #000000 !important;
+        border-radius: 8px !important;
+        padding: 8px !important;
+        width: 17.8% !important; 
+        margin-right: 1.0% !important;
+        vertical-align: top !important;
+        white-space: normal !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        box-sizing: border-box !important;
+      }
+
+      .linha-item-analitica {
+        display: block !important;
+        clear: both !important;
+        margin-bottom: 5px !important;
+      }
+      .linha-item-analitica > span { float: left !important; color: #000000 !important; font-weight: bold !important; }
+      .linha-item-analitica .metricas { float: right !important; color: #000000 !important; }
+    }
+
+    .painel-kanban-buscas, #boxPainelKanbanBI {
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 15px !important;
+      margin: 15px !important;
+      width: calc(100% - 30px) !important;
+      box-sizing: border-box !important;
+      align-items: start !important;
+    }
+
+    .coluna-kanban-estilizada {
+      background-color: #f1f3f4 !important;
+      border: 2px solid #7f8c8d !important;
+      border-radius: 8px !important;
+      padding: 10px !important;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.04) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      min-height: 450px !important;
+    }
+
+    .coluna-kanban-estilizada h4 {
+      background-color: #202124 !important;
+      color: #ffffff !important;
+      margin: -10px -10px 10px -10px !important;
+      padding: 8px 10px !important;
+      font-size: 11px !important;
+      font-weight: bold !important;
+      text-transform: uppercase !important;
+      text-align: center !important;
+      border-top-left-radius: 6px !important;
+      border-top-right-radius: 6px !important;
+      border-bottom: 2px solid #000000 !important;
+      letter-spacing: 0.5px !important;
+    }
+
+    .coluna-kanban-estilizada:nth-child(1) { border-color: #1a73e8 !important; }
+    .coluna-kanban-estilizada:nth-child(2) { border-color: #e65100 !important; }
+    .coluna-kanban-estilizada:nth-child(3) { border-color: #1e8449 !important; }
+
+    .card-paciente-kanban {
+      background-color: #ffffff !important;
+      border: 1px solid #dadce0 !important;
+      border-radius: 6px !important;
+      padding: 12px !important;
+      margin-bottom: 10px !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+      text-align: left !important;
+      transition: transform 0.2s, box-shadow 0.2s !important;
+    }
+    .card-paciente-kanban:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+    }
+
+    .card-paciente-kanban h5 {
+      margin: 0 0 8px 0 !important;
+      font-size: 12px !important;
+      color: #000000 !important;
+      font-weight: 800 !important;
+      text-transform: uppercase !important;
+      border-bottom: 1px dashed #dadce0 !important;
+      padding-bottom: 4px !important;
+    }
+
+    .card-paciente-kanban p {
+      margin: 0 0 4px 0 !important;
+      font-size: 11px !important;
+      line-height: 14px !important;
+      color: #5f6368 !important;
+    }
+    .card-paciente-kanban p b {
+      color: #202124 !important;
+    }
+
+    #wrapperTabelaPadrao table thead th,
+    .conteudo-sanfona-tabela table thead th {
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 100 !important;
+      box-shadow: inset 0 -1px 0 #dadce0;
+    }
+
+    #wrapperTabelaPadrao, .conteudo-sanfona-tabela {
+      overflow-y: auto !important;
+      max-height: 480px !important;
+    }
+
+    #txtStatusBI {
+      background-color: transparent !important;
+      transition: opacity 0.3s ease-in-out;
+    }
+    #txtStatusBI:empty {
+      visibility: hidden;
+    }
+</style>
+</head>
+<body>
+
+  <div class="grid-indicadores-bi">
+    <div class="card-indicador">
+      <h3 id="lblRelTotal">0</h3>
+      <p>Total Casos</p>
+    </div>
+    <div class="card-indicador busca">
+      <h3 id="lblRelBusca">0</h3>
+      <p>Em Busca</p>
+    </div>
+    <div class="card-indicador agendado">
+      <h3 id="lblRelAgendado">0</h3>
+      <p>Agendados</p>
+    </div>
+    <div class="card-indicador aguarda">
+      <h3 id="lblRelAguardar">0</h3>
+      <p>Aguardar Agenda</p>
+    </div>
+    <div class="card-indicador encerrado">
+      <h3 id="lblRelEncerrado">0</h3>
+      <p>Encerrados</p>
+    </div>
+  </div>
+
+  <div class="grid-bi-cards">
+    <div class="card-cont"><h3 id="lblTotal">0</h3><p>Total Filtrado</p></div>
+    <div class="card-cont busca"><h3 id="lblBusca">0</h3><p>Em Busca</p></div>
+    <div class="card-cont agendado"><h3 id="lblAgendado">0</h3><p>Agendados</p></div>
+    <div class="card-cont aguarda"><h3 id="lblAguarda">0</h3><p>Aguardando Agenda</p></div>
+    <div class="card-cont encerrado"><h3 id="lblEncerrado">0</h3><p>Encerrados</p></div>
+  </div>
+
+  <div class="caixa-central-relatorio">
+    <div class="barra-ferramentas">
+      <div class="form-group" style="min-width: 220px;">
+        <label>Selecionar Sub-Relatório</label>
+        <select id="repSubRelatorio">
+          <option value="geral">📊 1. RELATÓRIO GERAL DA BASE</option>
+          <option value="urgencias">🚨 2. ATENDIMENTOS DE URGÊNCIA</option>
+          <option value="pendentes">⏳ 3. PACIENTES FILA ATIVA (PENDENTES)</option>
+          <option value="concluidos">✅ 4. CASOS FINALIZADOS (CONCLUÍDOS)</option>
+          <option value="endo_ped">🩺 5. EXCLUSIVO ENDO PED.</option>
+          <option value="modelo_ficha">📄 9. MODELO FICHA DE ATENDIMENTO POR CLIQUE (A-Z)</option>
+          <option value="tempo_espera">⏳ 12. EXTRATOR POR TEMPO DE ESPERA E ALERTA CRITICIDADE</option>
+          <option value="cronologia_buscas">⏱️ 13. AUDITORIA CRONOLÓGICA DE ENTRADA DE BUSCAS</option>
+          <option value="produtividade_equipe">👥 14. PRODUTIVIDADE DA EQUIPE</option>
+        </select>
+      </div>
+      <div class="form-group" style="min-width: 75px;"><label>Mês</label><select id="repMes"><option value="">Todos</option><option value="1">Jan</option><option value="2">Fev</option><option value="3">Mar</option><option value="4">Abr</option><option value="5">Mai</option><option value="6">Jun</option><option value="7">Jul</option><option value="8">Ago</option><option value="9">Set</option><option value="10">Out</option><option value="11">Nov</option><option value="12">Dez</option></select></div>
+      <div class="form-group" style="min-width: 70px;"><label>Ano</label><select id="repAno"><option value="">Todos</option><option value="2025">2025</option><option value="2026">2026</option></select></div>
+      <div class="form-group">
+        <label>Prioridade</label>
+        <select id="repPrioridade"><option value="">Todos</option><option value="NORMAL">NORMAL</option><option value="ACIMA DE 60">ACIMA DE 60</option><option value="ACIMA DE 80">ACIMA DE 80</option><option value="ESPECIAIS">ESPECIAIS</option></select>
+      </div>
+      <div class="form-group">
+        <label>Status Atual</label>
+        <select id="repStatus"><option value="">Todos</option><option value="AGUARDAR AGENDA">AGUARDAR AGENDA</option><option value="EM BUSCA">EM BUSCA</option><option value="AGENDADO">AGENDADO</option><option value="ENCERRADO">ENCERRADO</option></select>
+      </div>
+      <div class="form-group">
+        <label>Especialidade</label>
+        <select id="repEspecialidade"><option value="">Todas</option><option value="ENDO GERAL">ENDO GERAL</option><option value="ENDO PED.">ENDO PED.</option><option value="TIREOIDE">TIREOIDE</option><option value="OUTROS">OUTROS</option></select>
+      </div>
+      <div class="form-group">
+        <label>Tipo de Atendimento</label>
+        <select id="repTipo"><option value="">Todos</option><option value="1ª CONSULTA">1ª CONSULTA</option><option value="RETORNO/MUDANÇA DE MÉDICO">RETORNO/MUDANÇA DE MÉDICO</option></select>
+      </div>
+      <div class="form-group">
+        <label>Situação do Caso</label>
+        <select id="repSituacao"><option value="">Todos</option><option value="ELETIVA">ELETIVA</option><option value="URGENCIA">URGENCIA</option></select>
+      </div>
+    </div>
+
+    <div class="linha-botoes-relatorio" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+      <button type="button" class="btn-atualizar-indicadores btn-blue" onclick="BI_processarPainelRelatorios()">🔍 Pesquisar Relatório</button>
+      <div id="txtStatusBI" style="flex: 1; text-align: center; font-size: 12px; font-weight: bold; color: #b22222; margin: 0 10px; padding: 4px; border-radius: 4px; min-height: 18px; line-height: 18px;"></div>
+      <div class="bloco-exportacoes-direita" style="display: flex; gap: 5px;">
+        <button type="button" class="btn-atualizar-indicadores btn-csv" onclick="BI_baixarCSVExcel()">📄 Exportar CSV</button>
+        <button type="button" class="btn-atualizar-indicadores btn-excel" onclick="BI_baixarXLSExcelReal()">📊 Exportar Excel</button>
+        <button type="button" class="btn-atualizar-indicadores btn-pdf-rel" onclick="BI_baixarPdfNativoServidor()">📕 Gerar PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="boxQuadradosBI" class="container-resumo-quadrados" style="display: none;"></div>
+  <div id="boxSanfonaInterativaBI" style="display: none; width: 100%;"></div>
+  <div id="boxPainelKanbanBI" class="painel-kanban-buscas" style="display: none;"></div>
+ 
+  <div id="boxPainelGraficosBI" style="display: none; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 15px; margin-bottom: 15px; width: 100%; box-sizing: border-box;">
+    <div class="caixa-central-relatorio" style="min-height: 300px;"><div id="graficoPizzaEspera" style="width: 100%; height: 100%;"></div></div>
+    <div class="caixa-central-relatorio" style="min-height: 300px;"><div id="graficoLinhaVolume" style="width: 100%; height: 100%;"></div></div>
+  </div>
+
+  <div class="area-visualizacao-tabela" id="wrapperTabelaPadrao">
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 85px;">Data Solicit.</th>
+          <th style="width: 105px;">ID Exclusivo</th>
+          <th>Nome Completo do Paciente</th>
+          <th style="width: 125px; color: #1a73e8;">CPF do Paciente</th>
+          <th style="width: 100px;">Carteira</th>
+          <th>Especialidade</th>
+          <th style="width: 95px;">Prioridade</th>
+          <th>Tipo Atend.</th>
+          <th>Situação</th>
+          <th style="width: 120px; text-align: center;">Status Atual</th>
+        </tr>
+      </thead>
+      <tbody id="corpoTabelaRelatorios">
+        <tr><td colspan="10" style="text-align: center; color: #5f6368; padding: 15px;">Defina os filtros acima e clique no botão azul 'Pesquisar Relatório' para carregar a exibição na tela.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="janela-modal-overlay" id="popupFichaPaciente" style="display: none;">
+    <div class="janela-modal-corpo" style="width: 520px; max-width: 95%;">
+      <h4 id="fichaNome">FICHA DE ATENDIMENTO</h4>
+      <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 12px; margin-top: 15px; border-bottom: 1px dashed #dadce0; padding-bottom: 10px;">
+        <div class="item-campo-ficha"><strong>Busca 1</strong><span id="fichaB1">-</span></div>
+        <div class="item-campo-ficha"><strong>Data/Hora e Operador (Busca 1)</strong><span id="fichaAud1" style="color: #1a73e8; font-weight: bold;">-</span></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 12px; margin-top: 10px; border-bottom: 1px dashed #dadce0; padding-bottom: 10px;">
+        <div class="item-campo-ficha"><strong>Busca 2</strong><span id="fichaB2">-</span></div>
+        <div class="item-campo-ficha"><strong>Data/Hora e Operador (Busca 2)</strong><span id="fichaAud2" style="color: #1a73e8; font-weight: bold;">-</span></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 12px; margin-top: 10px; border-bottom: 1px dashed #dadce0; padding-bottom: 10px;">
+        <div class="item-campo-ficha"><strong>Busca 3</strong><span id="fichaB3">-</span></div>
+        <div class="item-campo-ficha"><strong>Data/Hora e Operador (Busca 3)</strong><span id="fichaAud3" style="color: #1a73e8; font-weight: bold;">-</span></div>
+      </div>
+      <div class="item-campo-ficha" style="margin-top: 12px;">
+        <strong>Histórico de Observações</strong>
+        <span id="fichaObs" style="color: #5f6368;">-</span>
+      </div>
+      <div style="text-align:right; margin-top:20px;">
+        <button type="button" class="btn-operacao btn-executar" style="background:#202124;" onclick="BI_fecharJanelaModalFicha()">Fechar Ficha</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+    var CACHE_CSV_RAW_PRODUCAO = "";
+    var LISTA_DADOS_MEMORIA = [];
+    var EXTRACAO_TEM_DADOS = false;
+
+    window.addEventListener('load', function() {
+      google.script.run
+        .withSuccessHandler(function(v) { 
+          var el = document.getElementById("rotuloVersaoPainel"); 
+          if(el) el.innerText = v; 
+        })
+        .WEB_PARALELO_obterVersaoAtual();
+    });
+
+    function INTERFACE_alternarSanfonaLocal(id) {
+      var d = document.getElementById(id); 
+      if(d) d.style.display = (d.style.display === "block") ? "none" : "block";
+    }
+
+    function MOTOR_ABRIR_FICHA_9_EXCLUSIVO(chaveUnicaID) {
+      var p = window["paciente_objeto_ficha_" + chaveUnicaID];
+      if (!p) { alert("⚠️ Erro: Registro do paciente não localizado na memória ativa."); return; }
+      
+      var divListaFicha = document.getElementById("areaListaFicha9"); 
+      if (divListaFicha) { divListaFicha.style.display = "none"; }
+      
+      var dt1 = p.dataBusca1 || p.data1 || "-";
+      var us1 = p.user1 || "-";
+      var h1  = dt1 !== "-" ? dt1 + " por " + us1.toUpperCase() : "Não registrado";
+      
+      var dt2 = p.dataBusca2 || p.data2 || "-";
+      var us2 = p.user2 || "-";
+      var h2  = dt2 !== "-" ? dt2 + " por " + us2.toUpperCase() : "Não registrado";
+      
+      var dt3 = p.dataBusca3 || p.data3 || "-";
+      var us3 = p.user3 || "-";
+      var h3  = dt3 !== "-" ? dt3 + " por " + us3.toUpperCase() : "Não registrado";
+      
+      var hFicha = '<div id="bloco_card_ficha_9_real" class="bloco-status-sanfona" style="margin-top:10px; border:2px solid #b22222 !important; width:100% !important; box-sizing:border-box;">' +
+        '<div style="background:#fdfaf4; padding:15px; font-size:11px; line-height:1.6; color:#000000;">' +
+        '<h4 style="margin:0 0 12px 0; color:#b22222; font-size:11px; text-transform:uppercase; border-bottom:1px solid #000; padding-bottom:3px;"><span style="color:#00cc66 !important;">👤</span> DADOS CADASTRAIS DO PACIENTE</h4>' +
+        '<div style="display:table; width:100%; table-layout:fixed; margin-bottom:15px; background:#fdfaf4; padding:10px; border:1px solid #dadce0; border-radius:4px; box-sizing:border-box;">' +
+          '<div style="display:table-row;">' +
+            '<div style="display:table-cell; width:22%;"><div style="font-size:9px; font-weight:900; color:#ff0000;">👤 NOME COMPLETO</div><div style="text-transform: uppercase; font-weight: 800; font-size:11px; padding-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + (p.nome || "-") + '</div></div>' +
+            '<div style="display:table-cell; width:15%;"><div style="font-size:9px; font-weight:900; color:#ff0000;">💳 CPF DO PACIENTE</div><div style="font-weight: 800; font-size:11px; padding-top:2px;">' + (p.CPF || p.cpf || "-") + '</div></div>' +
+            '<div style="display:table-cell; width:15%;"><div style="font-size:9px; font-weight:900; color:#ff0000;">📇 CARTEIRA</div><div style="font-weight: 800; font-size:11px; padding-top:2px;">' + (p.CARTEIRA || p.carteira || "-") + '</div></div>' +
+            '<div style="display:table-cell; width:18%;"><div style="font-size:9px; font-weight:900; color:#ff0000;">🔑 ID EXCLUSIVO</div><div style="font-weight: 800; font-size:11px; padding-top:2px;">' + (p.ID || p.id || "-") + '</div></div>' +
+            '<div style="display:table-cell; width:15%;"><div style="font-size:9px; font-weight:900; color:#ff0000;">📞 DDD / TELEFONE</div><div style="color:#1a73e8; font-weight: 800; font-size:11px; padding-top:2px;">' + (p.telefone || "-") + '</div></div>' +
+            '<div style="display:table-cell; width:15%;"><div style="font-size:9px; font-weight:900; color:#ff0000;">📅 DATA SOLICITAÇÃO</div><div style="font-weight: 800; font-size:11px; padding-top:2px;">' + (p.DATA || p.data || "-") + '</div></div>' +
+          '</div>' +
+        '</div>' +
+        '<h4 style="margin:15px 0 12px 0; color:#b22222; font-size:11px; text-transform:uppercase; border-bottom:1px solid #000; padding-bottom:3px;"><span style="color:#ffcc00 !important;">✚</span> DETALHES DO ATENDIMENTO REQUISITADO</h4>' +
+        '<div style="display:table; width:100%; table-layout:fixed; margin-bottom:15px; background:#fdfaf4; padding:10px; border:1px solid #dadce0; border-radius:4px; box-sizing:border-box;">' +
+          '<div style="display:table-row;">' +
+            '<div style="display:table-cell; width:25%;"><div style="font-size:9px; font-weight:900; color:#ff0000;">🩺 ESPECIALIDADE</div><div style="text-transform: uppercase; font-weight: 800; font-size:11px; padding-top:2px;">' + (p.ESPECIALIDADE || p.especialidade || "-") + '</div></div>' +
+            '<div style="display:table-cell; width:25%;"><div style="font-size:9px; font-weight:900; color:#ff0000;">🚨 PRIORIDADE</div><div style="font-weight: 800; font-size:11px; padding-top:2px;">' + (p["PRIORIDADE DE"] || p.prioridade || "-") + '</div></div>' +
+            '<div style="display:table-cell; width:25%;"><div style="font-size:9px; font-weight:900; color:#ff0000;">📝 SITUAÇÃO</div><div style="text-transform: uppercase; font-weight: 800; font-size:11px; padding-top:2px;">' + (p.SITUAÇÃO || p.SITUAÇAO || p.situacao || "-") + '</div></div>' +
+            '<div style="display:table-cell; width:25%;"><div style="font-size:9px; font-weight:900; color:#ff0000;">📊 STATUS ATUAL</div><div style="text-transform: uppercase; font-weight: 800; font-size:11px; padding-top:2px;">' + (p.STATUS || p.status || "-") + '</div></div>' +
+          '</div>' +
+        '</div>' +
+      '<h4 style="margin: 15px 0 10px 0; color: #b22222; font-size: 13px; text-transform: uppercase; font-weight: 900; border-bottom: 2px solid #000000; padding-bottom: 5px;">☎ Histórico de Monitoramento de Buscas</h4>' +
+      '<div style="margin-bottom: 8px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 6px; font-size: 11px;">' +
+        '<div><b>📞 Busca 1:</b> ' + (p.busca1 || "-") + '</div>' +
+        '<div style="color: #1a73e8; font-weight: bold; margin-top: 2px;"><b>📅 DATA/HORA E OPERADOR - BUSCA 1:</b> ' + h1 + '</div>' +
+      '</div>' +
+      '<div style="margin-bottom: 8px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 6px; font-size: 11px;">' +
+        '<div><b>📞 Busca 2:</b> ' + (p.busca2 || "-") + '</div>' +
+        '<div style="color: #e65100; font-weight: bold; margin-top: 2px;"><b>📅 DATA/HORA E OPERADOR - BUSCA 2:</b> ' + h2 + '</div>' +
+      '</div>' +
+      '<div style="margin-bottom: 12px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 6px; font-size: 11px;">' +
+        '<div><b>📞 Busca 3:</b> ' + (p.busca3 || "-") + '</div>' +
+        '<div style="color: #1e8449; font-weight: bold; margin-top: 2px;"><b>📅 DATA/HORA E OPERADOR - BUSCA 3:</b> ' + h3 + '</div>' +
+      '</div>' +
+      '<p style="font-size: 11px; margin-bottom: 15px; color: #5f6368;"><b>📝 Observações Gerais Administrativas:</b> <br><span style="color:#000000; font-weight:600;">' + (p.obs || "-") + '</span></p>' +
+      '<div id="botaoFichaOcultoPdf" class="no-print" style="text-align: center; margin-top: 20px;" aria-hidden="true">' +
+        '<button type="button" class="no-print" style="height: 28px !important; padding: 0 15px !important; background-color: #c5221f !important; color: #ffffff !important; border: 2px solid #000000 !important; border-radius: 6px !important; font-weight: bold !important; font-size: 11px !important; text-transform: uppercase !important; cursor: pointer !important; box-sizing: border-box !important;" onclick="var el = document.getElementById(\'bloco_card_ficha_9_real\'); if(el) el.parentNode.removeChild(el); var dl = document.getElementById(\'areaListaFicha9\'); if(dl) dl.style.display=\'block\';">❌ FECHAR FICHA</button>' +
+      '</div>' +
+      '</div>';
+
+      var alvoFicha = document.getElementById("container_visualizador_ficha_9") || document.getElementById("boxSanfonaInterativaBI");
+      if (document.getElementById("container_visualizador_ficha_9")) {
+        document.getElementById("container_visualizador_ficha_9").innerHTML = hFicha;
+      } else {
+        var divTemp = document.getElementById("area_ficha_dinamica_9");
+        if (!divTemp) { divTemp = document.createElement("div"); divTemp.id = "area_ficha_dinamica_9"; alvoFicha.appendChild(divTemp); }
+        divTemp.innerHTML = hFicha;
+      }
+    }
+ 
+    function BI_fecharJanelaModalFicha() { document.getElementById("popupFichaPaciente").style.display = "none"; }
+
+    function BI_processarPainelRelatorios() {
+      var cargoSistemaValidador = typeof nivelUser !== "undefined" ? nivelUser : (window.nivelUser || "");
+      var comboRelatorioReal = document.getElementById("repSubRelatorio");
+      
+      if (cargoSistemaValidador === "OPERADOR_MISTO" && comboRelatorioReal && comboRelatorioReal.value === "produtividade_equipe") {
+        if (document.getElementById("wrapperTabelaPadrao")) document.getElementById("wrapperTabelaPadrao").style.display = "none";
+        if (document.getElementById("boxSanfonaInterativaBI")) document.getElementById("boxSanfonaInterativaBI").style.display = "none";
+        if (document.getElementById("boxPainelKanbanBI")) document.getElementById("boxPainelKanbanBI").style.display = "none";
+        if (document.getElementById("boxPainelGraficosBI")) document.getElementById("boxPainelGraficosBI").style.display = "none";
+        if (document.getElementById("boxQuadradosBI")) document.getElementById("boxQuadradosBI").style.display = "none";
+        
+        var caixaStatusSinal = document.getElementById("txtStatusBI");
+        if (caixaStatusSinal) {
+          caixaStatusSinal.style.display = "block";
+          caixaStatusSinal.style.backgroundColor = "#fce8e6";
+          caixaStatusSinal.style.color = "#c5221f";
+          caixaStatusSinal.innerHTML = "❌ ACESSO NEGADO: O perfil OPERADOR MISTO não possui permissão para gerar o Relatório 14.";
+        }
+        return; 
+      }
+
+      var aviso = document.getElementById("txtStatusBI");
+      var subRel = document.getElementById("repSubRelatorio").value;
+
+      var boxQuadrados = document.getElementById("boxQuadradosBI");
+      var boxSanfona = document.getElementById("boxSanfonaInterativaBI");
+      var boxKanban = document.getElementById("boxPainelKanbanBI");
+      var tableArea = document.getElementById("wrapperTabelaPadrao");
+      
+      if(boxQuadrados) { boxQuadrados.innerHTML = ""; boxQuadrados.style.display = "none"; }
+      if(boxSanfona) { boxSanfona.innerHTML = ""; boxSanfona.style.display = "none"; }
+      if(boxKanban) { boxKanban.innerHTML = ""; boxKanban.style.display = "none"; }
+      if(tableArea) { tableArea.style.display = "none"; }
+      
+      if (aviso) {
+        aviso.style.display = "block"; 
+        aviso.style.backgroundColor = "#e8f0fe"; 
+        aviso.style.color = "#1a73e8";
+        aviso.innerHTML = "⏳ Buscando dados no servidor...";
+      }
+      
+      var subRelValue = document.getElementById("repSubRelatorio").value;
+      var subRelFinalServidor = subRelValue;
+      if (subRelValue === "urgencias" || subRelValue === "urgencia" || subRelValue === "geral_urgencias") {
+        subRelFinalServidor = "geral";
+      }
+
+      var filtros = {
+        subRelatorio: subRelFinalServidor,
+        mes: document.getElementById("repMes").value,
+        ano: document.getElementById("repAno").value,
+        prioridade: document.getElementById("repPrioridade").value,
+        status: document.getElementById("repStatus").value,
+        especialidade: document.getElementById("repEspecialidade").value,
+        tipo: document.getElementById("repTipo").value,
+        situacao: document.getElementById("repSituacao").value
+      };
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          var bResidual = document.getElementById("boxFiltroNomeDinamicoExclusivo"); if(bResidual) { bResidual.parentNode.removeChild(bResidual); }
+
+          if(!res.sucesso) { aviso.style.backgroundColor = "#fce8e6"; aviso.style.color = "#c5221f"; aviso.innerHTML = "❌ " + res.erro; return; }
+          
+          aviso.style.display = "block";
+          aviso.style.backgroundColor = "#e6f4ea"; 
+          aviso.style.color = "#137333"; 
+          aviso.innerHTML = "✅ Dados atualizados com sucesso!";
+          
+          setTimeout(function() {
+            if (aviso) { aviso.style.display = 'none'; aviso.innerHTML = ''; }
+          }, 4000);
+
+          if(document.getElementById("lblRelTotal")) document.getElementById("lblRelTotal").innerText = String(res.totalRegistros || 0);
+          if(document.getElementById("lblRelBusca")) document.getElementById("lblRelBusca").innerText = String(res.contadores.emBusca || 0);
+          if(document.getElementById("lblRelAgendado")) document.getElementById("lblRelAgendado").innerText = String(res.contadores.agendado || 0);
+          if(document.getElementById("lblRelAguardar")) document.getElementById("lblRelAguardar").innerText = String(res.contadores.aguardando || 0);
+          if(document.getElementById("lblRelEncerrado")) document.getElementById("lblRelEncerrado").innerText = String(res.contadores.encerrado || 0);
+
+          CACHE_CSV_RAW_PRODUCAO = res.csvRaw;
+          if(res.dadosTabela) { res.dadosTabela.sort(function(a, b) { return (a.nome || "").localeCompare(b.nome || ""); }); }
+          LISTA_DADOS_MEMORIA = res.dadosTabela; window.NOME_ARQUIVO_BAIXAR = res.nomeArquivo; EXTRACAO_TEM_DADOS = (res.totalRegistros > 0);
+          
+          if(subRel === "resumo_categorias") {
+            if(boxSanfona) boxSanfona.style.display = "none"; if(tableArea) tableArea.style.display = "none"; if(boxKanban) boxKanban.style.display = "none"; 
+            if(boxQuadrados) boxQuadrados.style.display = "grid";
+            var esp = {"ENDO GERAL":0, "ENDO PED.":0, "TIREOIDE":0, "OUTROS":0}, pri = {"NORMAL":0, "ACIMA DE 60":0, "ACIMA DE 80":0, "ESPECIAIS":0}, atend = {"1ª CONSULTA":0, "RETORNO/MUDANÇA DE MÉDICO":0}, sit = {"ELETIVA":0, "URGENCIA":0}, st = {"AGUARDAR AGENDA":0, "EM BUSCA":0, "AGENDADO":0, "ENCERRADO":0};
+            res.dadosTabela.forEach(function(r) {
+              if(esp[r.especialidade] !== undefined) esp[r.especialidade]++; if(pri[r.prioridade] !== undefined) pri[r.prioridade]++; if(atend[r.tipo] !== undefined) atend[r.tipo]++;
+              var s = r.situacao ? r.situacao.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
+              if(s === "URGENCIA" || s.indexOf("URG") > -1) { sit["URGENCIA"]++; } else { sit["ELETIVA"]++; }
+              if(st[r.status] !== undefined) st[r.status]++;
+            });
+            var totalGeralFiltrado = res.totalRegistros || res.dadosTabela.length || 1;
+            var pct = function(v) { return totalGeralFiltrado > 0 ? ((v / totalGeralFiltrado) * 100).toFixed(1) + "%" : "0.0%"; };
+            var card = function(t, dic) {
+              var h = '<div class="bloco-categoria-card"><h3 style="margin: 0 0 8px 0; font-size: 12px; border-bottom: 2px solid #000000; padding-bottom: 4px; color: #202124;">' + t + '</h3>', sm = 0;
+              for(var k in dic) { sm += dic[k]; h += '<div class="linha-item-analitica"><span style="color:#5f6368; font-weight:bold;">' + k + '</span><div class="metricas"><span>' + dic[k] + '</span><span class="pct">(' + pct(dic[k]) + ')</span></div></div>'; }
+              return h + '<div class="rodape-total-card"><span>Total</span><span>' + sm + '</span></div></div>';
+            };
+            if(boxQuadrados) boxQuadrados.innerHTML = card("🩺 Especialidades", esp) + card("⚡ Prioridades", pri) + card("📝 Tipo Atendimento", atend) + card("⚖️ Situação Caso", sit) + card("🔍 Status Atuais", st);
+          }
+          else if(subRel === "interativo_status") {
+            if(boxQuadrados) boxQuadrados.style.display = "none"; if(tableArea) tableArea.style.display = "none"; if(boxKanban) boxKanban.style.display = "none"; if(boxSanfona) boxSanfona.style.display = "block";
+            var stList = ["AGUARDAR AGENDA", "EM BUSCA", "AGENDADO", "ENCERRADO"], hSan = "";
+            stList.forEach(function(stN, idx) {
+              var filt = res.dadosTabela.filter(function(x) { return x.status === stN; }), idU = "sanfona_" + idx;
+              hSan += '<div class="bloco-status-sanfona"><div class="cabecalho-sanfona" onclick="INTERFACE_alternarSanfonaLocal(\'' + idU + '\')"><span>📋 ' + stN + ' (' + filt.length + ')</span><span class="indicador-clique">🔍 Ver Dados</span></div><div class="conteudo-sanfona-tabela" id="' + idU + '">';
+              if(filt.length === 0) { hSan += '<p style="text-align:center;color:#5f6368;margin:0;padding:10px;">Vazio</p>'; }
+              else { hSan += '<table><thead><tr><th>Nome</th><th>ID</th><th>Carteira</th><th>Especialidade</th><th>Prioridade</th></tr></thead><tbody>'; filt.forEach(function(p){ hSan += '<tr><td>'+p.nome+'</td><td>'+p.id+'</td><td>'+p.carteira+'</td><td>'+p.especialidade+'</td><td>'+p.prioridade+'</td></tr>'; }); hSan += '</tbody></table>'; }
+              hSan += '</div></div>';
+            });
+            if(boxSanfona) boxSanfona.innerHTML = hSan;
+          }
+          else if(subRel === "historico_buscas" || subRel === "modelo_ficha" || subRel === "modelo_linha" || subRel === "modelo_kanban") {
+            if(boxQuadrados) boxQuadrados.style.display = "none"; if(tableArea) tableArea.style.display = "none"; if(boxSanfona) boxSanfona.style.display = "none"; if(boxKanban) boxKanban.style.display = "none";
+            
+            google.script.run.withSuccessHandler(function(dbReal) {
+              if(boxQuadrados) { boxQuadrados.innerHTML = ""; boxQuadrados.style.display = "none"; }
+              dbReal.sort(function(a, b) { return (a.nome || "").localeCompare(b.nome || ""); });
+              if(subRel !== "modelo_kanban") { if(boxSanfona) boxSanfona.style.display = "block"; }
+              
+              if(subRel === "historico_buscas") {
+                var h8 = '<div class="bloco-status-sanfona"><div class="cabecalho-sanfona"><span>📞 EM BUSCA ATIVA ('+dbReal.length+')</span></div><div class="conteudo-sanfona-tabela" style="display:block;"><table><thead><tr><th>Nome Completo do Paciente</th><th style="text-align:center; width:135px; color:#1a73e8;">📞 DDD / Telefone</th><th>Busca 1</th><th>Busca 2</th><th>Busca 3</th><th>Observação</th></tr></thead><tbody>';
+                dbReal.forEach(function(p) {
+                  var buscaObjetoBruto = (res.dadosTabela || []).find(function(item) { return item.nome === p.nome || item.id === p.id; });
+                  var foneCruHistorico = buscaObjetoBruto && buscaObjetoBruto.telefone ? String(buscaObjetoBruto.telefone).trim() : "";
+                  if (foneCruHistorico.toUpperCase().indexOf("AGUARDAR") > -1 || foneCruHistorico.toUpperCase().indexOf("BUSCA") > -1) { foneCruHistorico = ""; }
+                  var celulaFoneHistHtml = foneCruHistorico !== "" ? '<b style="color:#1a73e8; font-size:11px;">' + foneCruHistorico + '</b>' : '<span style="color:#9aa0a6;">-</span>';
+                  h8 += '<tr><td style="color:#000000; font-weight:800; text-transform:uppercase;">'+(p.nome || "-")+'</td><td style="text-align:center;">' + celulaFoneHistHtml + '</td><td>'+(p.b1 || "-")+'</td><td>'+(p.b2 || "-")+'</td><td>'+(p.b3 || "-")+'</td><td style="color:#5f6368;">'+(p.obs || "-")+'</td></tr>'; 
+                });
+                if(boxSanfona) boxSanfona.innerHTML = h8 + '</tbody></table></div></div>';
+              }
+              else if(subRel === "modelo_ficha") {
+                var baseMestreServidor = typeof LISTA_DADOS_MEMORIA !== "undefined" ? LISTA_DADOS_MEMORIA : [];
+                var apenasEmBusca = baseMestreServidor.filter(function(r) { 
+                  return String(r.status).toUpperCase().trim() === "EM BUSCA"; 
+                });
+                
+                if(boxSanfona) { boxSanfona.style.display = "flex"; boxSanfona.style.flexDirection = "column"; }
+                dbReal = apenasEmBusca; 
+                dbReal.sort(function(a, b) { return (a.nome || "").localeCompare(b.nome || ""); });
+                
+                var barraBuscaFicha = '<div class="no-print" style="background:#f1f3f4; padding:6px 15px; margin:10px 0; border-radius:4px; border:1px solid #dadce0; display:flex; align-items:center; gap:10px; box-sizing:border-box;"><span style="font-size:11px; font-weight:bold; color:#202124; text-transform:uppercase;">🔍 Consultar por Nome:</span><input type="text" id="txtFiltroNomeUniversal" onkeyup="window.MOTOR_FILTRO_UNIVERSAL_TABELA()" placeholder="Digite no mínimo 5 caracteres para iniciar a pesquisa..." style="flex:1; height:26px; padding:0 10px; font-size:12px; font-weight:600; border:1px solid #cbd5e1; border-radius:4px; box-sizing:border-box;"></div>';
+                var h9 = '<div id="areaListaFicha9" class="bloco-status-sanfona" style="width:100% !important;"><div class="cabecalho-sanfona" style="background:#1a73e8; color:white;"><span>📄 AUDITORIA ATIVA - FICHA INDIVIDUAL (EM BUSCA)</span></div>' + barraBuscaFicha + '<div class="conteudo-sanfona-tabela" style="display:block; width:100% !important;"><table><thead><tr><th>Nome Completo (A-Z)</th><th style="width:100px; text-align:center;">🔑 ID Exclusivo</th><th style="width:130px; text-align:center; color:#1a73e8;">💳 CPF do Paciente</th><th style="width:130px; text-align:center; color:#1a73e8;">📞 DDD / Telefone</th><th style="width:160px; text-align:center;">Ação de Monitoring</th></tr></thead><tbody>';
+                
+                dbReal.forEach(function(p, index){ 
+                  var idTabela   = p.id || "-";
+                  var cpfTabela  = p.cpf || "-";
+                  var foneTabela = p.telefone ? String(p.telefone).trim() : "-";
+                  if (foneTabela.toUpperCase().indexOf("AGUARDAR") > -1 || foneTabela.toUpperCase().indexOf("BUSCA") > -1) { foneTabela = "-"; }
+                  var argChaveID = idTabela !== "-" ? idTabela.trim().replace(/[^a-zA-Z0-9]/g, "") : "index_" + index;
+                  window["paciente_objeto_ficha_" + argChaveID] = p;
+                  
+                  h9 += '<tr><td style="color:#000000; font-weight:800; text-transform:uppercase;">'+p.nome+'</td><td style="text-align:center; font-weight:bold; color:#7f8c8d;">'+idTabela+'</td><td style="text-align:center; font-weight:bold; color:#000000;">'+cpfTabela+'</td><td style="text-align:center; font-weight:bold; color:#1a73e8;">'+foneTabela+'</td><td style="text-align:center;"><button type="button" class="btn-operacao btn-executar" style="height:24px; font-size:10px; padding:0 8px; background-color:#1a73e8 !important; color:#ffffff !important; border:1px solid #1a73e8 !important; font-weight:bold; border-radius:4px; cursor:pointer;" onclick="MOTOR_ABRIR_FICHA_9_EXCLUSIVO(\'' + argChaveID + '\')">📄 Abrir Ficha Completa</button></td></tr>'; 
+                });
+                if(boxSanfona) boxSanfona.innerHTML = h9 + '</tbody></table></div></div><div id="container_visualizador_ficha_9" style="width:100% !important;"></div>';
+              }
+              else if(subRel === "modelo_linha" || subRelValue === "modelo_linha") {
+                var h10 = '<div class="bloco-status-sanfona"><div class="cabecalho-sanfona" style="background:#e65100; color:white;"><span>⏳ AUDITORIA ATIVA - LINHA DO TEMPO HORIZONTAL ('+dbReal.length+' Casos)</span></div><div class="conteudo-sanfona-tabela" style="display:block;"><table><thead><tr><th>Nome do Paciente (A-Z)</th><th style="text-align:center; width:135px; color:#1a73e8;">📞 DDD / Telefone</th><th style="width:120px; text-align:center;">Busca 1</th><th style="width:120px; text-align:center;">Busca 2</th><th style="width:120px; text-align:center;">Busca 3</th><th>Observação Geral</th></tr></thead><tbody>';
+                dbReal.forEach(function(p) {
+                  var buscaObjetoBruto = (res.dadosTabela || []).find(function(item) { return item.nome === p.nome || item.id === p.id; });
+                  var foneCruLinha = buscaObjetoBruto && buscaObjetoBruto.telefone ? String(buscaObjetoBruto.telefone).trim() : "";
+                  if (foneCruLinha.toUpperCase().indexOf("AGUARDAR") > -1 || foneCruLinha.toUpperCase().indexOf("BUSCA") > -1) { foneCruLinha = ""; }
+                  var celulaFoneLinhaHtml = foneCruLinha !== "" ? '<b style="color:#1a73e8; font-size:11px;">' + foneCruLinha + '</b>' : '<span style="color:#9aa0a6;">-</span>';
+                  var s1 = (p.b1 && p.b1 !== "-") ? "background:#e8f0fe; color:#1a73e8; border:1px solid #1a73e8;" : "background:#f1f3f4; color:#5f6368;";
+                  var s2 = (p.b2 && p.b2 !== "-") ? "background:#ffe0b2; color:#e65100; border:1px solid #e65100;" : "background:#f1f3f4; color:#5f6368;";
+                  var s3 = (p.b3 && p.b3 !== "-") ? "background:#c8e6c9; color:#1b5e20; border:1px solid #1b5e20;" : "background:#f1f3f4; color:#5f6368;";
+                  h10 += '<tr><td style="color:#000000; font-weight:800; text-transform:uppercase;">'+p.nome+'</td><td style="text-align:center;">' + celulaFoneLinhaHtml + '</td><td style="text-align:center;"><span style="padding:2px 6px; border-radius:10px; font-size:10px; font-weight:bold;'+s1+'">'+p.b1+'</span></td><td style="text-align:center;"><span style="padding:2px 6px; border-radius:10px; font-size:10px; font-weight:bold;'+s2+'">'+p.b2+'</span></td><td style="text-align:center;"><span style="padding:2px 6px; border-radius:10px; font-size:10px; font-weight:bold;'+s3+'">'+p.b3+'</span></td><td style="color:#5f6368;">'+p.obs+'</td></tr>'; 
+                });
+                if(boxSanfona) boxSanfona.innerHTML = h10 + '</tbody></table></div></div>';
+              }
+              else if(subRel === "modelo_kanban") {
+                if(boxKanban) boxKanban.style.display = "grid"; var c1 = "", c2 = "", c3 = "";
+                google.script.run.withSuccessHandler(function(dbKanban) {
+                  dbReal = dbKanban; dbReal.sort(function(a, b) { return (a.nome || "").localeCompare(b.nome || ""); });
+                  dbReal.forEach(function(p){ 
+                    var nome = p.nome ? p.nome.toUpperCase() : "-"; var obs = p.obs && p.obs !== "-" ? p.obs : "SEM OBSERVAÇÃO REGISTRADA";
+                    var fonePacKanban = p.telefone ? String(p.telefone).trim() : "";
+                    if (fonePacKanban.toUpperCase().indexOf("AGUARDAR") > -1 || fonePacKanban.toUpperCase().indexOf("BUSCA") > -1) { fonePacKanban = ""; }
+                    var exibFoneKanban = fonePacKanban !== "" ? ' <span style="color:#1a73e8; font-weight:bold;">📞 ' + fonePacKanban + '</span>' : '';
+
+                    var d1 = (p.data1 && p.data1 !== "-" ? p.data1 : "") + (p.user1 && p.user1 !== "-" ? " por " + p.user1.toUpperCase() : "");
+                    var d2 = (p.data2 && p.data2 !== "-" ? p.data2 : "") + (p.user2 && p.user2 !== "-" ? " por " + p.user2.toUpperCase() : "");
+                    var d3 = (p.data3 && p.data3 !== "-" ? p.data3 : "") + (p.user3 && p.user3 !== "-" ? " por " + p.user3.toUpperCase() : "");
+                    
+                    var card1 = '<div class="card-paciente-kanban" style="padding:10px;margin-bottom:8px;border-left:4px solid #1a73e8;background:white;border-radius:4px;"><h5 style="margin:0 0 6px 0;font-size:11px;color:#202124;text-transform:uppercase;font-weight:800;border-bottom:1px dashed #dadce0;padding-bottom:3px;">' + nome + exibFoneKanban + '</h5><p style="margin:0 0 2px 0;font-size:10px;"><b>🔍 BUSCA 1:</b> ' + (p.b1 || "-") + '</p><p style="margin:0 0 2px 0;color:#1a73e8;font-size:10px;"><b>📅 HISTÓRICO:</b> ' + (d1 || "-") + '</p><p style="margin:0;font-size:10px;color:#5f6368;"><b>📝 OBS:</b> ' + obs + '</p></div>';
+                    var card2 = '<div class="card-paciente-kanban" style="padding:10px;margin-bottom:8px;border-left:4px solid #e65100;background:white;border-radius:4px;"><h5 style="margin:0 0 6px 0;font-size:11px;color:#202124;text-transform:uppercase;font-weight:800;border-bottom:1px dashed #dadce0;padding-bottom:3px;">' + nome + exibFoneKanban + '</h5><p style="margin:0 0 2px 0;font-size:10px;"><b>🔍 BUSCA 2:</b> ' + (p.b2 || "-") + '</p><p style="margin:0 0 2px 0;color:#e65100;font-size:10px;"><b>📅 HISTÓRICO:</b> ' + (d2 || "-") + '</p><p style="margin:0;font-size:10px;color:#5f6368;"><b>📝 OBS:</b> ' + obs + '</p></div>';
+                    var card3 = '<div class="card-paciente-kanban" style="padding:10px;margin-bottom:8px;border-left:4px solid #1e8449;background:white;border-radius:4px;"><h5 style="margin:0 0 6px 0;font-size:11px;color:#202124;text-transform:uppercase;font-weight:800;border-bottom:1px dashed #dadce0;padding-bottom:3px;">' + nome + exibFoneKanban + '</h5><p style="margin:0 0 2px 0;font-size:10px;"><b>🔍 BUSCA 3:</b> ' + (p.b3 || "-") + '</p><p style="margin:0 0 2px 0;color:#1e8449;font-size:10px;"><b>📅 HISTÓRICO:</b> ' + (d3 || "-") + '</p><p style="margin:0;font-size:10px;color:#5f6368;"><b>📝 OBS:</b> ' + obs + '</p></div>';
+                    if(p.b1 && p.b1 !== "-") { c1 += card1; } if(p.b2 && p.b2 !== "-") { c2 += card2; } if(p.b3 && p.b3 !== "-") { c3 += card3; }
+                  });
+                  var ct = function(str){ return str ? str.split("card-paciente-kanban").length - 1 : 0; };
+                  if(boxKanban) boxKanban.innerHTML = '<div class="coluna-kanban-estilizada"><h4>📞 Tentativa 1 ('+ct(c1)+')</h4>'+(c1||'<p style="font-size:10px;color:#5f6368;text-align:center;padding:10px;">Vazio</p>')+'</div><div class="coluna-kanban-estilizada" style="border-color:#e65100;"><h4>📞 Tentativa 2 ('+ct(c2)+')</h4>'+(c2||'<p style="font-size:10px;color:#5f6368;text-align:center;padding:10px;">Vazio</p>')+'</div><div class="coluna-kanban-estilizada" style="border-color:#1e8449;"><h4>📞 Tentativa 3 ('+ct(c3)+')</h4>'+(c3||'<p style="font-size:10px;color:#5f6368;text-align:center;padding:10px;">Vazio</p>')+'</div>';
+                }).MOTOR_EXCLUSIVO_KANBAN_AUDITORIA();
+              }
+            }).WEB_PARALELO_pescarDadosBuscasReais();
+          }
+          else if(subRel === "cronologia_buscas") {
+            if(boxQuadrados) boxQuadrados.style.display = "none"; 
+            if(tableArea) tableArea.style.display = "none"; 
+            if(boxKanban) boxKanban.style.display = "none";
+            if(boxSanfona) boxSanfona.style.display = "block";
+            
+            var hojeMestre = new Date(); hojeMestre.setHours(0,0,0,0);
+            
+            var processarDataPuraCronologia = function(txt) {
+              if (!txt) return null; var s = String(txt).trim();
+              if (s === "" || s === "-" || s.toUpperCase().indexOf("INVALID") > -1) return null;
+              var partes = s.substring(0, 10).split("/");
+              if (partes.length === 3) {
+                var dia = parseInt(partes[0], 10);
+                var mes = parseInt(partes[1], 10) - 1;
+                var ano = parseInt(partes[2], 10);
+                if (ano < 100) ano += 2000;
+                if (ano < 2020) ano = 2026; 
+                var dRes = new Date(ano, mes, dia); dRes.setHours(0,0,0,0);
+                return !isNaN(dRes.getTime()) ? dRes : null;
+              }
+              return null;
+            };
+            
+            var calcularDiferencaDiasReal = function(inicio, fim) {
+              if (!inicio || !fim) return 0;
+              var diff = fim.getTime() - inicio.getTime();
+              return diff >= 0 ? Math.floor(diff / (1000 * 60 * 60 * 24)) : 0;
+            };
+
+            window.CRON_FILTRAR_NOMES = function() {
+              var termo = document.getElementById("buscaNomeCronologia").value.toUpperCase().trim();
+              var linhas = document.querySelectorAll("#tabelaCronologiaCorpo tr");
+              linhas.forEach(function(l) {
+                if (l.innerText.toUpperCase().indexOf(termo) > -1) { l.style.display = ""; } else { l.style.display = "none"; }
+              });
+            };
+
+            window.CRON_ORDENAR_CAMPOS = function(tipo) {
+              var tabela = document.getElementById("tabelaCronologiaCorpo"); if (!tabela) return;
+              var linhas = Array.from(tabela.rows);
+              linhas.sort(function(rowA, rowB) {
+                if (tipo === "NOME") { return rowA.cells[0].innerText.trim().localeCompare(rowB.cells[0].innerText.trim(), 'pt-BR'); }
+                var txtA = rowA.cells && rowA.cells[1] ? rowA.cells[1].innerText.replace("📅", "").trim().substring(0, 10) : "";
+                var txtB = rowB.cells && rowB.cells[1] ? rowB.cells[1].innerText.replace("📅", "").trim().substring(0, 10) : "";
+                var dA = processarDataPuraCronologia(txtA); var dB = processarDataPuraCronologia(txtB);
+                if (!dA && !dB) return 0; if (!dA) return 1; if (!dB) return -1;
+                return dA.getTime() - dB.getTime();
+              });
+              linhas.forEach(function(l) { tabela.appendChild(l); });
+            };
+
+            var htmlControles = '<div class="no-print" style="background:#f1f3f4; padding:8px 12px; display:flex; gap:15px; align-items:center; flex-wrap:wrap; margin-bottom:10px; border-radius:4px; border:1px solid #dadce0; width:100%; box-sizing:border-box;">' +
+              '<div class="no-print" style="display:flex; align-items:center; gap:8px; flex:1;"><label style="font-size:11px; font-weight:bold; color:#202124; white-space:nowrap;">🔍 NOME DO PACIENTE:</label>' +
+              '<input type="text" id="buscaNomeCronologia" class="no-print" oninput="window.CRON_FILTRAR_NOMES()" placeholder="DIGITE O NOME PARA FILTRAR..." style="width:100%; height:28px; padding:0 8px; border:1px solid #dadce0; border-radius:4px; font-size:11px; text-transform:uppercase; font-weight:bold; box-sizing:border-box;"></div>' +
+              '<div class="no-print" style="display:flex; align-items:center; gap:8px;"><label style="font-size:11px; font-weight:bold; color:#202124; white-space:nowrap;">📊 EXIBIÇÃO POR:</label>' +
+              '<button type="button" class="btn-atualizar-indicadores btn-blue no-print" onclick="window.CRON_ORDENAR_CAMPOS(\'DATA\')" style="height:28px; padding:0 14px; background:#e65100 !important; color:white !important; border:none !important; border-radius:4px !important; font-weight:900 !important; cursor:pointer !important; font-size:10px !important;">⏱️ TEMPO DE ESPERA</button>' +
+              '<button type="button" class="btn-atualizar-indicadores btn-blue no-print" onclick="window.CRON_ORDENAR_CAMPOS(\'NOME\')" style="height:28px; padding:0 14px; background:#1a73e8 !important; color:white !important; border:none !important; border-radius:4px !important; font-weight:900 !important; cursor:pointer !important; font-size:10px !important;">🔤 ORDEM ALFABÉTICA</button></div></div>';
+
+            if(boxSanfona) { 
+              boxSanfona.style.display = "block"; 
+              boxSanfona.style.width = "100% !important";
+            }
+
+            var hMestre = '<div class="no-print" style="display:block !important; width:100% !important; margin-bottom:15px !important;">' + htmlControles + '</div>' +
+                          '<div class="bloco-status-sanfona" style="margin:12px 0 0 0; padding:0; height:auto; display:block; width:100% !important;"><div class="cabecalho-sanfona" style="background:#e65100; color:white;"><span>⏱️ AUDITORIA CRONOLÓGICA DE BUSCAS ATIVAS ('+res.dadosTabela.length+' Casos)</span></div><div class="conteudo-sanfona-tabela" style="display:block; border:1px solid #dadce0; border-radius:0 0 4px 4px; box-sizing:border-box; width:100% !important; margin:0 !important;">' +
+                          '<table style="width:100% !important; border-collapse:collapse !important; display:table !important; margin:0 !important; padding:0 !important;"><thead><tr style="background:#000; position:sticky; top:0; z-index:100;"><th style="color:#fff; padding:8px;">Nome Completo do Paciente</th><th style="text-align:center; width:140px; color:#fff;">Data Cad. / Atendente</th><th style="text-align:center; width:195px; color:#1a73e8;">Cad ➡️ Busca 1</th><th style="text-align:center; width:195px; color:#e65100;">Busca 1 ➡️ Busca 2</th><th style="text-align:center; width:195px; color:#1e8449;">Busca 2 ➡️ Busca 3</th><th style="color:#fff;">Status</th></tr></thead><tbody id="tabelaCronologiaCorpo">';
+ 
+            res.dadosTabela.forEach(function(p) {
+              var dCad = processarDataPuraCronologia(p.data); 
+              var dB1 = processarDataPuraCronologia(p.dataBusca1); var dB2 = processarDataPuraCronologia(p.dataBusca2); var dB3 = processarDataPuraCronologia(p.dataBusca3);
+              var txtB1 = "-", txtB2 = "-", txtB3 = "-"; var st = p.status ? String(p.status).toUpperCase().trim() : "";
+              var finalizado = (st === "AGENDADO" || st === "ENCERRADO");
+              
+              var limparUser = function(v) { return (!v || String(v).trim() === "" || String(v).trim() === "-") ? "" : String(v).trim().toLowerCase(); };
+              var opCad = limparUser(p.colunaU); var op1 = limparUser(p.user1); var op2 = limparUser(p.user2); var op3 = limparUser(p.user3);
+
+              if (dCad) {
+                if (dB1) { 
+                  txtB1 = '<div style="font-size:11px; line-height:1.2;"><b>📞 '+(p.busca1 || "Realizada")+'</b><br><span style="color:#1a73e8;">📅 '+p.dataBusca1+'</span>'+(op1?'<br><span style="color:#5f6368;">👤 '+op1+'</span>':'')+'<br><b style="color:#137333;">Intervalo: '+calcularDiferencaDiasReal(dCad, dB1)+' dias</b></div>'; 
+                } else { 
+                  var dDias = calcularDiferencaDiasReal(dCad, hojeMestre); var corCrit = dDias > 90 ? '#b22222' : (dDias > 45 ? '#e65100' : '#137333');
+                  txtB1 = finalizado ? '<span style="color:#9aa0a6;">-</span>' : '<b style="color:'+corCrit+';">⚠️ Aguardando há '+dDias+' dias</b>'; 
+                }
+              }
+              if (dB1) {
+                if (dB2) { txtB2 = '<div style="font-size:11px; line-height:1.2;"><b>📞 '+(p.busca2 || "Realizada")+'</b><br><span style="color:#e65100;">📅 '+p.dataBusca2+'</span>'+(op2?'<br><span style="color:#5f6368;">👤 '+op2+'</span>':'')+'<br><b style="color:#137333;">Intervalo: '+calcularDiferencaDiasReal(dB1, dB2)+' dias</b></div>'; } 
+                else { 
+                  var dDias2 = calcularDiferencaDiasReal(dB1, hojeMestre); var corCrit2 = dDias2 > 90 ? '#b22222' : (dDias2 > 45 ? '#e65100' : '#137333');
+                  txtB2 = finalizado ? '<span style="color:#9aa0a6;">-</span>' : '<b style="color:'+corCrit2+';">⚠️ Aguardando há '+dDias2+' dias</b>'; 
+                }
+              } else if (dCad && !dB1) { txtB2 = '<span style="color:#9aa0a6;">-</span>'; }
+              if (dB2) {
+                if (dB3) { txtB3 = '<div style="font-size:11px; line-height:1.2;"><b>📞 '+(p.busca3 || "Realizada")+'</b><br><span style="color:#1e8449;">📅 '+p.dataBusca3+'</div>'+(op3?'<br><span style="color:#5f6368;">👤 '+op3+'</span>':'')+'<br><b style="color:#137333;">Intervalo: '+calcularDiferencaDiasReal(dB2, dB3)+' dias</b></div>'; } 
+                else { 
+                  var dDias3 = calcularDiferencaDiasReal(dB2, hojeMestre); var corCrit3 = dDias3 > 90 ? '#b22222' : (dDias3 > 45 ? '#e65100' : '#137333');
+                  txtB3 = finalizado ? '<span style="color:#9aa0a6;">-</span>' : '<b style="color:'+corCrit3+';">⚠️ Aguardando há '+dDias3+' dias</b>'; 
+                }
+              } else if (!dB2) { txtB3 = '<span style="color:#9aa0a6;">-</span>'; }
+              
+              var atendExib = opCad !== "" ? '<div style="color:#202124; font-size:10px; margin-top:2px; font-weight:bold;">👤 '+opCad+'</div>' : '<div style="color:#9aa0a6; font-size:10px; margin-top:2px;">👤 -</div>';
+              var strDataAtributo = p.data ? String(p.data).substring(0,10) : "";
+              var foneLimpo = p.telefone ? String(p.telefone).trim() : "";
+              var exibirTelefone = (foneLimpo !== "" && foneLimpo !== "-") ? '<div style="color:#1a73e8; font-size:11px; margin-top:4px; font-weight:bold; letter-spacing:0.3px; text-align:center;">📞 ' + foneLimpo + '</div>' : '';
+              
+              hMestre += '<tr><td style="color:#000; font-weight:800; text-transform:uppercase; padding:8px 5px;"><div style="text-align:center;">' + (p.nome || "-") + '</div>' + exibirTelefone + '</td><td style="text-align:center; font-size:11px;"><div>📅 ' + strDataAtributo + '</div>' + atendExib + '</td><td style="text-align:left; padding:5px;">' + txtB1 + '</td><td style="text-align:left; padding:5px;"> ' + txtB2 + '</td><td style="text-align:left; padding:5px;">' + txtB3 + '</td><td><b>' + st + '</b></td></tr>';
+            });
+            
+            var boxSanfonaReal = document.getElementById("boxSanfonaInterativaBI");
+            if(boxSanfonaReal) { 
+              boxSanfonaReal.innerHTML = hMestre + '</tbody></table></div></div>'; 
+              setTimeout(function() { if(typeof window.CRON_ORDENAR_CAMPOS === 'function') window.CRON_ORDENAR_CAMPOS('DATA'); }, 150);
+            }
+          }
+          else if(subRel === "tempo_espera") {
+            if(boxQuadrados) boxQuadrados.style.display = "none"; 
+            if(tableArea) tableArea.style.display = "none"; 
+            if(boxSanfona) boxSanfona.style.display = "none"; 
+            if(boxKanban) boxKanban.style.display = "none";
+            if(boxSanfona) boxSanfona.style.display = "block";
+            
+            var listaPacientesOficial = res.dadosTabela || [];
+            var totalCriticos = 0; var totalAlertas = 0; var totalEstaveis = 0;
+            
+            var extrairDataSimples = function(txt) {
+              var s = txt ? String(txt).trim() : ""; if (s === "" || s === "-") return null;
+              var strDataPura = s.substring(0, 10); var partes = strDataPura.split("/");
+              if (partes.length === 3) {
+                var dia = parseInt(partes[0], 10); var mes = parseInt(partes[1], 10) - 1; var ano = parseInt(partes[2], 10);
+                if (ano < 100) ano += 2000;
+                var d = new Date(ano, mes, dia); d.setHours(0,0,0,0);
+                return !isNaN(d.getTime()) ? d : null;
+              }
+              return null;
+            };
+
+            listaPacientesOficial.sort(function(a, b) {
+              var dtA = extrairDataSimples(a.data); var dtB = extrairDataSimples(b.data);
+              if (!dtA && !dtB) return 0; if (!dtA) return 1; if (!dtB) return -1;
+              return dtA.getTime() - dtB.getTime();
+            });
+
+            listaPacientesOficial.forEach(function(p) {
+              var dtCad = extrairDataSimples(p.data);
+              if (dtCad) {
+                var diff = (new Date()).setHours(0,0,0,0) - dtCad.getTime();
+                var nDias = Math.floor(diff / (1000 * 60 * 60 * 24));
+                if (nDias > 90) totalCriticos++; else if (nDias > 45) totalAlertas++; else totalEstaveis++;
+              }
+            });
+
+            var htmlIndicadores = '<div class="no-print" style="background:#f8f9fa; padding:10px 14px; display:flex; gap:20px; align-items:center; flex-wrap:wrap; margin-bottom:12px; border-radius:4px; border:1px solid #dadce0; width:100%; box-sizing:border-box; font-size:11px; font-weight:bold;">' +
+              '<div style="color:#202124; text-transform:uppercase;">📊 RESUMO DE CRITICIDADE:</div>' +
+              '<div style="background:#fce8e6; color:#b22222; padding:4px 10px; border-radius:3px; border:1px solid #fad2cf;">🔴 CRÍTICO (> 90 dias): <span style="font-size:12px; font-weight:900;">' + totalCriticos + '</span> Casos</div>' +
+              '<div style="background:#fff4e5; color:#e65100; padding:4px 10px; border-radius:3px; border:1px solid #ffe2cc;">🟠 ALERTA (46 a 90 dias): <span style="font-size:12px; font-weight:900;">' + totalAlertas + '</span> Casos</div>' +
+              '<div style="background:#e6f4ea; color:#137333; padding:4px 10px; border-radius:3px; border:1px solid #ceead6;">🟢 ESTÁVEL (0 a 45 dias): <span style="font-size:12px; font-weight:900;">' + totalEstaveis + '</span> Casos</div></div>';
+
+            var h12 = htmlIndicadores + '<div class="bloco-status-sanfona"><div class="cabecalho-sanfona" style="background:#202124; color:white;"><span>⏳ FILA CRONOLÓGICA POR TEMPO DE ESPERA ('+listaPacientesOficial.length+' Casos)</span></div><div class="conteudo-sanfona-tabela" style="display:block;"><table><thead><tr><th>Nome Completo do Paciente</th><th style="text-align:center; width:135px; color:#1a73e8;">📞 DDD / Telefone</th><th style="text-align:center; width:120px;">Data Cad.</th><th style="text-align:center; width:155px;">Espera Geral</th><th style="text-align:center; width:125px;">Status</th><th>Especialidade</th></tr></thead><tbody>';
+            
+            listaPacientesOficial.forEach(function(p) {
+              var dtCad = extrairDataSimples(p.data), diasGeral = "-", textoDiasHtml = "-";
+              if (dtCad) {
+                var diff = (new Date()).setHours(0,0,0,0) - dtCad.getTime();
+                var calculo = Math.floor(diff / (1000 * 60 * 60 * 24));
+                var nDias = calculo >= 0 ? calculo : 0;
+                diasGeral = nDias + " dias";
+                var corCrit = nDias > 90 ? '#b22222' : (nDias > 45 ? '#e65100' : '#137333');
+                var simbCrit = nDias > 90 ? '🔴 Crítico: ' : (nDias > 45 ? '🟠 Alerta: ' : '🟢 ');
+                textoDiasHtml = '<span style="color:' + corCrit + '; font-weight:900;">' + simbCrit + diasGeral + '</span>';
+              } else {
+                textoDiasHtml = '<span>' + diasGeral + '</span>';
+              }
+              
+              var foneRealPac = p.telefone ? String(p.telefone).trim() : "";
+              if (foneRealPac.toUpperCase().indexOf("AGUARDAR") > -1 || foneRealPac.toUpperCase().indexOf("BUSCA") > -1) foneRealPac = "";
+              var exibirFoneFila = (foneRealPac !== "") ? '<b style="color:#1a73e8; font-size:11px;">' + foneRealPac + '</b>' : '<span style="color:#9aa0a6;">-</span>';
+              
+              h12 += '<tr><td style="color:#000000; font-weight:800; text-transform:uppercase;">'+(p.nome || "-")+'</td><td style="text-align:center;">'+exibirFoneFila+'</td><td style="text-align:center;">'+(p.data || "-")+'</td><td style="text-align:center;">'+textoDiasHtml+'</td><td><b>'+(p.status || "-")+'</b></td><td>'+(p.especialidade || "-")+'</td></tr>';
+            });
+            
+            if(boxSanfona) boxSanfona.innerHTML = h12 + '</tbody></table></div></div>';
+          }
+          else if(subRel === "produtividade_equipe") {
+            if(boxQuadrados) boxQuadrados.style.display = "none"; 
+            if(boxSanfona) boxSanfona.style.display = "none"; 
+            if(boxKanban) boxKanban.style.display = "none"; 
+            if(tableArea) tableArea.style.display = "block";
+            
+            var baseGeral = res.dadosTabela || [];
+            var mapaProdutividade = {};
+            var tCad = 0, tB1 = 0, tB2 = 0, tB3 = 0, tAcoesGerais = 0;
+            
+            var limparNomeUsuario = function(texto) {
+              if (!texto) return "";
+              var s = String(texto).trim().toLowerCase();
+              return (s === "" || s === "-" || s === "não consta") ? "" : s;
+            };
+            
+            var verificarEInjetarUser = function(nomeUser) {
+              if (!nomeUser) return;
+              if (!mapaProdutividade[nomeUser]) {
+                mapaProdutividade[nomeUser] = { cadastro: 0, busca1: 0, busca2: 0, busca3: 0, total: 0 };
+              }
+            };
+
+            baseGeral.forEach(function(p) {
+              var op1 = limparNomeUsuario(p.user1);
+              var op2 = limparNomeUsuario(p.user2);
+              var op3 = limparNomeUsuario(p.user3);
+              var opCad = limparNomeUsuario(p.colunaU || p.atendente || p.usuario) || op1 || op2 || op3;
+              if (!opCad) { opCad = "sistema operacional"; }
+
+              if (opCad !== "") {
+                verificarEInjetarUser(opCad); mapaProdutividade[opCad].cadastro++;
+                mapaProdutividade[opCad].total++; tCad++; tAcoesGerais++;
+              }
+              if (op1 !== "") {
+                verificarEInjetarUser(op1); mapaProdutividade[op1].busca1++;
+                mapaProdutividade[op1].total++; tB1++; tAcoesGerais++;
+              }
+              if (op2 !== "") {
+                verificarEInjetarUser(op2); mapaProdutividade[op2].busca2++;
+                mapaProdutividade[op2].total++; tB2++; tAcoesGerais++;
+              }
+              if (op3 !== "") {
+                verificarEInjetarUser(op3); mapaProdutividade[op3].busca3++;
+                mapaProdutividade[op3].total++; tB3++; tAcoesGerais++;
+              }
+            });
+            var hProd = '<thead><tr style="background-color:#202124; color:#ffffff;"><th>Usuário / Operador Registrado</th><th style="text-align:center;">Cadastros</th><th style="text-align:center; color:#1a73e8;">Busca 1</th><th style="text-align:center; color:#e65100;">Busca 2</th><th style="text-align:center; color:#1e8449;">Busca 3</th><th style="text-align:center; background-color:#1a73e8;">Total Ações</th><th style="text-align:center; background-color:#137333;">% Produtividade</th></tr></thead><tbody>';
+            var listaOrdenadaOperadores = Object.keys(mapaProdutividade).sort();
+            var totalAcoesUniverso = tAcoesGerais || 1;
+            
+            if(listaOrdenadaOperadores.length === 0) {
+              hProd += '<tr><td colspan="7" style="text-align:center; color:#c5221f; padding:15px; font-weight:bold;">⚠️ Nenhuma ação de operador localizada para este filtro.</td></tr>';
+            } else {
+              listaOrdenadaOperadores.forEach(function(usr) {
+                var o = mapaProdutividade[usr];
+                var pPct = ((o.total / totalAcoesUniverso) * 100).toFixed(1) + "%";
+                hProd += '<tr><td style="color:#000000; font-weight:800; font-size:12px; text-transform:uppercase;">👤 ' + usr + '</td><td style="text-align:center; font-weight:bold;">' + o.cadastro + '</td><td style="text-align:center; color:#1a73e8; font-weight:bold;">' + o.busca1 + '</td><td style="text-align:center; color:#e65100; font-weight:bold;">' + o.busca2 + '</td><td style="text-align:center; color:#1e8449; font-weight:bold;">' + o.busca3 + '</td><td style="text-align:center; background-color:#f1f3f4; font-weight:900;">' + o.total + '</td><td style="text-align:center; color:#137333; font-weight:900; background-color:#e6f4ea;">' + pPct + '</td></tr>';
+              });
+              hProd += '<tr style="background-color:#f1f3f4; font-weight:900; border-top:2px solid #000000;"><td>🟢 TOTAL DA EQUIPE</td><td style="text-align:center;">' + tCad + '</td><td style="text-align:center;">' + tB1 + '</td><td style="text-align:center;">' + tB2 + '</td><td style="text-align:center;">' + tB3 + '</td><td style="text-align:center; background-color:#1a73e8; color:#ffffff;">' + tAcoesGerais + '</td><td style="text-align:center; background-color:#137333; color:#ffffff;">100.0%</td></tr>';
+            }
+            
+            var areaTabelaPadrao = document.getElementById("wrapperTabelaPadrao");
+            if(areaTabelaPadrao) { areaTabelaPadrao.innerHTML = '<table>' + hProd + '</tbody></table>'; }
+          }
+          else {
+            var boxF = document.getElementById("containerFiltroNomeFixo"); 
+            if(boxF) { document.getElementById("txtFiltroNomeUniversal").value = ""; boxF.style.display = "none"; }
+
+            var verAbaAtiva = subRel ? String(subRel).toUpperCase().trim() : "";
+            var verValorFiltro = subRelValue ? String(subRelValue).toUpperCase().trim() : "";
+            
+            if (verAbaAtiva !== "MODELO_KANBAN" && verValorFiltro.indexOf("RESUMO") === -1 && verValorFiltro !== "6") {
+              if(boxF) boxF.style.display = "flex"; 
+            }
+
+            if(boxQuadrados) { boxQuadrados.innerHTML = ""; boxQuadrados.style.display = "none"; }
+            if(boxSanfona) boxSanfona.style.display = "none"; if(boxKanban) boxKanban.style.display = "none"; if(tableArea) tableArea.style.display = "block";
+            var dadosFiltradosTabela = res.dadosTabela || []; var situacaoSelecionada = document.getElementById("repSituacao").value ? document.getElementById("repSituacao").value.toUpperCase().trim() : "";
+            if (subRelValue === "urgencias" || subRelValue === "urgencia") { dadosFiltradosTabela = dadosFiltradosTabela.filter(function(p) { var s = p.situacao ? p.situacao.toUpperCase().trim() : ""; return s === "URGENCIA" || s.indexOf("URG") > -1; }); } 
+            else if (situacaoSelecionada !== "") { dadosFiltradosTabela = dadosFiltradosTabela.filter(function(p) { var s = p.situacao ? p.situacao.toUpperCase().trim() : ""; return s === "URGENCIA" || s.indexOf("URG") > -1; }); }
+            
+            var hTb = "";
+            if (dadosFiltradosTabela.length === 0) { 
+              hTb = '<tr><td colspan="11" style="text-align: center; color: #c5221f; padding: 15px;">Nenhum paciente atende aos filtros.</td></tr>'; 
+            } else { 
+              dadosFiltradosTabela.forEach(function(p) {
+                var foneGeralExib = p.telefone ? String(p.telefone).trim() : "";
+                if (foneGeralExib.toUpperCase().indexOf("AGUARDAR") > -1 || foneGeralExib.toUpperCase().indexOf("BUSCA") > -1) { foneGeralExib = ""; }
+                var celulaFoneHtml = foneGeralExib !== "" ? '<b style="color:#1a73e8; font-size:11px;">' + foneGeralExib + '</b>' : '<span style="color:#9aa0a6;">-</span>';
+                
+                hTb += '<tr><td>' + p.data + '</td><td>' + p.id + '</td><td style="color:#000000; font-weight:800; text-transform:uppercase;">' + p.nome + '</td><td style="text-align:center;">' + celulaFoneHtml + '</td><td style="color:#1a73e8;">' + (p.cpf || "-") + '</td><td>' + p.carteira + '</td><td>' + p.especialidade + '</td><td>' + p.prioridade + '</td><td>' + p.tipo + '</td><td>' + p.situacao + '</td><td style="text-align:center;">' + p.status + '</td></tr>'; 
+              }); 
+            }
+
+            var containerTabelaExclusivo = document.getElementById("wrapperTabelaPadrao");
+            if(containerTabelaExclusivo) { 
+              var barrasResiduais = document.querySelectorAll("#boxFiltroNomeDinamicoExclusivo");
+              barrasResiduais.forEach(function(b) { b.parentNode.removeChild(b); });
+              
+              containerTabelaExclusivo.style.marginTop = "0px"; 
+              containerTabelaExclusivo.style.paddingTop = "0px";   
+              containerTabelaExclusivo.style.minHeight = "630px";
+              
+              var htmlBarraPesquisaOriginal = '<div id="boxFiltroNomeDinamicoExclusivo" class="no-print" style="background:#f1f3f4; padding:6px 15px; margin:-25px 15px 12px 15px; border-radius:4px; border:1px solid #dadce0; display:block; box-sizing:border-box;"><span style="font-size:11px; font-weight:bold; color:#202124; text-transform:uppercase; margin-right:10px;">🔍 Consultar por Nome:</span><input type="text" id="txtFiltroNomeUniversal" onkeyup="window.MOTOR_FILTRO_UNIVERSAL_TABELA()" placeholder="Digite no mínimo 5 caracteres para iniciar a pesquisa..." style="width:75%; height:26px; padding:0 10px; font-size:12px; font-weight:600; border:1px solid #cbd5e1; border-radius:4px; box-sizing:border-box;"></div>';
+              
+              containerTabelaExclusivo.insertAdjacentHTML('beforebegin', htmlBarraPesquisaOriginal);
+              containerTabelaExclusivo.innerHTML = '<table style="width:100% !important; border-collapse:collapse !important; margin:0 !important; padding:0 !important;"><thead><tr style="background:#000;"><th style="width: 85px; color:#fff;">Data Solicit.</th><th style="width: 105px; color:#fff;">ID Exclusivo</th><th style="color:#fff;">Nome Completo do Paciente</th><th style="text-align:center; width:135px; color:#1a73e8;">📞 DDD / Telefone</th><th style="width: 125px; color: #1a73e8;">CPF do Paciente</th><th style="width: 100px; color:#fff;">Carteira</th><th style="color:#fff;">Especialidade</th><th style="width: 95px; color:#fff;">Prioridade</th><th style="color:#fff;">Tipo Atend.</th><th style="color:#fff;">Situação</th><th style="width: 120px; text-align: center; color:#fff;">Status Atual</th></tr></thead><tbody>' + hTb + '</tbody></table>'; 
+            }
+          }
+        })
+        .withFailureHandler(function(err) { 
+          var av = document.getElementById("txtStatusBI"); if(av) { av.style.backgroundColor = "#fce8e6"; av.style.color = "#c5221f"; av.innerHTML = "❌ Erro: " + err.message; }
+        })
+        .WEB_RELATORIOS_processarBase_OFICIAL(filtros);
+    }
+
+    function BI_baixarCSVExcel() {
+      if(!EXTRACAO_TEM_DADOS) return;
+      var blob = new Blob(["\ufeff" + CACHE_CSV_RAW_PRODUCAO], { type: 'text/csv;charset=utf-8;' });
+      var link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.setAttribute("download", window.NOME_ARQUIVO_BAIXAR || "Relatorio.csv");
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+
+    function BI_baixarXLSExcelReal() {
+      if(!EXTRACAO_TEM_DADOS) { alert("⚠️ Por favor, clique em Pesquisar Relatório primeiro!"); return; }
+      
+      var htmlXLS = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://w3.org"><head><meta charset="utf-8"></head><body><table border="1"><tr style="background-color:#1a73e8; color:#ffffff; font-weight:bold;"><td>Data Solicitacao</td><td>ID Exclusivo</td><td>Nome Completo</td><td>CPF Paciente</td><td>Carteira</td><td>Especialidade</td><td>Prioridade</td><td>Tipo Atendimento</td><td>Situaçao</td><td>Status</td></tr>';
+      var dadosExcel = LISTA_DADOS_MEMORIA || [];
+      
+      dadosExcel.forEach(function(r) { 
+        htmlXLS += '<tr><td>' + (r.data || "") + '</td><td>' + (r.id || "") + '</td><td>' + (r.nome || "") + '</td><td style="mso-number-format:\'\@\';">' + (r.cpf || "-") + '</td><td>' + (r.carteira || "") + '</td><td>' + (r.especialidade || "") + '</td><td>' + (r.prioridade || "") + '</td><td>' + (r.tipo || "") + '</td><td>' + (r.situacao || "") + '</td><td>' + (r.status || "") + '</td></tr>'; 
+      });
+      
+      var blob = new Blob([htmlXLS + '</table></body></html>'], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+      var link = document.createElement("a"); 
+      link.href = URL.createObjectURL(blob); 
+      link.setAttribute("download", "BI_Relatorio_Diabetes_" + new Date().getTime() + ".xls");
+      
+      document.body.appendChild(link); 
+      link.click(); 
+      document.body.removeChild(link);
+    }
+
+    function BI_baixarPdfNativoServidor() {
+      if(!EXTRACAO_TEM_DADOS) { alert("⚠️ Por favor, clique em Pesquisar Relatório primeiro!"); return; }
+      
+      var aviso = document.getElementById("txtStatusBI"); 
+      if(aviso) { 
+        aviso.style.display = "block"; 
+        aviso.innerHTML = "⏳ Isolando dados da tela para geração do PDF Limpo... Aguarde..."; 
+      }
+      
+      var combo = document.getElementById("repSubRelatorio");
+      var nomeRelatorio = combo ? combo.options[combo.selectedIndex].text : "Relatório Executivo";
+      var subRel = document.getElementById("repSubRelatorio").value;
+      
+      setTimeout(function() {
+        if(aviso) { aviso.innerHTML = "⏳ Abrindo visualizador purificado do Google Chrome..."; }
+        
+        var htmlConteudo = "";
+        
+        if(subRel === "resumo_categorias") { 
+          htmlConteudo = document.getElementById("boxQuadradosBI") ? document.getElementById("boxQuadradosBI").innerHTML : ""; 
+        } else if(subRel === "modelo_kanban") { 
+          htmlConteudo = document.getElementById("boxPainelKanbanBI") ? document.getElementById("boxPainelKanbanBI").innerHTML : ""; 
+        } else if(subRel === "interativo_status" || subRel === "historico_buscas" || subRel === "modelo_ficha" || subRel === "modelo_linha" || subRel === "tempo_espera" || subRel === "cronologia_buscas") { 
+          htmlConteudo = document.getElementById("boxSanfonaInterativaBI") ? document.getElementById("boxSanfonaInterativaBI").innerHTML : ""; 
+        } else { 
+          htmlConteudo = document.getElementById("wrapperTabelaPadrao") ? document.getElementById("wrapperTabelaPadrao").innerHTML : ""; 
+        }
+
+        var estilosImpressaoMaster = "<style>" +
+          "body { font-family: 'Segoe UI', sans-serif; background-color: #ffffff; color: #202124; padding: 20px; margin: 0; }" +
+          "h2 { text-align: center; color: #b22222; font-size: 16px; border-bottom: 2px solid #000000; padding-bottom: 6px; text-transform: uppercase; font-weight: 900; margin-bottom: 20px; }" +
+          ".container-resumo-quadrados, #boxQuadradosBI { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; gap: 12px !important; width: 100% !important; margin-top: 15px !important; }" +
+          ".bloco-categoria-card { background-color: #f4eee1 !important; border: 2px solid #000000 !important; border-radius: 8px !important; padding: 10px !important; width: 19% !important; display: flex !important; flex-direction: column !important; box-sizing: border-box !important; min-height: 240px !important; }" +
+          "h3 { margin: 0 0 10px 0 !important; font-size: 11px !important; text-transform: uppercase !important; color: #b22222 !important; font-weight: 900 !important; text-align: center !important; border-bottom: 2px dashed #000000 !important; padding-bottom: 6px !important; }" +
+          ".linha-item-analitica { display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; width: 100% !important; margin-bottom: 5px !important; border-bottom: 1px dashed #cbd5e1 !important; padding-bottom: 3px !important; }" +
+          ".linha-item-analitica > span { color: #000000 !important; font-weight: 800 !important; font-size: 11px !important; }" +
+          ".metricas { display: flex !important; flex-direction: row !important; gap: 6px !important; font-weight: 800 !important; color: #000000 !important; }" +
+          ".pct { color: #1a73e8 !important; font-size: 11px !important; font-weight: bold !important; }" +
+          ".rodape-total-card { display: flex !important; justify-content: space-between !important; font-weight: 900 !important; color: #000000 !important; border-top: 2px solid #000000 !important; margin-top: auto !important; padding-top: 5px !important; text-transform: uppercase !important; font-size: 11px !important; }" +
+          ".painel-kanban-buscas, #boxPainelKanbanBI { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 15px !important; width: 100% !important; box-sizing: border-box !important; }" +
+          ".coluna-kanban-estilizada { background-color: #f1f3f4 !important; border: 2px solid #7f8c8d !important; border-radius: 8px !important; padding: 10px !important; display: flex !important; flex-direction: column !important; min-height: 450px !important; }" +
+          ".coluna-kanban-estilizada h4 { background-color: #202124 !important; color: #ffffff !important; margin: -10px -10px 10px -10px !important; padding: 8px 10px !important; font-size: 11px !important; font-weight: bold !important; text-transform: uppercase !important; text-align: center !important; border-top-left-radius: 6px !important; border-top-right-radius: 6px !important; border-bottom: 2px solid #000000 !important; }" +
+          ".coluna-kanban-estilizada:nth-child(1) { border-color: #1a73e8 !important; }" +
+          ".coluna-kanban-estilizada:nth-child(2) { border-color: #e65100 !important; }" +
+          ".coluna-kanban-estilizada:nth-child(3) { border-color: #1e8449 !important; }" +
+          ".card-paciente-kanban { background-color: #ffffff !important; border: 1px solid #dadce0 !important; border-radius: 6px !important; padding: 12px !important; margin-bottom: 10px !important; box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important; }" +
+          ".card-paciente-kanban h5 { margin: 0 0 8px 0 !important; font-size: 12px !important; color: #000000 !important; font-weight: 800 !important; text-transform: uppercase !important; border-bottom: 1px dashed #dadce0 !important; padding-bottom: 4px !important; }" +
+          ".card-paciente-kanban p { margin: 0 0 4px 0 !important; font-size: 11px !important; color: #5f6368 !important; }" +
+          ".card-paciente-kanban p b { color: #202124 !important; }" +
+          "table { width: 100% !important; border-collapse: collapse !important; border: 2px solid #000000 !important; font-size: 10px !important; margin-top: 15px !important; }" +
+          "th { background-color: #000000 !important; color: #ffffff !important; font-weight: bold !important; padding: 6px 10px !important; text-transform: uppercase !important; }" +
+          "td { padding: 6px 10px !important; border: 1px solid #cbd5e1 !important; font-weight: 600 !important; color: #000000 !important; }" +
+          "tr:nth-child(even) td { background-color: #f4eee1 !important; }" +
+          "@page { size: landscape !important; margin: 10mm !important; }" +
+          "@media print { body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }" +
+        "</style>";
+
+        var janelaImpressao = window.open("", "_blank");
+        janelaImpressao.document.write("<html><head><title>IPESAUDE - " + nomeRelatorio + "</title>");
+        janelaImpressao.document.write(estilosImpressaoMaster);
+        janelaImpressao.document.write("</head><body>");
+        janelaImpressao.document.write("<h2>IPESAUDE - " + nomeRelatorio + "</h2>");
+        janelaImpressao.document.write("<div class='container-resumo-quadrados'>" + htmlConteudo + "</div>");
+        janelaImpressao.document.write("</body></html>");
+        janelaImpressao.document.close();
+
+        try {
+          var botaoResidualFicha = janelaImpressao.document.getElementById("botaoFichaOcultoPdf");
+          if (botaoResidualFicha) { botaoResidualFicha.parentNode.removeChild(botaoResidualFicha); }
+        } catch(errBotao) { console.log("Botão não existente nesta aba: " + errBotao); }
+ 
+        var controlesResiduaisPdf = janelaImpressao.document.getElementById("buscaNomeCronologia") || janelaImpressao.document.querySelector(".no-print");
+        if (controlesResiduaisPdf) {
+          var blocoPaiControles = controlesResiduaisPdf.closest("div");
+          if (blocoPaiControles) { blocoPaiControles.parentNode.removeChild(blocoPaiControles); }
+        }
+        
+        janelaImpressao.focus();
+        janelaImpressao.print();
+        janelaImpressao.close();
+
+        if(aviso) { aviso.style.display = "none"; }
+      }, 800); 
+    }
+
+    window.MOTOR_ABRIR_FICHA_9_FINAL = function(nomeParametro) {
+      if(!nomeParametro) return;
+      var divLista = document.getElementById("areaListaFicha9"); if(divLista) divLista.style.display = "none";
+      
+      var baseMestreAtiva = typeof dbReal !== "undefined" ? dbReal : [];
+      var cB = {};
+      
+      for (var i = 0; i < baseMestreAtiva.length; i++) {
+        var registro = baseMestreAtiva[i];
+        if (registro && (registro.nome || registro.NOME || "").toUpperCase().trim() === String(nomeParametro).toUpperCase().trim()) {
+          cB = registro;
+          break;
+        }
+      }
+      
+      var p = cB; 
+      var d_solicit = cB.DATA || cB.data || "-";
+      var d_cpf     = cB.CPF || cB.cpf || "-";
+      var d_cart    = cB.CARTEIRA || cB.carteira || "-";
+      var d_id      = cB.ID || cB.id || "-";
+      var d_esp     = cB.ESPECIALIDADE || cB.especialidade || "-";
+      var d_prio    = cB["PRIORIDADE DE"] || cB.prioridade || "-";
+      var d_sit     = cB.SITUAÇÃO || cB.SITUAÇAO || cB.situacao || "-";
+      var d_stat    = cB.STATUS || cB.status || "-";
+      var d_fone    = cB.FONE || cB.fone || cB.telefone || "";
+
+      var foneCru = String(d_fone).trim();
+      if (foneCru.toUpperCase().indexOf("AGUARDAR") > -1 || foneCru.toUpperCase().indexOf("BUSCA") > -1) { foneCru = ""; }
+      var exibFone = foneCru !== "" ? '<b style="color:#1a73e8; font-size:12px; font-weight:900;">' + foneCru + '</b>' : '<span style="color:#7f8c8d;">-</span>';
+
+      var h = '<div class="bloco-status-sanfona" style="margin-top:10px; border:2px solid #b22222 !important;"><div class="cabecalho-sanfona" style="background:#202124; color:white; display:flex; justify-content:between; align-items:center;"><span>📋 PRONTUÁRIO COMPLETO DE AUDITORIA ATIVA</span><button type="button" onclick="window.MOTOR_FECHAR_FICHA_9_FINAL()" style="background:#c5221f; color:white; border:none; padding:2px 10px; font-size:10px; font-weight:bold; border-radius:3px; cursor:pointer; margin-left:auto;">✖️ FECHAR FICHA</button></div>' +
+        '<div style="background:#fdfaf4; padding:15px; font-size:11px; line-height:1.6; color:#000000;">' +
+        '<h4 style="margin:0 0 12px 0; color:#b22222; font-size:13px; text-transform:uppercase; border-bottom:2px solid #b22222; padding-bottom:3px;"><span style="color:#00cc66 !important; font-family:sans-serif !important; font-weight:900; font-size:18px; margin-right:6px; display:inline-block; vertical-align:middle;">👤</span> DADOS CADASTRAIS DO PACIENTE</h4>' +
+        '<div style="display:table; width:100%; table-layout:fixed; margin-bottom:12px;"><div style="display:table-row;">' +
+        '<div style="display:table-cell; width:33.33%; padding-bottom:12px;"><div style="background:#e8f0fe; color:#ff0000; font-size:10px; font-weight:900; text-transform:uppercase; padding:2px 6px; display:inline-block; border-radius:3px; border:1px solid #1a73e8;">👤 Nome Completo</div><div style="color:#000; font-weight:900; font-size:12px; text-transform:uppercase; padding-top:4px; padding-left:6px;">' + (p.nome || p.NOME || "-") + '</div></div>' +
+        '<div style="display:table-cell; width:33.33%; padding-bottom:12px;"><div style="background:#e8f0fe; color:#ff0000; font-size:10px; font-weight:900; text-transform:uppercase; padding:2px 6px; display:inline-block; border-radius:3px; border:1px solid #1a73e8;">📅 Data Solicitação</div><div style="color:#000; font-weight:900; font-size:12px; padding-top:4px; padding-left:6px;">' + d_solicit + '</div></div>' +
+        '<div style="display:table-cell; width:33.33%; padding-bottom:12px;"><div style="background:#e8f0fe; color:#ff0000; font-size:10px; font-weight:900; text-transform:uppercase; padding:2px 6px; display:inline-block; border-radius:3px; border:1px solid #1a73e8;">💳 CPF do Paciente</div><div style="color:#000; font-weight:900; font-size:12px; padding-top:4px; padding-left:6px;">' + d_cpf + '</div></div></div>' +
+        '<div style="display:table-row;">' +
+        '<div style="display:table-cell; width:33.33%;"><div style="background:#e8f0fe; color:#ff0000; font-size:10px; font-weight:900; text-transform:uppercase; padding:2px 6px; display:inline-block; border-radius:3px; border:1px solid #1a73e8;">📇 Carteira</div><div style="color:#000; font-weight:900; font-size:12px; padding-top:4px; padding-left:6px;">' + d_cart + '</div></div>' +
+        '<div style="display:table-cell; width:33.33%;"><div style="background:#e8f0fe; color:#ff0000; font-size:10px; font-weight:900; text-transform:uppercase; padding:2px 6px; display:inline-block; border-radius:3px; border:1px solid #1a73e8;">🔑 ID Exclusivo</div><div style="color:#000; font-weight:900; font-size:12px; padding-top:4px; padding-left:6px;">' + d_id + '</div></div>' +
+        '<div style="display:table-cell; width:33.33%;"><div style="background:#e8f0fe; color:#ff0000; font-size:10px; font-weight:900; text-transform:uppercase; padding:2px 6px; display:inline-block; border-radius:3px; border:1px solid #1a73e8;">📞 DDD / Telefone</div><div style="padding-top:4px; padding-left:6px;">' + exibFone + '</div></div></div></div>';
+
+      h += '<h4 style="margin:15px 0 12px 0; color:#b22222; font-size:13px; text-transform:uppercase; border-bottom:2px solid #b22222; padding-bottom:3px;"><span style="color:#ffcc00 !important; font-family:sans-serif !important; font-weight:900; font-size:18px; margin-right:6px; display:inline-block; vertical-align:middle;">✚</span> DETALHES DO ATENDIMENTO REQUISITADO</h4>' +
+        '<div style="display:table; width:100%; table-layout:fixed; margin-bottom:12px;"><div style="display:table-row;">' +
+        '<div style="display:table-cell; width:33.33%; padding-bottom:12px;"><div style="background:#e8f0fe; color:#ff0000; font-size:10px; font-weight:900; text-transform:uppercase; padding:2px 6px; display:inline-block; border-radius:3px; border:1px solid #1a73e8;">🩺 Especialidade</div><div style="color:#000000; font-weight:900; font-size:12px; text-transform:uppercase; padding-top:4px; padding-left:6px;">' + d_esp + '</div></div>' +
+        '<div style="display:table-cell; width:33.33%; padding-bottom:12px;"><div style="background:#e8f0fe; color:#ff0000; font-size:10px; font-weight:900; text-transform:uppercase; padding:2px 6px; display:inline-block; border-radius:3px; border:1px solid #1a73e8;">🚨 Prioridade</div><div style="color:#000000; font-weight:900; font-size:12px; padding-top:4px; padding-left:6px;">' + d_prio + '</div></div>' +
+        '<div style="display:table-cell; width:33.33%; padding-bottom:12px;"><div style="background:#e8f0fe; color:#ff0000; font-size:10px; font-weight:900; text-transform:uppercase; padding:2px 6px; display:inline-block; border-radius:3px; border:1px solid #1a73e8;">⚡ Tipo Atendimento</div><div style="color:#000000; font-weight:900; font-size:12px; padding-top:4px; padding-left:6px;">' + d_stat + '</div></div></div>' +
+        '<div style="display:table-row;"><div style="display:table-cell; width:33.33%;"><div style="background:#e8f0fe; color:#ff0000; font-size:10px; font-weight:900; text-transform:uppercase; padding:2px 6px; display:inline-block; border-radius:3px; border:1px solid #1a73e8;">📝 Situação</div><div style="color:#000000; font-weight:900; font-size:12px; padding-top:4px; padding-left:6px;">' + d_sit + '</div></div>' +
+        '<div style="display:table-cell; width:33.33%;"></div><div style="display:table-cell; width:33.33%;"></div></div></div>' +
+        '<div style="background:#fff; padding:6px 10px; border:1px solid #dadce0; border-left:4px solid #1a73e8; margin-bottom:15px; font-weight:bold;"><span style="background:#1a73e8; color:#ffffff; font-size:10px; text-transform:uppercase; padding:2px 6px; border-radius:3px; border:1px solid #1a73e8;">📊 Status Atual do Caso</span><span style="color:#b22222; font-size:12px; font-weight:900; text-transform:uppercase; margin-left:10px;">' + d_stat + '</span></div>';
+        
+      h += '<h4 style="margin:15px 0 10px 0; color:#b22222; font-size:13px; text-transform:uppercase; border-bottom:2px solid #b22222; padding-bottom:3px;"><span style="color:#ff0000 !important; font-family:sans-serif !important; font-weight:900; font-size:18px; margin-right:6px; display:inline-block; vertical-align:middle;">☎</span> HISTÓRICO DE MONITORAMENTO DE BUSCAS</h4>' +
+        '<p style="margin:6px 0;"><span style="background:#fff4e5; color:#e65100; font-size:10px; font-weight:bold; padding:1px 6px; border-radius:3px; border:1px solid #ffe2cc;">🔍 Busca 1</span><span style="font-weight:900; color:#000; margin-left:6px;">' + (p.b1 || p.B1 || "-") + '</span>' + (p.data1 && p.data1 !== "-" ? ' <span style="color:#1a73e8; font-weight:bold;">(📅 ' + p.data1 + ')</span>' : '') + '</p>' +
+        '<p style="margin:6px 0;"><span style="background:#fff4e5; color:#e65100; font-size:10px; font-weight:bold; padding:1px 6px; border-radius:3px; border:1px solid #ffe2cc;">🔍 Busca 2</span><span style="font-weight:900; color:#000; margin-left:6px;">' + (p.b2 || p.B2 || "-") + '</span>' + (p.data2 && p.data2 !== "-" ? ' <span style="color:#e65100; font-weight:bold;">(📅 ' + p.data2 + ')</span>' : '') + '</p>' +
+        '<p style="margin:6px 0;"><span style="background:#fff4e5; color:#e65100; font-size:10px; font-weight:bold; padding:1px 6px; border-radius:3px; border:1px solid #ffe2cc;">🔍 Busca 3</span><span style="font-weight:900; color:#000; margin-left:6px;">' + (p.b3 || p.B3 || "-") + '</span>' + (p.data3 && p.data3 !== "-" ? ' <span style="color:#1e8449; font-weight:bold;">(📅 ' + p.data3 + ')</span>' : '') + '</p>';
+        
+      h += '<p style="margin:12px 0 0 0; background:#fff; padding:10px; border:1px dashed #dadce0; font-size:11px; line-height:1.4;"><span style="background:#1a73e8; color:#ffffff; font-size:10px; font-weight:bold; text-transform:uppercase; padding:2px 6px; border-radius:3px; border:1px solid #1a73e8; display:inline-block; margin-bottom:4px;">📝 Observações Gerais Administrativas</span><br><span style="color:#000000; font-weight:600; padding-left:4px;">' + (p.obs || p.OBS || "Nenhuma observação registrada.") + '</span></p>' +
+        '</div></div>';
+        
+      var container = document.getElementById("wrapperFichaProntuario9"); if(container) container.innerHTML = h;
+    };
+
+    window.MOTOR_FECHAR_FICHA_9_FINAL = function() {
+      var container = document.getElementById("wrapperFichaProntuario9"); if(container) container.innerHTML = "";
+      var divLista = document.getElementById("areaListaFicha9"); if(divLista) divLista.style.display = "block";
+    };
+
+    window.MOTOR_FILTRO_UNIVERSAL_TABELA = function() {
+      var inputNome = document.getElementById("txtFiltroNomeUniversal"); if (!inputNome) return;
+      var textoDigitado = inputNome.value.toUpperCase().trim();
+      
+      var containerTabela = document.getElementById("areaListaFicha9") || document.getElementById("wrapperTabelaPadrao"); 
+      if (!containerTabela) return;
+      
+      var linhas = containerTabela.getElementsByTagName("tr");
+      var totalLinhas = linhas.length;
+      
+      if (textoDigitado.length < 5) {
+        for (var k = 1; k < totalLinhas; k++) { if (linhas[k]) linhas[k].style.display = ""; }
+        return; 
+      }
+      
+      for (var i = 1; i < totalLinhas; i++) {
+        var linha = linhas[i];
+        var celulas = linha.cells;
+        
+        if (celulas && celulas.length > 0) {
+          var indiceColunaNome = document.getElementById("areaListaFicha9") ? 0 : 2;
+          var celulaAlvo = celulas[indiceColunaNome];
+          var nomePaciente = celulaAlvo ? celulaAlvo.textContent.toUpperCase().trim() : "";
+          
+          if (nomePaciente.indexOf(textoDigitado) === 0) {
+            if (linha.style.display === "none") linha.style.display = "";
+          } else {
+            if (linha.style.display !== "none") linha.style.display = "none";
+          }
+        }
+      }
+    };
+
+    window.MOTOR_FILTRO_CRONOLOGIA_NATIVO = function() {
+      var inputCronologia = document.getElementById("txtFiltroNomeUniversal") || document.getElementById("txtFiltroCronologia"); 
+      if (!inputCronologia) return;
+      
+      if(inputCronologia.getAttribute("autocomplete") !== "off") { inputCronologia.setAttribute("autocomplete", "off"); }
+      
+      var textoDigitado = inputCronologia.value.toUpperCase().trim();
+      var corpoTabela = document.getElementById("tabelaCronologiaCorpo"); if (!corpoTabela) return;
+      var linhas = corpoTabela.getElementsByTagName("tr");
+      var totalLinhas = linhas.length;
+      
+      if (textoDigitado.length < 5) {
+        for (var k = 0; k < totalLinhas; k++) { if (linhas[k]) linhas[k].style.display = ""; }
+        return; 
+      }
+      
+      for (var i = 0; i < totalLinhas; i++) {
+        var linha = linhas[i];
+        var celulas = linha.cells;
+        
+        if (celulas && celulas.length > 0) {
+          var nomePaciente = celulas[0].textContent.toUpperCase().trim();
+          
+          if (nomePaciente.indexOf(textoDigitado) === 0) {
+            if (linha.style.display === "none") linha.style.display = "";
+          } else {
+            if (linha.style.display !== "none") linha.style.display = "none";
+          }
+        }
+      }
+    };
+</script>
+
+<style>
+@media print {
+  .conteudo-sanfona-tabela, 
+  #boxSanfona .conteudo-sanfona-tabela,
+  .bloco-status-sanfona {
+    max-height: none !important;
+    overflow: visible !important;
+    height: auto !important;
+    display: block !important;
+    padding: 10mm !important;
+  }
+
+  #boxSanfona tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}
+</style>
+
+<script>
+window.addEventListener("load", function() {
+  try {
+    var cargoLogado = typeof nivelUser !== "undefined" ? nivelUser : (window.nivelUser || "");
+    if (cargoLogado === "OPERADOR_MISTO") {
+      var selectMenu = document.getElementById("repSubRelatorio");
+      if (selectMenu) {
+        var opcao14 = selectMenu.querySelector('option[value="produtividade_equipe"]');
+        if (opcao14) {
+          if (selectMenu.value === "produtividade_equipe") {
+            selectMenu.selectedIndex = 0;
+          }
+          opcao14.parentNode.removeChild(opcao14);
+        }
+      }
+    }
+  } catch(e) { console.log("Erro na trava: " + e); }
+});
+</script>
+
+</body>
+</html>

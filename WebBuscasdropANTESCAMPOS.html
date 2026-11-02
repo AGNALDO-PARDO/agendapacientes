@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target='_top'>
+  <style>
+    body { 
+      font-family: 'Segoe UI', sans-serif; 
+      padding: 0 !important; 
+      margin: 0 !important; 
+      background-color: #e8f0fe !important; 
+      color: #202124; 
+      font-size: 12px; 
+      box-sizing: border-box; 
+      overflow-x: hidden !important; 
+      overflow-y: auto !important;   
+    }
+
+    .form-group { margin-bottom: 1px; position: relative; display: flex; flex-direction: column; } 
+    label { display: block; margin-bottom: 2px; font-weight: 800 !important; font-size: 11px !important; color: #000000 !important; text-transform: uppercase; letter-spacing: 0.5px; }
+    input, select { width: 100% !important; padding: 2px 10px !important; border: 2px solid #000000 !important; border-radius: 8px !important; box-sizing: border-box !important; font-size: 13px !important; height: 35px !important; background-color: #ffffff !important; color: #000000 !important; font-weight: bold !important; transition: all 0.15s ease-in-out !important; }
+    input[disabled], select[disabled], input[readonly] { background-color: #e9ecef !important; color: #202124 !important; cursor: not-allowed; border: 2px solid #000000 !important; }
+    input:focus, select:focus { border-color: #ff0000 !important; background-color: #e9ecef !important; color: #000000 !important; outline: none !important; box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.15) !important; }
+    
+    .linha-tripla { 
+      display: flex !important; 
+      gap: 8px; 
+      width: 100%; 
+      box-sizing: border-box; 
+      align-items: flex-end; 
+      margin-bottom: 2px; 
+      flex-wrap: wrap !important; 
+    }
+
+    .coluna { flex: 1 1 180px !important; min-width: 140px !important; }
+    .col-status-compacto { flex: 1 1 185px !important; min-width: 150px !important; }
+    .col-id-visual { flex: 1 1 135px !important; min-width: 110px !important; }
+    
+    .btn-busca { background-color: #1a73e8; color: white; padding: 0 25px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; height: 35px; }
+    .btn-busca:hover { background-color: #1557b0; }
+    
+    .grupo-botoes-rodape { display: flex !important; gap: 16px !important; margin-top: 6px !important; width: 100% !important; box-sizing: border-box !important; align-items: center !important; justify-content: space-between !important; flex-wrap: wrap !important; }
+    .grupo-botoes-rodape button { min-width: 180px; }
+
+    .btn-salvar { flex: 2 !important; background-color: #137333 !important; color: white !important; padding: 8px !important; font-size: 14px !important; height: 38px !important; border: none !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer; box-shadow: 0 4px 8px rgba(19,115,51,0.2); margin-top: 0 !important; }
+    .btn-salvar:hover { background-color: #0b5123 !important; }
+    
+    .btn-voltar-menu { flex: 1 !important; background-color: #5f6368 !important; color: white !important; padding: 8px !important; font-size: 14px !important; height: 38px !important; border: none !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important; transition: background 0.2s !important; display: block !important; margin: 0 !important; box-sizing: border-box !important; text-align: center; line-height: 22px; }
+    .btn-voltar-menu:hover { background-color: #3c4043 !important; }
+    
+    .secao-titulo { font-size: 11px !important; font-weight: 800; color: #ffffff; background-color: #1a73e8; margin: 4px 0 3px 0; padding: 3px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; border: none !important; width: 100%; box-sizing: border-box; }
+    .secao-busca { background-color: #fdfaf4 !important; padding: 6px 12px; border-radius: 12px; margin: 6px 12px 4px 12px; border: 2px solid #000000; position: relative; box-sizing: border-box; }
+    .cartao-resultado { background-color: #fdfaf4 !important; border: 2px solid #000000; padding: 6px 12px; margin: 0 12px 6px 12px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); box-sizing: border-box; }
+    
+    #msgStatusComp { margin-top: 4px; text-align: center; font-size: 12px; font-weight: bold; padding: 4px; border-radius: 4px; display: none; }
+    .sucesso { color: #137333; background-color: #e6f4ea; border: 1px solid #ceead6; }
+    .erro { color: #c5221f; background-color: #fce8e6; border: 1px solid #fad2cf; }
+
+    .lista-sugestoes-autocomplete { position: absolute; top: 100%; left: 0; width: 100%; background-color: #ffffff !important; border: 2px solid #000000; border-radius: 0 0 8px 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 999999 !important; max-height: 250px; overflow-y: auto; margin: 1px 0 0 0; padding: 0; list-style: none; display: none; box-sizing: border-box; }
+    .lista-sugestoes-autocomplete li { padding: 6px 12px; font-weight: bold; font-size: 13px; color: #202124; cursor: pointer; border-bottom: 1px solid #f1f3f4; text-transform: uppercase; background-color: #ffffff !important; }
+    .lista-sugestoes-autocomplete li:hover, .lista-sugestoes-autocomplete li.selecionado { background-color: #e8f0fe !important; color: #1a73e8 !important; }
+
+    .area-fila-exposta { width: 100%; max-height: 410px !important; overflow-y: auto; border: 2px solid #000000; border-radius: 8px; background-color: #ffffff; margin-top: 4px; box-sizing: border-box; }
+    .tabela-fila-crono { width: 100%; border-collapse: collapse; font-size: 12px; font-weight: bold; text-align: left; }
+    .tabela-fila-crono thead th { background-color: #137333; color: white; padding: 6px 10px; position: sticky; top: 0; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid #000000; }
+    .tabela-fila-crono tbody tr { cursor: pointer; transition: background 0.15s; border-bottom: 1px solid #cbd5e1; }
+    .tabela-fila-crono tbody tr:hover { background-color: #e8f0fe !important; color: #1a73e8; }
+    .tabela-fila-crono tbody td { padding: 6px 10px; color: #000000; }
+  </style>
+</head>
+<body>
+
+  <!-- 🔎 BUSCA DIRECIONADA NO TOPO MESTRE -->
+  <div class="secao-busca">
+    <div class="linha-tripla">
+      <div class="form-group coluna">
+        <label>🔎 Buscar Paciente Por:</label>
+        <select id='compFiltro' onchange="INTERFACE_AJUSTAR_placeholderBusca(this.value)">
+          <option value='nome'>👤 NOME COMPLETO</option>
+          <option value='carteira'>📇 NÚMERO DA CARTEIRA</option>
+          <option value='CPF'>💳 NÚMERO DO CPF</option>
+          <option value='id'>🆔 NÚMERO DO ID EXCLUSIVO</option>
+        </select>
+      </div>
+      <div class="form-group coluna" style="flex: 2; position: relative;">
+        <label>🔎 Termo de Pesquisa Operacional:</label>
+        <input type="text" id="compTermo" placeholder="✍️ Digite no mínimo 5 letras para buscar..." autocomplete="off" oninput="INTERFACE_INTERCEPTAR_tecladoBusca(this)" onkeyup="LAB_monitorarTecladoAutocomplete(event)">
+        <ul id="listaSugestoesDrop" class="lista-sugestoes-autocomplete"></ul>
+      </div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <button type="button" class="btn-busca" onclick="COMP_executarBuscaManual()">🔍 Buscar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⏳ FILA OPERACIONAL CRONOLÓGICA -->
+  <div class="secao-busca" id="wrapperFilaCronologicaPrincipal" style="display: block;">
+    <div class="secao-titulo" style="background-color: #137333 !important; margin-top: 0;">⏳ FILA OPERACIONAL CRONOLÓGICA (Mais Antigos com Contato Pendente no Topo)</div>
+    <div class="area-fila-exposta">
+      <table class="tabela-fila-crono">
+        <thead>
+          <tr>
+            <th>NOME DO PACIENTE</th>
+            <th style="width: 120px; text-align: center;">📅 DATA CAD.</th>
+            <th style="width: 120px;">🪪 CARTEIRA</th>
+            <th style="width: 120px;">💳 CPF PACIENTE</th>
+            <th style="width: 120px;">📱 TELEFONE</th>
+            <th style="width: 90px; text-align: center;">⏳ DIAS ESPERA</th>
+            <th style="width: 100px;">ID EXCLUSIVO</th>
+            <th style="width: 130px; text-align: center;">STATUS ATUAL</th>
+            <th style="width: 50px; text-align: center;">ORDEM</th>
+          </tr>
+        </thead>
+        <tbody id="corpoFilaCronologicaAberta">
+          <tr><td colspan="9" style="text-align: center; padding: 25px; color: #475569; font-weight: bold; font-size: 13px;">🟢 Painel operacional pronto! Clique no botão verde abaixo em "Atualizar Fila" para carregar a lousa cronológica ativa.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="display: flex; justify-content: flex-end; margin-top: 6px;">
+      <button type="button" class="btn-busca" style="background-color: #137333 !important; height: 28px; font-size: 11px; padding: 0 15px;" onclick="CRONO_recarregarListaFilaExposta()">🔄 Atualizar Fila</button>
+    </div>
+  </div>
+
+  <div id='msgStatusComp'></div>
+  
+  <form id="formComplementoReal" class="cartao-resultado" autocomplete="off" style="display:none;">
+    <input type="hidden" id="compLinhaFisica">
+    <input type="hidden" id="txtAuditorOriginalK">
+    <input type="hidden" id="txtAuditorOriginalN">
+    <input type="hidden" id="txtAuditorOriginalQ">
+    
+    <div class='secao-titulo' style="margin-top: 0;">Dados Cadastrais (Leitura Protegida)</div>
+    <div class="linha-tripla">
+      <div class="form-group coluna"><label>👤 NOME COMPLETO DO PACIENTE</label><input type='text' id='compA' readonly></div>
+      <div class="form-group col-id-visual"><label>💳 CPF DO PACIENTE</label><input type='text' id='compCPF' readonly style="text-align: center;"></div>
+      <div class="form-group col-id-visual"><label>📇 CARTEIRA</label><input type='text' id='compB' readonly style="text-align: center;"></div>
+      <div class="form-group" style="width: 45px; margin-bottom: 2px;"><label>📞 DDD</label><input type='text' id='compC' readonly style="text-align: center;"></div>
+      <div class="form-group" style="width: 95px; margin-bottom: 2px;"><label>📱 TELEFONE</label><input type='text' id='compD' readonly style="text-align: center;"></div>
+      <div class="form-group col-status-compacto"><label>🆔 ID EXCLUSIVO 🔒</label><input type='text' id='compW' readonly style="text-align: center;"></div>
+    </div>
+    
+    <div class="secao-titulo">🩺 Configurações Clínicas e Administrativas</div>
+    <div class="linha-tripla">
+      <div class="form-group coluna"><label>🩺 ESPECIALIDADE</label><input type='text' id='compE' readonly></div>
+      <div class="form-group coluna"><label>🚨 PRIORIDADE</label><input type='text' id='compF' readonly></div>
+      <div class="form-group coluna"><label>📋 TIPO ATENDIMENTO</label><input type='text' id='compG' readonly></div>
+      <div class="form-group coluna"><label>🚩 SITUAÇÃO CASO</label><input type='text' id='compH' readonly></div>
+      <div class="form-group coluna"><label>⚡ STATUS ATUAL</label><input type='text' id='compI' readonly style="font-weight: 800; color: #1a73e8;"></div>
+    </div>
+
+    <div class='secao-titulo'>Histórico Operacional de Acionamentos (Lançamentos e Bloqueios)</div>
+    
+    <!-- BUSCA 1 + AUDITORIA -->
+    <div class="linha-tripla">
+      <div class="form-group coluna" style="flex: 2;">
+        <label>📂 CONTEÚDO BUSCA 1</label>
+        <select id='compK' onchange="COMP_gerenciarOpcoesEStatus_DINAMICO('compK')">
+          <option value="">-- Em Branco --</option><option value="CAIXA POSTAL">CAIXA POSTAL</option><option value="Nº INVÁLIDO/BLOQUEADO 2">Nº BLOQUEADO 2</option><option value="Nº INCORRETO - TERCEIRO DESCONHECE">Nº INCORRETO - TERCEIRO DESCONHECE</option><option value="SEM SUCESSO - 3ª TENTATIVA">SEM SUCESSO - 3ª TENTATIVA</option><option value="EXITO">EXITO</option>
+        </select>
+      </div>
+      <div class="form-group coluna"><label>📅 Data Busca 1</label><input type='text' id='lblDataBusca1' readonly style="text-align: center;"></div>
+      <div class="form-group coluna"><label>👤 Usuário Busca 1</label><input type='text' id='lblUsuarioBusca1' readonly style="text-align: center;"></div>
+    </div>
+
+    <!-- BUSCA 2 + AUDITORIA -->
+    <div class="linha-tripla">
+      <div class="form-group coluna" style="flex: 2;">
+        <label>🛠️ CONTEÚDO BUSCA 2</label>
+        <select id='compN' onchange="COMP_gerenciarOpcoesEStatus_DINAMICO('compN')">
+          <option value="">-- Em Branco --</option><option value="CAIXA POSTAL">CAIXA POSTAL</option><option value="Nº INVÁLIDO/BLOQUEADO 2">Nº BLOQUEADO 2</option><option value="Nº INCORRETO - TERCEIRO DESCONHECE">Nº INCORRETO - TERCEIRO DESCONHECE</option><option value="SEM SUCESSO - 3ª TENTATIVA">SEM SUCESSO - 3ª TENTATIVA</option><option value="EXITO">EXITO</option>
+        </select>
+      </div>
+      <div class="form-group coluna"><label>📅 Data Busca 2</label><input type='text' id='lblDataBusca2' readonly style="text-align: center;"></div>
+      <div class="form-group coluna"><label>👤 Usuário Busca 2</label><input type='text' id='lblUsuarioBusca2' readonly style="text-align: center;"></div>
+    </div>
+
+    <!-- BUSCA 3 + AUDITORIA -->
+    <div class="linha-tripla">
+      <div class="form-group coluna" style="flex: 2;">
+        <label>🔎 CONTEÚDO BUSCA 3</label>
+        <select id='compQ' onchange="COMP_gerenciarOpcoesEStatus_DINAMICO('compQ')">
+          <option value="">-- Em Branco --</option><option value="CAIXA POSTAL">CAIXA POSTAL</option><option value="Nº INVÁLIDO/BLOQUEADO 2">Nº BLOQUEADO 2</option><option value="Nº INCORRETO - TERCEIRO DESCONHECE">Nº INCORRETO - TERCEIRO DESCONHECE</option><option value="SEM SUCESSO - 3ª TENTATIVA">SEM SUCESSO - 3ª TENTATIVA</option><option value="EXITO">EXITO</option>
+        </select>
+      </div>
+      <div class="form-group coluna"><label>📅 Data Busca 3</label><input type='text' id='lblDataBusca3' readonly style="text-align: center;"></div>
+      <div class="form-group coluna"><label>👤 Usuário Busca 3</label><input type='text' id='lblUsuarioBusca3' readonly style="text-align: center;"></div>
+    </div>
+
+    <div class='form-group' style="width: 100%;"><label>📝 Observações Gerais da Evolução (T)</label><input type='text' id='compT' autocomplete="off"></div>
+
+    <div class="grupo-botoes-rodape" style="margin-top: 6px;">
+      <button type="button" class="btn-voltar-menu" onclick="CRONO_restaurarPainelFilaTotal()">↩️ Menu Principal (Voltar)</button>
+      <button type="button" class="btn-salvar" id="btnSalvarComplemento" onclick="COMP_salvarDadosGerais()">💾 Gravar e Atualizar Acionamento Atual</button>
+    </div>
+  </form>
+
+  <script>
+    var INDICE_SELECIONADO_KEYBOARD = -1;
+
+    function INTERFACE_AJUSTAR_placeholderBusca(filtro) {
+      var txt = document.getElementById("compTermo"); txt.value = ""; LAB_fecharDropdownSugestoes();
+      if (filtro === "CPF") { txt.placeholder = "000.000.000-00"; txt.maxLength = 14; }
+      else if (filtro === "carteira") { txt.placeholder = "Digite entre 14 e 16 números..."; txt.maxLength = 16; }
+      else if (filtro === "id") { txt.placeholder = "ID alfanumérico..."; txt.maxLength = 50; }
+      else { txt.placeholder = "Digite no mínimo 5 letras para buscar..."; txt.removeAttribute("maxlength"); }
+    }
+
+    function COMP_gerenciarOpcoesEStatus_DINAMICO(idSelectAlterado) {
+      var s1 = document.getElementById('compK'); 
+      var s2 = document.getElementById('compN');
+      var s3 = document.getElementById('compQ'); 
+      var inputStatus = document.getElementById('compI');
+
+      // 1. Ocultar "SEM SUCESSO - 3ª TENTATIVA" nas Buscas 1 e 2
+      [s1, s2].forEach(function(sel) {
+        if (sel && sel.options) {
+          for (var i = 0; i < sel.options.length; i++) {
+            if (sel.options[i].value === "SEM SUCESSO - 3ª TENTATIVA") {
+              sel.options[i].style.display = 'none';
+            }
+          }
+        }
+      });
+
+      // 2. Na Busca 3, mostrar apenas "-- Em Branco --", "SEM SUCESSO - 3ª TENTATIVA" e "EXITO"
+      if (s3 && s3.options) {
+        for (var k = 0; k < s3.options.length; k++) {
+          var val = s3.options[k].value;
+          if (val !== "" && val !== "SEM SUCESSO - 3ª TENTATIVA" && val !== "EXITO") {
+            s3.options[k].style.display = 'none';
+          } else {
+            s3.options[k].style.display = 'block';
+          }
+        }
+      }
+
+      // 3. Recálculo automático de Status
+      var val1 = s1 ? s1.value : '';
+      var val2 = s2 ? s2.value : '';
+      var val3 = s3 ? s3.value : '';
+
+      if (val1 === 'EXITO' || val2 === 'EXITO' || val3 === 'EXITO') {
+        inputStatus.value = 'AGENDADO';
+      } else if (val3 === 'SEM SUCESSO - 3ª TENTATIVA') {
+        inputStatus.value = 'ENCERRADO';
+      } else if (val1 !== '' || val2 !== '') {
+        inputStatus.value = 'EM BUSCA';
+      }
+
+      if (typeof COMP_recalibrarCoresSelects === "function") COMP_recalibrarCoresSelects();
+    }
+
+    function COMP_tratarRetornoBusca(res) {
+      var status = document.getElementById('msgStatusComp');
+      if(res.sucesso && res.dados) {
+        status.style.display = 'none'; 
+        document.getElementById('formComplementoReal').style.display = 'block';
+        
+        var wrapperFila = document.getElementById('wrapperFilaCronologicaPrincipal');
+        if (wrapperFila) wrapperFila.style.display = 'none';
+
+        var d = res.dados; 
+        document.getElementById('compLinhaFisica').value = d.id || "";
+        document.getElementById('compA').value = d.nome || ""; 
+        document.getElementById('compCPF').value = d.cpf || "";
+        document.getElementById('compB').value = d.carteira || ""; 
+        document.getElementById('compC').value = d.ddd || "";
+        document.getElementById('compD').value = d.telefone || ""; 
+        document.getElementById('compE').value = d.especialidade || "";
+        document.getElementById('compF').value = d.prioridade || ""; 
+        document.getElementById('compG').value = d.tipo || "";
+        document.getElementById('compH').value = d.situacao || ""; 
+        document.getElementById('compI').value = d.status_atendimento || "";
+        
+        document.getElementById('compK').value = (d.busca1 || "").trim(); 
+        document.getElementById('compN').value = (d.busca2 || "").trim();
+        document.getElementById('compQ').value = (d.busca3 || "").trim(); 
+        document.getElementById('compT').value = d.observacao || "";
+        document.getElementById('compW').value = d.id || ""; 
+
+        document.getElementById('lblDataBusca1').value = d.data_busca1 || "-";
+        document.getElementById('lblUsuarioBusca1').value = d.auditor1 || "-";
+        
+        document.getElementById('lblDataBusca2').value = d.data_busca2 || "-";
+        document.getElementById('lblUsuarioBusca2').value = d.auditor2 || "-";
+        
+        document.getElementById('lblDataBusca3').value = d.data_busca3 || "-";
+        document.getElementById('lblUsuarioBusca3').value = d.auditor3 || "-";
+
+        document.getElementById('txtAuditorOriginalK').value = d.busca1 || "";
+        document.getElementById('txtAuditorOriginalN').value = d.busca2 || ""; 
+        document.getElementById('txtAuditorOriginalQ').value = d.busca3 || "";
+        
+        var operadorLogado = window.EMAIL_OPERADOR_REAL_WEB || "";
+        var travarSelect = function(idSelect, valOrig, txtAud) {
+          var sel = document.getElementById(idSelect); 
+          if (sel) { 
+            if (valOrig && valOrig.trim() !== "" && valOrig.trim() !== "-") { 
+              if (txtAud.toLowerCase().indexOf(operadorLogado.toLowerCase()) === -1 && operadorLogado !== "") {
+                sel.disabled = true; 
+              } else { 
+                sel.disabled = false; 
+              } 
+            } else { 
+              sel.disabled = false; 
+            } 
+          }
+        };
+
+        travarSelect('compK', d.busca1, d.auditor1 || ""); 
+        travarSelect('compN', d.busca2, d.auditor2 || ""); 
+        travarSelect('compQ', d.busca3, d.auditor3 || ""); 
+        
+        COMP_gerenciarOpcoesEStatus_DINAMICO();
+      } else {
+        status.style.display='block'; status.className='erro'; status.innerHTML = res.mensagem || "⚠️ Nenhum registro localizado."; 
+        document.getElementById('formComplementoReal').reset();
+      }
+    }
+
+    function CRONO_restaurarPainelFilaTotal() {
+      var f = document.getElementById('formComplementoReal'); if(f) f.reset(); f.style.display = 'none';
+      var wrapperFila = document.getElementById('wrapperFilaCronologicaPrincipal');
+      if (wrapperFila) wrapperFila.style.display = 'block'; 
+      var status = document.getElementById('msgStatusComp'); if(status) { status.style.display='none'; status.innerHTML=''; }
+      var t = document.getElementById('compTermo'); if(t) t.value='';
+      CRONO_recarregarListaFilaExposta();
+    }
+
+    async function CRONO_abrirFichaDiretaSemDigitar(identificador, filtroSugerido) {
+      var status = document.getElementById('msgStatusComp');
+      status.style.display='block'; status.className=''; status.innerHTML='⚙️ Conectando com o banco Supabase...';
+      try {
+        const req = await fetch('/api/pacientes/busca-completa?filtro=' + encodeURIComponent(filtroSugerido) + '&termo=' + encodeURIComponent(identificador));
+        const res = await req.json();
+        COMP_tratarRetornoBusca(res);
+      } catch(err) {
+        status.className='erro'; status.innerHTML='Erro: '+err.message;
+      }
+    }
+
+    async function LAB_monitorarTecladoAutocomplete(event) {
+      var filtro = document.getElementById("compFiltro").value;
+      var termo = document.getElementById("compTermo").value.trim().toUpperCase();
+      var list = document.getElementById("listaSugestoesDrop");
+      if (filtro !== "nome") { LAB_fecharDropdownSugestoes(); return; }
+      var itens = list.getElementsByTagName("li");
+
+      if (event.key === "ArrowDown") {
+        event.preventDefault(); INDICE_SELECIONADO_KEYBOARD++;
+        if (INDICE_SELECIONADO_KEYBOARD >= itens.length) INDICE_SELECIONADO_KEYBOARD = 0;
+        LAB_destacarItemDropdown(itens); return;
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault(); INDICE_SELECIONADO_KEYBOARD--;
+        if (INDICE_SELECIONADO_KEYBOARD < 0) INDICE_SELECIONADO_KEYBOARD = itens.length - 1;
+        LAB_destacarItemDropdown(itens); return;
+      } else if (event.key === "Enter") {
+        event.preventDefault();
+        if (INDICE_SELECIONADO_KEYBOARD > -1 && itens[INDICE_SELECIONADO_KEYBOARD]) { 
+          LAB_selecionarNomeDropdown(itens[INDICE_SELECIONADO_KEYBOARD].innerText);
+        } else { COMP_executarBuscaManual(); } return;
+      } else if (event.key === "Escape") { LAB_fecharDropdownSugestoes(); return; }
+
+      INDICE_SELECIONADO_KEYBOARD = -1;
+      if (termo.length < 5) { LAB_fecharDropdownSugestoes(); return; }
+
+      try {
+        const req = await fetch('/api/pacientes/sugestoes?termo=' + encodeURIComponent(termo));
+        const res = await req.json();
+        if (!res.sucesso || !res.sugestoes || res.sugestoes.length === 0) { LAB_fecharDropdownSugestoes(); return; }
+        
+        var htmlDrop = "";
+        res.sugestoes.forEach(function(nome) {
+          htmlDrop += '<li onmousedown="LAB_selecionarNomeDropdown(\'' + nome.replace(/'/g, "\\'") + '\')">' + nome + '</li>';
+        });
+        list.innerHTML = htmlDrop; list.style.display = "block";
+      } catch(err) {
+        console.error("Erro no autocomplete:", err);
+      }
+    }
+
+    function LAB_destacarItemDropdown(itens) {
+      for (var i = 0; i < itens.length; i++) {
+        if (i === INDICE_SELECIONADO_KEYBOARD) itens[i].classList.add("selecionado");
+        else itens[i].classList.remove("selecionado");
+      }
+    }
+
+    function LAB_selecionarNomeDropdown(nome) {
+      document.getElementById("compTermo").value = nome; LAB_fecharDropdownSugestoes(); COMP_executarBuscaManual(); 
+    }
+
+    function LAB_fecharDropdownSugestoes() {
+      var list = document.getElementById("listaSugestoesDrop"); if (list) { list.style.display = "none"; list.innerHTML = ""; }
+      INDICE_SELECIONADO_KEYBOARD = -1;
+    }
+
+    document.addEventListener("mousedown", function(e) {
+      var list = document.getElementById("listaSugestoesDrop"); var campo = document.getElementById("compTermo");
+      if (e.target !== campo && e.target !== list && e.target.tagName !== "LI") { LAB_fecharDropdownSugestoes(); }
+    });
+
+    function INTERFACE_INTERCEPTAR_tecladoBusca(campo) {
+      var filtro = document.getElementById("compFiltro").value;
+      if (filtro === "CPF") {
+        var v = campo.value.replace(/[^0-9]/g, "");
+        if (v.length > 3 && v.length <= 6) campo.value = v.substring(0,3) + "." + v.substring(3);
+        else if (v.length > 6 && v.length <= 9) campo.value = v.substring(0,3) + "." + v.substring(3,6) + "." + v.substring(6);
+        else if (v.length > 9) campo.value = v.substring(0,3) + "." + v.substring(3,6) + "." + v.substring(6,9) + "-" + v.substring(9,11);
+      } else if (filtro !== "id" && filtro !== "carteira") { campo.value = campo.value.toUpperCase(); }
+    }
+
+    async function COMP_executarBuscaManual() {
+      var status = document.getElementById('msgStatusComp'); var termoOriginal = document.getElementById('compTermo').value.trim();
+      var filtro = document.getElementById('compFiltro').value.trim();
+      if(!termoOriginal) { status.style.display='block'; status.className='erro'; status.innerHTML='⚠️ Insira o termo de pesquisa operacional.'; return; }
+      status.style.display='block'; status.className=''; status.innerHTML='⚙️ Consultando base de dados Supabase...';
+      
+      var termoEnvio = termoOriginal;
+      if (filtro === "CPF" || filtro === "carteira") { 
+        var dPuros = termoOriginal.replace(/[^0-9]/g, ""); 
+        termoEnvio = (filtro === "carteira") ? dPuros.toString().padStart(16, '0') : dPuros; 
+      }
+
+      try {
+        const req = await fetch('/api/pacientes/busca-completa?filtro=' + encodeURIComponent(filtro) + '&termo=' + encodeURIComponent(termoEnvio));
+        const res = await req.json();
+        COMP_tratarRetornoBusca(res);
+      } catch(err) {
+        status.className='erro'; status.innerHTML='Erro de rede: '+err.message;
+      }
+    }
+
+    async function COMP_salvarDadosGerais() {
+      var status = document.getElementById('msgStatusComp'); 
+      var SecretLinhaFisica = document.getElementById('compLinhaFisica').value;
+      if(!SecretLinhaFisica) { status.style.display='block'; status.className='erro'; status.innerHTML='⚠️ Carregue um prontuário antes de salvar.'; return; }
+      
+      var valK = document.getElementById('compK').value; 
+      var valN = document.getElementById('compN').value;
+      var valQ = document.getElementById('compQ').value; 
+      var statusFinalVal = document.getElementById('compI').value;
+      
+      if (valK === 'EXITO' || valN === 'EXITO' || valQ === 'EXITO') { 
+        statusFinalVal = 'AGENDADO'; 
+        document.getElementById('compI').value = 'AGENDADO'; 
+      }
+
+      var payload = {
+        id: SecretLinhaFisica,
+        operador: window.EMAIL_OPERADOR_REAL_WEB || 'Operador Web',
+        busca1: valK,
+        busca2: valN,
+        busca3: valQ,
+        observacao: document.getElementById('compT').value,
+        status_atendimento: statusFinalVal  
+      };
+
+      status.style.display='block'; status.className=''; status.innerHTML='💾 Gravando acionamento no Supabase...';
+      
+      try {
+        const req = await fetch('/api/pacientes/acionamento', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const res = await req.json();
+
+        status.style.display='block'; 
+        if(!res.sucesso) { 
+          status.className='erro'; status.innerHTML = res.mensagem; 
+        } else {
+          status.className='sucesso'; 
+          status.innerHTML = "🎯 " + res.mensagem; 
+          CRONO_restaurarPainelFilaTotal();
+        }
+      } catch(err) {
+        status.style.display='block'; status.className='erro'; status.innerHTML='Erro ao salvar: '+err.message;
+      }
+    }
+
+    function COMP_recalibrarCoresSelects() {
+      ['compK', 'compN', 'compQ'].forEach(function(id) {
+        var el = document.getElementById(id); 
+        if (el) { 
+          if (el.value === "") el.style.setProperty('color', '#757575', 'important'); 
+          else el.style.setProperty('color', '#000000', 'important'); 
+        }
+      });
+    }
+
+    async function CRONO_recarregarListaFilaExposta() {
+      var tabelaCorpo = document.getElementById("corpoFilaCronologicaAberta");
+      tabelaCorpo.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 15px; color: #137333;">⏳ Lendo fila cronológica do Supabase...</td></tr>';
+      
+      try {
+        const req = await fetch('/api/pacientes/fila-cronologica');
+        const res = await req.json();
+        
+        if (!res.sucesso || !res.dados || res.dados.length === 0) {
+          tabelaCorpo.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 15px; color: #137333; font-weight: bold;">✅ Fila zerada! Nenhum paciente aguardando agenda ou em busca.</td></tr>'; 
+          return;
+        }
+
+        var htmlRows = "";
+        res.dados.forEach(function(p, index) {
+          var ordemCalculada = index + 1;
+          var txtNome = p.nome || "-";
+          var txtDataCad = p.dataCadastro || "-";
+          var txtCarteira = p.carteira || "-";
+          var txtCpf = p.cpf || "-";
+          var foneExibicao = p.telefone || "-";
+          var txtDias = p.diasEspera !== undefined ? p.diasEspera + " dias" : "0 dias";
+          var txtId = p.id || "SEM-ID";
+          var txtStatus = p.status || "-";
+          
+          htmlRows += '<tr onclick="CRONO_abrirFichaDiretaSemDigitar(\'' + txtId + '\', \'id\')">';
+          htmlRows += '<td style="text-transform: uppercase; font-weight: bold; color: #000000;">' + txtNome + '</td>';
+          htmlRows += '<td style="text-align: center; color: #1e293b !important; font-weight: 800 !important; font-size: 13px !important;">' + txtDataCad + '</td>';
+          htmlRows += '<td style="color: #444;">' + txtCarteira + '</td>';
+          htmlRows += '<td style="color: #444;">' + txtCpf + '</td>';
+          htmlRows += '<td style="color: #0044ff; font-weight: bold;">' + foneExibicao + '</td>';
+          htmlRows += '<td style="text-align: center; color: #b22222; font-weight: 800;">' + txtDias + '</td>';
+          htmlRows += '<td style="color: #555;">' + txtId + '</td>';
+          htmlRows += '<td style="text-align: center;"><span style="background-color: #fce8e6; color: #c5221f; padding: 2px 6px; border-radius: 4px; font-size: 10px;">' + txtStatus + '</span></td>';
+          htmlRows += '<td style="text-align: center; color: #137333; font-weight: 900;">' + ordemCalculada + 'º</td>';
+          htmlRows += '</tr>';
+        });
+
+        tabelaCorpo.innerHTML = htmlRows;
+      } catch(err) {
+        tabelaCorpo.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 15px; color: #c5221f; font-weight: bold;">⚠️ Erro de leitura da fila: ' + err.message + '</td></tr>';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      INTERFACE_AJUSTAR_placeholderBusca('nome');
+      COMP_recalibrarCoresSelects();
+      CRONO_recarregarListaFilaExposta();
+    });
+  </script>
+</body>
+</html>

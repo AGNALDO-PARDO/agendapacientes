@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>IPESAUDE - 5A. Relatórios e Listagens (Tabelas)</title>
+  <style>
+    /* 🎯 ESTABILIDADE UNIVERSAL: Cores corporativas Bege Areia Nobre e Preto */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 0 !important;
+      margin: 0 !important;
+      background-color: #ffffff !important;
+      color: #202124;
+      font-size: 12px;
+      overflow-y: auto !important;
+      height: auto !important;
+      box-sizing: border-box;
+    }
+
+    /* 📋 CABEÇALHO ÚNICO EXATO DA FOTO 1 */
+    .topo-cabecalho-sistema {
+      background-color: #000000 !important;
+      color: #ffffff !important;
+      padding: 8px 15px !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      font-weight: bold !important;
+      font-size: 13px !important;
+      border-bottom: 3px solid #ff0000 !important;
+      margin-bottom: 10px !important;
+    }
+
+    .caixa-central-relatorio, .caixa-central-filtros, form { 
+      background: #eaddca !important; 
+      border: 2px solid #000000 !important; 
+      padding: 6px 12px 10px 12px !important; 
+      margin: 4px 15px !important; 
+      border-radius: 8px !important; 
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important; 
+    }
+    
+    .barra-ferramentas { 
+      display: flex !important; 
+      flex-direction: row !important; 
+      flex-wrap: nowrap !important; 
+      gap: 6px !important; 
+      align-items: flex-end !important; 
+      width: 100% !important; 
+      box-sizing: border-box !important; 
+    }
+    
+    .form-group { 
+      flex: 1 !important; 
+      min-width: 0 !important; 
+      display: flex !important; 
+      flex-direction: column !important; 
+      margin: 0 !important;
+    }
+
+    br { display: none !important; }
+
+    label { 
+      font-size: 9px !important; 
+      font-weight: 900 !important; 
+      color: #0044ff !important; /* Azul original preservado */
+      text-transform: uppercase !important; 
+      margin-bottom: 2px !important; 
+      letter-spacing: -0.2px !important; 
+      display: block !important;
+      white-space: nowrap !important; 
+    }
+
+    select, input { 
+      height: 28px !important; 
+      padding: 2px 6px !important; 
+      border: 2px solid #000000 !important; 
+      border-radius: 6px !important; 
+      font-weight: bold !important; 
+      font-size: 11px !important; 
+      background-color: #fdfaf4 !important; 
+      color: #000000 !important; 
+      box-sizing: border-box !important; 
+      transition: all 0.2s !important; 
+      width: 100% !important;
+    }
+    select:focus, input:focus { border-color: #ff0000 !important; background-color: #f7f0e4 !important; outline: none !important; }
+    
+    select option { 
+      background-color: #fff9c4 !important; 
+      color: #000000 !important; 
+      font-weight: bold !important; 
+    }
+    
+    /* 🎯 CARDS DE BI DO TOPO */
+    .grid-indicadores-bi { 
+      display: grid !important; 
+      grid-template-columns: repeat(5, 1fr) !important; 
+      gap: 6px !important; 
+      margin: 4px 15px 2px 15px !important; 
+    }
+    
+    .card-indicador { 
+      background: #f1f3f4 !important; 
+      border: 2px solid #000000 !important; 
+      border-radius: 6px !important; 
+      padding: 3px 6px !important; 
+      text-align: center !important; 
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; 
+      border-top: 4px solid #1a73e8 !important; 
+    }
+    .card-indicador.busca { border-top-color: #e65100 !important; }
+    .card-indicador.agendado { border-top-color: #1e8449 !important; }
+    .card-indicador.aguarda { border-top-color: #2f80ed !important; }
+    .card-indicador.encerrado { border-top-color: #7928ca !important; }
+    
+    .card-indicador h3 { margin: 0 !important; font-size: 16px !important; font-weight: 800 !important; color: #202124 !important; }
+    .card-indicador p { margin: 0 !important; font-size: 9px !important; font-weight: bold !important; color: #5f6368 !important; text-transform: uppercase !important; }
+
+    .linha-botoes-relatorio {
+      display: flex !important;
+      justify-content: space-between !important; 
+      align-items: center !important;
+      width: 100% !important;
+      margin-top: 10px !important;
+      flex-direction: row !important;
+    }
+    .bloco-exportacoes-direita { display: flex !important; gap: 6px !important; align-items: center !important; }
+
+    button, .btn-atualizar-indicadores { 
+      height: 28px !important; 
+      padding: 0 12px !important; 
+      border: 2px solid #000000 !important; 
+      border-radius: 6px !important; 
+      font-weight: bold !important; 
+      cursor: pointer !important; 
+      font-size: 11px !important; 
+      display: inline-flex !important; 
+      align-items: center !important; 
+      justify-content: center !important; 
+      gap: 5px !important; 
+      color: white !important; 
+    }
+    .btn-blue { background-color: #1a73e8 !important; } 
+    .btn-csv { background-color: #137333 !important; } 
+    .btn-excel { background-color: #0f9d58 !important; } 
+    .btn-pdf-rel { background-color: #c5221f !important; }
+
+    .area-visualizacao-tabela { display: none; margin: 10px 15px !important; }
+
+    table { width: 100% !important; margin: 0 !important; border-collapse: collapse !important; border: 2px solid #000000 !important; font-size: 11px !important; }
+    table th { background-color: #000000 !important; color: #ffffff !important; font-weight: bold !important; padding: 6px 10px !important; border: 1px solid #334155 !important; text-transform: uppercase !important; position: sticky; top: 0; z-index: 10; }
+    table td { padding: 6px 10px !important; border: 1px solid #cbd5e1 !important; font-weight: 600 !important; background-color: #fdfaf4 !important; color: #000000 !important; }
+    table tr:nth-child(even) td { background-color: #f4eee1 !important; }
+
+    @media print {
+      @page { size: landscape !important; margin: 0mm !important; }
+      body { background-color: #ffffff !important; }
+      .no-print, .barra-ferramentas, button, .linha-botoes-relatorio, .topo-cabecalho-sistema { display: none !important; }
+      table { width: 100% !important; border: 2px solid #000 !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 📋 CABEÇALHO ÚNICO EXATO DA FOTO 1 -->
+  <div class="topo-cabecalho-sistema">
+    <span>📋 5A. RELATÓRIOS E LISTAGENS (TABELAS)</span>
+    <span>Base: Agenda2026 | Versão 2.1.8</span>
+  </div>
+
+  <!-- 📊 TOTALIZADORES DE BI -->
+  <div class="grid-indicadores-bi">
+    <div class="card-indicador"><h3 id="lblRelTotal">0</h3><p>Total Casos</p></div>
+    <div class="card-indicador busca"><h3 id="lblRelBusca">0</h3><p>Em Busca</p></div>
+    <div class="card-indicador agendado"><h3 id="lblRelAgendado">0</h3><p>Agendados</p></div>
+    <div class="card-indicador aguarda"><h3 id="lblRelAguardar">0</h3><p>Aguardar Agenda</p></div>
+    <div class="card-indicador encerrado"><h3 id="lblRelEncerrado">0</h3><p>Encerrados</p></div>
+  </div>
+
+  <!-- CAIXA DE FILTROS BEGE -->
+  <div class="caixa-central-relatorio">
+    <div class="barra-ferramentas">
+      <div class="form-group" style="min-width: 220px;">
+        <label>Selecionar Sub-Relatório</label>
+        <select id="repSubRelatorio">
+          <option value="geral">📊 1. RELATÓRIO GERAL DA BASE</option>
+          <option value="urgencias">🚨 2. ATENDIMENTOS DE URGÊNCIA</option>
+          <option value="pendentes">⏳ 3. PACIENTES FILA ATIVA (PENDENTES)</option>
+          <option value="concluidos">✅ 4. CASOS FINALIZADOS (CONCLUÍDOS)</option>
+          <option value="endo_ped">🩺 5. EXCLUSIVO ENDO PED.</option>
+          <option value="resumo_categorias">📈 6. RESUMO ANALÍTICO POR CATEGORIAS</option>
+          <option value="interativo_status">📋 7. PAINEL INTERATIVO POR STATUS</option>
+          <option value="historico_buscas">📞 8. HISTÓRICO DE BUSCAS ATIVAS</option>
+          <option value="modelo_ficha">📄 9. MODELO FICHA DE ATENDIMENTO POR CLIQUE (A-Z)</option>
+          <option value="modelo_linha">⏳ 10. LINHA DO TEMPO HORIZONTAL DE BUSCAS</option>
+          <option value="modelo_kanban">📌 11. KANBAN DE TENTATIVAS DE BUSCA</option>
+          <option value="tempo_espera">⏳ 12. EXTRATOR POR TEMPO DE ESPERA E ALERTA CRITICIDADE</option>
+          <option value="cronologia_buscas">⏱️ 13. AUDITORIA CRONOLÓGICA DE ENTRADA DE BUSCAS</option>
+          <option value="produtividade_equipe">📊 14. PRODUTIVIDADE DA EQUIPE</option>
+        </select>
+      </div>
+      <div class="form-group" style="min-width: 75px;"><label>Mês</label><select id="repMes"><option value="">Todos</option><option value="01">Jan</option><option value="02">Fev</option><option value="03">Mar</option><option value="04">Abr</option><option value="05">Mai</option><option value="06">Jun</option><option value="07">Jul</option><option value="08">Ago</option><option value="09">Set</option><option value="10">Out</option><option value="11">Nov</option><option value="12">Dez</option></select></div>
+      <div class="form-group" style="min-width: 70px;"><label>Ano</label><select id="repAno"><option value="">Todos</option><option value="2025">2025</option><option value="2026">2026</option></select></div>
+      <div class="form-group">
+        <label>Prioridade</label>
+        <select id="repPrioridade"><option value="">Todos</option><option value="NORMAL">NORMAL</option><option value="ACIMA DE 60">ACIMA DE 60</option><option value="ACIMA DE 80">ACIMA DE 80</option><option value="ESPECIAIS">ESPECIAIS</option></select>
+      </div>
+      <div class="form-group">
+        <label>Status Atual</label>
+        <select id="repStatus"><option value="">Todos</option><option value="AGUARDAR AGENDA">AGUARDAR AGENDA</option><option value="EM BUSCA">EM BUSCA</option><option value="AGENDADO">AGENDADO</option><option value="ENCERRADO">ENCERRADO</option></select>
+      </div>
+      <div class="form-group">
+        <label>Especialidade</label>
+        <select id="repEspecialidade"><option value="">Todas</option><option value="ENDO GERAL">ENDO GERAL</option><option value="ENDO PED.">ENDO PED.</option><option value="TIREOIDE">TIREOIDE</option><option value="OUTROS">OUTROS</option></select>
+      </div>
+      <div class="form-group">
+        <label>Tipo de Atendimento</label>
+        <select id="repTipo"><option value="">Todos</option><option value="1ª CONSULTA">1ª CONSULTA</option><option value="RETORNO/MUDANÇA DE MÉDICO">RETORNO/MUDANÇA DE MÉDICO</option></select>
+      </div>
+      <div class="form-group">
+        <label>Situação do Caso</label>
+        <select id="repSituacao"><option value="">Todos</option><option value="ELETIVA">ELETIVA</option><option value="URGENCIA">URGENCIA</option></select>
+      </div>
+    </div>
+
+    <div class="linha-botoes-relatorio">
+      <button type="button" class="btn-atualizar-indicadores btn-blue" onclick="BI_processarPainelRelatorios()">🔍 Pesquisar Relatório</button>
+      <div id="txtStatusBI" style="flex: 1; text-align: center; font-size: 12px; font-weight: bold; color: #b22222; margin: 0 10px; padding: 4px; border-radius: 4px; min-height: 18px; line-height: 18px; display: none;"></div>
+      <div class="bloco-exportacoes-direita">
+        <button type="button" class="btn-atualizar-indicadores btn-csv" onclick="BI_baixarCSVExcel()">📄 Exportar CSV</button>
+        <button type="button" class="btn-atualizar-indicadores btn-excel" onclick="BI_baixarXLSExcelReal()">📊 Exportar Excel</button>
+        <button type="button" class="btn-atualizar-indicadores btn-pdf-rel" onclick="BI_baixarPdfNativoServidor()">📕 Gerar PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-resumo-quadrados" id="boxQuadradosBI" style="display: none;"></div>
+  <div id="boxSanfonaInterativaBI" style="display: none; width: 100%;"></div>
+  <div id="wrapperFichaProntuario9" style="width:100% !important;"></div>
+  <div id="boxPainelKanbanBI" class="painel-kanban-buscas" style="display: none;"></div>
+
+  <div class="area-visualizacao-tabela" id="wrapperTabelaPadrao">
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 85px;">Data Solicit.</th>
+          <th style="width: 105px;">ID Exclusivo</th>
+          <th>Nome Completo do Paciente</th>
+          <th style="width: 125px; color: #1a73e8;">CPF do Paciente</th>
+          <th style="width: 100px;">Carteira</th>
+          <th>Especialidade</th>
+          <th style="width: 95px;">Prioridade</th>
+          <th>Tipo Atend.</th>
+          <th>Situação</th>
+          <th style="width: 120px; text-align: center;">Status Atual</th>
+        </tr>
+      </thead>
+      <tbody id="corpoTabelaRelatorios">
+        <!-- Linha vazia inicial sem textos indesejados -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    var CACHE_CSV_RAW_PRODUCAO = "";
+    var LISTA_DADOS_MEMORIA = [];
+    var EXTRACAO_TEM_DADOS = false;
+    var dbReal = [];
+
+    function INTERFACE_alternarSanfonaLocal(id) {
+      var d = document.getElementById(id); 
+      if(d) d.style.display = (d.style.display === "block") ? "none" : "block";
+    }
+
+    function BI_processarPainelRelatorios() {
+      var tableArea = document.getElementById("wrapperTabelaPadrao");
+      if(tableArea) { 
+        tableArea.style.display = "block"; 
+        
+        var barraAntiga = document.getElementById("boxFiltroNomeDinamicoExclusivo");
+        if(barraAntiga) { barraAntiga.parentNode.removeChild(barraAntiga); }
+
+        var htmlBarraPesquisaOriginal = '<div id="boxFiltroNomeDinamicoExclusivo" class="no-print" style="background:#f1f3f4; padding:6px 15px; margin:0 15px 10px 15px; border-radius:4px; border:1px solid #dadce0; display:block; box-sizing:border-box;"><span style="font-size:11px; font-weight:bold; color:#202124; text-transform:uppercase; margin-right:10px;">🔍 CONSULTAR POR NOME:</span><input type="text" id="txtFiltroNomeUniversal" onkeyup="window.MOTOR_FILTRO_UNIVERSAL_TABELA()" placeholder="Digite no mínimo 5 caracteres para iniciar a pesquisa..." style="width:75%; height:26px; padding:0 10px; font-size:12px; font-weight:600; border:1px solid #cbd5e1; border-radius:4px; box-sizing:border-box;"></div>';
+        
+        tableArea.insertAdjacentHTML('beforebegin', htmlBarraPesquisaOriginal);
+      }
+    }
+
+    window.MOTOR_FILTRO_UNIVERSAL_TABELA = function() {
+      var inputNome = document.getElementById("txtFiltroNomeUniversal"); if (!inputNome) return;
+      var textoDigitado = inputNome.value.toUpperCase().trim();
+      var containerTabela = document.getElementById("wrapperTabelaPadrao"); if (!containerTabela) return;
+      var linhas = containerTabela.getElementsByTagName("tr");
+      
+      if (textoDigitado.length < 5) {
+        for (var k = 1; k < linhas.length; k++) { if (linhas[k]) linhas[k].style.display = ""; }
+        return; 
+      }
+      
+      for (var i = 1; i < linhas.length; i++) {
+        var linha = linhas[i];
+        var celulas = linha.cells;
+        if (celulas && celulas.length > 2) {
+          var nomePaciente = celulas[2].textContent.toUpperCase().trim();
+          if (nomePaciente.indexOf(textoDigitado) === 0) {
+            if (linha.style.display === "none") linha.style.display = "";
+          } else {
+            if (linha.style.display !== "none") linha.style.display = "none";
+          }
+        }
+      }
+    };
+
+    function BI_baixarCSVExcel() {}
+    function BI_baixarXLSExcelReal() {}
+    function BI_baixarPdfNativoServidor() {}
+  </script>
+</body>
+</html>

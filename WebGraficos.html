@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <base target='_top'>
+  <title>IPESAUDE - Painel de Gráficos e BI</title>
+  
+  <style>
+    body { 
+      font-family: 'Segoe UI', -apple-system, sans-serif; 
+      padding: 0 !important; 
+      margin: 0 !important; 
+      background-color: #e8f0fe !important; 
+      color: #202124; 
+      font-size: 13px; 
+      overflow-y: auto !important; 
+      box-sizing: border-box; 
+    }
+
+    .caixa-central-filtros { 
+      background: #eaddca !important; 
+      border: 2px solid #000000 !important; 
+      padding: 6px 12px 10px 12px !important; 
+      margin: 4px 15px !important; 
+      border-radius: 8px !important; 
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important; 
+    }
+    
+    .barra-filtros-graficos { 
+      display: flex !important; 
+      flex-direction: row !important; 
+      flex-wrap: nowrap !important; 
+      gap: 6px !important; 
+      align-items: flex-end !important; 
+      width: 100% !important; 
+      box-sizing: border-box !important; 
+    }
+    
+    .form-group-grafico { 
+      flex: 1 !important; 
+      min-width: 0 !important; 
+      display: flex !important; 
+      flex-direction: column !important; 
+      margin: 0 !important;
+    }
+    
+    label { 
+      font-size: 9px !important; 
+      font-weight: 900 !important; 
+      color: #0044ff !important; 
+      text-transform: uppercase !important; 
+      margin-bottom: 2px !important; 
+      letter-spacing: -0.2px !important; 
+      display: block !important;
+      white-space: nowrap !important; 
+    }
+
+    select, input { 
+      height: 28px !important; 
+      padding: 2px 6px !important; 
+      border: 2px solid #000000 !important; 
+      border-radius: 6px !important; 
+      font-weight: bold !important; 
+      font-size: 11px !important; 
+      background-color: #fdfaf4 !important; 
+      color: #000000 !important; 
+      box-sizing: border-box !important; 
+      transition: all 0.2s !important; 
+      width: 100% !important;
+    }
+    select:focus, input:focus { border-color: #ff0000 !important; background-color: #f7f0e4 !important; outline: none !important; }
+    
+    select option { 
+      background-color: #fff9c4 !important; 
+      color: #000000 !important; 
+      font-weight: bold !important; 
+    }
+    
+    .grid-indicadores-bi { 
+      display: grid !important; 
+      grid-template-columns: repeat(5, 1fr) !important; 
+      gap: 6px !important; 
+      margin: 4px 15px 2px 15px !important; 
+    }
+    
+    .card-indicador { 
+      background: #f1f3f4 !important; 
+      border: 2px solid #000000 !important; 
+      border-radius: 6px !important; 
+      padding: 3px 6px !important; 
+      text-align: center !important; 
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; 
+      border-top: 4px solid #1a73e8 !important; 
+    }
+    
+    .card-indicador.busca { border-top-color: #e65100 !important; }
+    .card-indicador.agendado { border-top-color: #1e8449 !important; }
+    .card-indicador.aguarda { border-top-color: #2f80ed !important; }
+    .card-indicador.encerrado { border-top-color: #7928ca !important; }
+    
+    .card-indicador h3 { margin: 0 !important; font-size: 16px !important; font-weight: 800 !important; color: #202124 !important; }
+    .card-indicador p { margin: 0 !important; font-size: 9px !important; font-weight: bold !important; color: #5f6368 !important; text-transform: uppercase !important; }
+    
+    .dashboard-container-graficos { 
+      display: grid !important; 
+      grid-template-columns: repeat(2, 1fr) !important; 
+      gap: 15px !important; 
+      margin: 15px !important; 
+      box-sizing: border-box !important; 
+    }
+    
+    .caixa-quadro-grafico { 
+      background: #f4eee1 !important; 
+      border: 2px solid #000000 !important; 
+      border-radius: 8px !important; 
+      padding: 15px !important; 
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.05), 0 4px 6px rgba(0,0,0,0.08) !important; 
+      height: 320px !important; 
+      display: flex !important; 
+      flex-direction: column !important; 
+      align-items: center !important; 
+      box-sizing: border-box !important; 
+    }
+
+    .caixa-quadro-grafico h4 { 
+      margin: 0 0 10px 0 !important; 
+      font-size: 11px !important; 
+      text-transform: uppercase !important; 
+      color: #b22222 !important; 
+      font-weight: 900 !important; 
+      text-align: center !important; 
+      width: 100% !important; 
+      border-bottom: 2px dashed #000000 !important; 
+      padding-bottom: 6px !important; 
+      letter-spacing: 0.5px !important; 
+    }
+    
+    .canvas-bi-render { 
+      width: 100% !important; 
+      height: 250px !important; 
+      position: relative; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+    }
+
+    .btn-atualizar-indicadores { 
+      height: 28px !important; 
+      padding: 0 12px !important; 
+      border: 2px solid #000000 !important; 
+      border-radius: 6px !important; 
+      font-weight: bold !important; 
+      cursor: pointer !important; 
+      font-size: 11px !important; 
+      display: inline-flex !important; 
+      align-items: center !important; 
+      justify-content: center !important; 
+      gap: 5px !important; 
+      color: white !important; 
+    }
+    .btn-blue { background-color: #1a73e8 !important; } .btn-blue:hover { background-color: #1557b0 !important; }
+    .btn-pdf-rel { background-color: #c5221f !important; } .btn-pdf-rel:hover { background-color: #9e1c1a !important; }
+    
+    #txtStatusGraficos { 
+      display: none; 
+      text-align: center; 
+      font-weight: bold; 
+      padding: 8px; 
+      margin: 10px 15px; 
+      border-radius: 4px; 
+      background-color: #e8f0fe; 
+      color: #1a73e8; 
+      font-size: 12px; 
+    }
+
+    /* 🖨️ REGRAS DEFINITIVAS PARA O PDF EXECUTIVO */
+  @media print {
+    /* 1. Oculta tudo o que seja menus, barras de topo da aplicação, filtros e botões */
+    .caixa-central-filtros,
+    .barra-filtros-graficos,
+    .btn-atualizar-indicadores,
+    button,
+    select,
+    #txtStatusGraficos,
+    /* Seletores abrangentes para caixas de menu lateral */
+    div[style*="width: 2"], 
+    div[style*="position: fixed"], 
+    aside, 
+    nav, 
+    .sidebar, 
+    #sidebar,
+    .menu-lateral {
+      display: none !important;
+    }
+
+    /* 2. Remove restrições de tamanho, scrollbars e define fundo branco limpo */
+    html, body {
+      height: auto !important;
+      max-height: none !important;
+      overflow: visible !important;
+      background-color: #ffffff !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    /* 3. Expande o painel de gráficos para ocupar toda a largura da página impressa */
+    .dashboard-container-graficos {
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 15px !important;
+      margin: 0 !important;
+      width: 100% !important;
+      overflow: visible !important;
+    }
+
+    /* 4. Garante que os quadrantes não sejam cortados a meio entre as páginas */
+    .caixa-quadro-grafico {
+      break-inside: avoid;
+      page-break-inside: avoid;
+      background: #ffffff !important;
+      border: 2px solid #000000 !important;
+      box-shadow: none !important;
+      height: 270px !important;
+      overflow: visible !important;
+    }
+  }
+  </style>
+</head>
+<body>
+
+  <div class="grid-indicadores-bi">
+    <div class="card-indicador"><h3 id="lblG_Total">0</h3><p>Total na Amostra</p></div>
+    <div class="card-indicador busca"><h3 id="lblG_Busca">0</h3><p>Fila: Em Busca</p></div>
+    <div class="card-indicador agendado"><h3 id="lblG_Agendado">0</h3><p>Casos Agendados</p></div>
+    <div class="card-indicador aguarda"><h3 id="lblG_Aguarda">0</h3><p>Aguardando Agenda</p></div>
+    <div class="card-indicador encerrado"><h3 id="lblG_Encerrado">0</h3><p>Encerrados Totais</p></div>
+  </div>
+
+  <div class="caixa-central-filtros">
+    <div class="barra-filtros-graficos">
+      <div class="form-group-grafico" style="min-width: 180px;">
+        <label>Perfil do Gráfico</label>
+        <select id="filtroG_Sub">
+          <option value="geral">📊 1 - GRÁFICO GERAL DA BASE</option>
+          <option value="urgencias">🚨 2 - GRÁFICO DE ATENDIMENTOS DE URGÊNCIA</option>
+          <option value="pendentes">⏳ 3 - GRÁFICO DE PACIENTES FILA ATIVA (PENDENTES)</option>
+          <option value="concluidos">✅ 4 - GRÁFICO DE CASOS FINALIZADOS (CONCLUÍDOS)</option>
+          <option value="endo_ped">🩺 5 - GRÁFICO EXCLUSIVO ENDO PED.</option>
+        </select>
+      </div>
+      <div class="form-group-grafico" style="min-width: 75px;"><label>Mês</label><select id="filtroG_Mes"><option value="">Todos</option><option value="01">Jan</option><option value="02">Fev</option><option value="03">Mar</option><option value="04">Abr</option><option value="05">Mai</option><option value="06">Jun</option><option value="07">Jul</option><option value="08">Ago</option><option value="09">Set</option><option value="10">Out</option><option value="11">Nov</option><option value="12">Dez</option></select></div>
+      <div class="form-group-grafico" style="min-width: 70px;"><label>Ano</label><select id="filtroG_Ano"><option value="">Todos</option><option value="2025">2025</option><option value="2026">2026</option></select></div>
+      <div class="form-group-grafico"><label>Prioridade</label><select id="filtroG_Prioridade"><option value="">Todos</option><option value="NORMAL">NORMAL</option><option value="ACIMA DE 60">ACIMA DE 60</option><option value="ACIMA DE 80">ACIMA DE 80</option><option value="ESPECIAIS">ESPECIAIS</option></select></div>
+      <div class="form-group-grafico"><label>Status</label><select id="filtroG_Status"><option value="">Todos</option><option value="AGUARDAR AGENDA">AGUARDAR AGENDA</option><option value="EM BUSCA">EM BUSCA</option><option value="AGENDADO">AGENDADO</option><option value="ENCERRADO">ENCERRADO</option></select></div>
+      <div class="form-group-grafico"><label>Especialidade</label><select id="filtroG_Especialidade"><option value="">Todas</option><option value="ENDO GERAL">ENDO GERAL</option><option value="ENDO PED.">ENDO PED.</option><option value="TIREOIDE">TIREOIDE</option><option value="OUTROS">OUTROS</option></select></div>
+      <div class="form-group-grafico"><label>Tipo</label><select id="filtroG_Tipo"><option value="">Todos</option><option value="1ª CONSULTA">1ª CONSULTA</option><option value="RETORNO/MUDANÇA DE MÉDICO">RETORNO/MUDANÇA DE MÉDICO</option></select></div>
+      <div class="form-group-grafico"><label>Situação</label><select id="filtroG_Situacao"><option value="">Todos</option><option value="ELETIVA">ELETIVA</option><option value="URGENCIA">URGENCIA</option></select></div>
+      
+      <div style="display: flex; gap: 6px;">
+        <button type="button" class="btn-atualizar-indicadores btn-blue" onclick="GRAPH_atualizarIndicadoresDashboard()">⚡ Processar BI</button>
+        <button type="button" class="btn-atualizar-indicadores btn-pdf-rel" id="btnSalvarPdfGraficos" onclick="GRAPH_imprimirPdfMasterGraficos()">📄 PDF Executivo</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="txtStatusGraficos"></div>
+
+  <!-- 📊 8 QUADRANTES DE BI EXPANDIDOS (Com múltiplos gráficos de barras verticais e horizontais) -->
+  <div class="dashboard-container-graficos">
+    <div class="caixa-quadro-grafico">
+      <h4>Volumetria por Especialidade Médica (Colunas)</h4>
+      <div class="canvas-bi-render"><canvas id="chartBarras" width="420" height="230"></canvas></div>
+    </div>
+    <div class="caixa-quadro-grafico">
+      <h4>Andamento Operacional por Status (Barras)</h4>
+      <div class="canvas-bi-render"><canvas id="chartBarrasStatus" width="420" height="230"></canvas></div>
+    </div>
+    <div class="caixa-quadro-grafico">
+      <h4>Distribuição Clínica por Situação</h4>
+      <div class="canvas-bi-render"><canvas id="chartSituacao" width="420" height="230"></canvas></div>
+    </div>
+    <div class="caixa-quadro-grafico">
+      <h4>Tendência e Volumetria de Crescimento Mensal</h4>
+      <div class="canvas-bi-render"><canvas id="chartLinhas" width="420" height="230"></canvas></div>
+    </div>
+    <div class="caixa-quadro-grafico">
+      <h4>Distribuição de Criticidade por Tempo de Espera</h4>
+      <div class="canvas-bi-render"><canvas id="chartPizza14" width="420" height="230"></canvas></div>
+    </div>
+    <div class="caixa-quadro-grafico">
+      <h4>Panorama Operacional Completo de Fila</h4>
+      <div class="canvas-bi-render"><canvas id="chartBarras14" width="420" height="230"></canvas></div>
+    </div>
+    <div class="caixa-quadro-grafico">
+      <h4>Volumetria por Nível de Prioridade</h4>
+      <div class="canvas-bi-render"><canvas id="chartPrioridade" width="420" height="230"></canvas></div>
+    </div>
+    <div class="caixa-quadro-grafico">
+      <h4>Distribuição por Tipo de Atendimento</h4>
+      <div class="canvas-bi-render"><canvas id="chartTipo" width="420" height="230"></canvas></div>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", function() {
+      GRAPH_atualizarIndicadoresDashboard();
+    });
+
+    // Motor de barras verticais nativas
+    function desenharBarras(canvasId, labels, valores, cores) {
+      var canvas = document.getElementById(canvasId);
+      if(!canvas) return;
+      var ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      var maxVal = Math.max.apply(null, valores.concat([1]));
+      var pad = 35;
+      var w = canvas.width - pad * 2;
+      var h = canvas.height - pad * 2;
+      var barW = w / labels.length - 12;
+
+      ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(pad, pad); ctx.lineTo(pad, canvas.height - pad); ctx.lineTo(canvas.width - pad, canvas.height - pad); ctx.stroke();
+
+      labels.forEach(function(lbl, i) {
+        var val = valores[i];
+        var bH = (val / maxVal) * (h - 20);
+        var x = pad + i * (w / labels.length) + 6;
+        var y = canvas.height - pad - bH;
+
+        ctx.fillStyle = cores[i % cores.length];
+        ctx.fillRect(x, y, barW, bH);
+
+        ctx.fillStyle = '#000'; ctx.font = 'bold 10px Segoe UI'; ctx.textAlign = 'center';
+        ctx.fillText(val, x + barW / 2, y - 4);
+        ctx.fillText(lbl, x + barW / 2, canvas.height - pad + 12);
+      });
+    }
+
+    // Motor de barras horizontais nativas (estilo rústico elegante)
+    function desenharBarrasHorizontais(canvasId, labels, valores, cores) {
+      var canvas = document.getElementById(canvasId);
+      if(!canvas) return;
+      var ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      var maxVal = Math.max.apply(null, valores.concat([1]));
+      var xInicio = 90;
+      var wMax = canvas.width - xInicio - 40;
+      var yInicio = 20;
+      var alturaBarra = 24;
+      var espacamento = 12;
+
+      labels.forEach(function(lbl, i) {
+        var val = valores[i];
+        var bW = (val / maxVal) * wMax;
+        var y = yInicio + i * (alturaBarra + espacamento);
+
+        // Rótulo à esquerda
+        ctx.fillStyle = '#000'; ctx.font = 'bold 10px Segoe UI'; ctx.textAlign = 'right';
+        ctx.fillText(lbl, xInicio - 10, y + 16);
+
+        // Barra de fundo
+        ctx.fillStyle = '#e0d6c3';
+        ctx.fillRect(xInicio, y, wMax, alturaBarra);
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+        ctx.strokeRect(xInicio, y, wMax, alturaBarra);
+
+        // Preenchimento da barra
+        ctx.fillStyle = cores[i % cores.length];
+        ctx.fillRect(xInicio, y, bW, alturaBarra);
+
+        // Valor à direita da barra
+        ctx.fillStyle = '#000'; ctx.font = 'bold 11px Segoe UI'; ctx.textAlign = 'left';
+        ctx.fillText(val, xInicio + bW + 8, y + 16);
+      });
+    }
+
+    function desenharPizza(canvasId, labels, valores, cores) {
+      var canvas = document.getElementById(canvasId);
+      if(!canvas) return;
+      var ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      var total = valores.reduce(function(a, b) { return a + b; }, 0);
+      if(total === 0) {
+        ctx.fillStyle = '#000'; ctx.font = '11px Segoe UI'; ctx.textAlign = 'center';
+        ctx.fillText('Sem dados na amostra', canvas.width / 2, canvas.height / 2);
+        return;
+      }
+
+      var cx = canvas.width / 2 - 50;
+      var cy = canvas.height / 2;
+      var r = Math.min(cx, cy) - 20;
+      var anguloAtual = 0;
+
+      valores.forEach(function(val, i) {
+        if(val <= 0) return;
+        var anguloSlice = (val / total) * 2 * Math.PI;
+
+        ctx.beginPath(); ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, anguloAtual, anguloAtual + anguloSlice);
+        ctx.closePath();
+        ctx.fillStyle = cores[i % cores.length];
+        ctx.fill(); ctx.stroke();
+
+        anguloAtual += anguloSlice;
+      });
+
+      var legX = canvas.width - 120;
+      var legY = 30;
+      labels.forEach(function(lbl, i) {
+        if(valores[i] <= 0) return;
+        ctx.fillStyle = cores[i % cores.length];
+        ctx.fillRect(legX, legY, 10, 10);
+        ctx.fillStyle = '#000'; ctx.font = 'bold 10px Segoe UI'; ctx.textAlign = 'left';
+        ctx.fillText(lbl + ': ' + valores[i], legX + 15, legY + 9);
+        legY += 22;
+      });
+    }
+
+    function desenharLinhas(canvasId, labels, valores, cor) {
+      var canvas = document.getElementById(canvasId);
+      if(!canvas) return;
+      var ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      var maxVal = Math.max.apply(null, valores.concat([1]));
+      var pad = 35;
+      var w = canvas.width - pad * 2;
+      var h = canvas.height - pad * 2;
+
+      ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(pad, pad); ctx.lineTo(pad, canvas.height - pad); ctx.lineTo(canvas.width - pad, canvas.height - pad); ctx.stroke();
+
+      var stepX = w / (labels.length - 1 || 1);
+
+      ctx.strokeStyle = cor; ctx.lineWidth = 2;
+      ctx.beginPath();
+
+      labels.forEach(function(lbl, i) {
+        var val = valores[i];
+        var x = pad + i * stepX;
+        var y = canvas.height - pad - (val / maxVal) * (h - 20);
+
+        if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+
+        ctx.fillStyle = cor; ctx.fillRect(x - 3, y - 3, 6, 6);
+
+        ctx.fillStyle = '#000'; ctx.font = '9px Segoe UI'; ctx.textAlign = 'center';
+        ctx.fillText(lbl, x, canvas.height - pad + 12);
+      });
+      ctx.stroke();
+    }
+
+    async function GRAPH_atualizarIndicadoresDashboard() {
+      var aviso = document.getElementById("txtStatusGraficos");
+      if(aviso) {
+        aviso.style.display = "block";
+        aviso.innerHTML = "⏳ Processando os 8 quadrantes de Gráficos e BI...";
+      }
+      
+      var subRelValue = document.getElementById("filtroG_Sub").value;
+
+      var pacoteFiltros = {
+        subRelatorio: (subRelValue === "urgencias") ? "geral" : subRelValue,
+        mes: document.getElementById("filtroG_Mes").value,
+        ano: document.getElementById("filtroG_Ano").value,
+        prioridade: document.getElementById("filtroG_Prioridade").value,
+        status: document.getElementById("filtroG_Status").value,
+        especialidade: document.getElementById("filtroG_Especialidade").value,
+        tipo: document.getElementById("filtroG_Tipo").value,
+        situacao: document.getElementById("filtroG_Situacao").value
+      };
+
+      try {
+        const response = await fetch('/api/relatorios/processar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(pacoteFiltros)
+        });
+        const res = await response.json();
+
+        if(aviso) aviso.style.display = "none";
+
+        if(res.sucesso) {
+          var dados = res.dadosTabela || [];
+          
+          var cEmBusca = 0, cAgendado = 0, cAguardando = 0, cEncerrado = 0;
+          var cGeral = 0, cPed = 0, cTireoide = 0, cOutros = 0;
+          var cEletiva = 0, cUrgencia = 0;
+          var mesesArray = new Array(13).fill(0);
+          var faixasEspera = { Ate15Dias: 0, De16A30Dias: 0, De31A60Dias: 0, MaisDe60Dias: 0 };
+          var prioridadesMap = { NORMAL: 0, 'ACIMA DE 60': 0, 'ACIMA DE 80': 0, ESPECIAIS: 0 };
+          var tiposMap = { '1ª CONSULTA': 0, 'RETORNO': 0 };
+          
+          var hojeBI = new Date();
+          var perfilSelecionado = document.getElementById("filtroG_Sub").value;
+
+          dados.forEach(function(item) {
+            var espCaso = (item.especialidade || item.ESPECIALIDADE || "").toUpperCase().trim();
+            var sitCaso = (item.situacao || item.SITUAÇÃO || item.SITUAÇAO || "").toUpperCase().trim();
+            var statusCaso = (item.status || item.STATUS || "").toUpperCase().trim();
+            var prioridadeCaso = (item.prioridade || item.PRIORIDADE || "").toUpperCase().trim();
+            var tipoCaso = (item.tipo || item.TIPO || "").toUpperCase().trim();
+            var dataCaso = item.data || item.DATA || "";
+            
+            if (perfilSelecionado === "urgencias") {
+              if (sitCaso !== "URGENCIA" && sitCaso !== "URGÊNCIA" && sitCaso.indexOf("URG") === -1) return;
+            }
+            else if (perfilSelecionado === "endo_ped") {
+              if (espCaso !== "ENDO PED.") return;
+            }
+            else if (perfilSelecionado === "pendentes") {
+              if (statusCaso === "ENCERRADO") return;
+            }
+            else if (perfilSelecionado === "concluidos") {
+              if (statusCaso !== "ENCERRADO") return;
+            }
+
+            if (statusCaso === "EM BUSCA") cEmBusca++;
+            else if (statusCaso === "AGENDADO") cAgendado++;
+            else if (statusCaso === "AGUARDAR AGENDA" || statusCaso === "AGUARDANDO") cAguardando++;
+            else if (statusCaso === "ENCERRADO") cEncerrado++;
+
+            if(espCaso === "ENDO GERAL") cGeral++;
+            else if(espCaso === "ENDO PED.") cPed++;
+            else if(espCaso === "TIREOIDE") cTireoide++;
+            else cOutros++;
+            
+            if(sitCaso === "ELETIVA") cEletiva++;
+            else if(sitCaso === "URGENCIA" || sitCaso === "URGÊNCIA" || sitCaso.indexOf("URG") > -1) cUrgencia++;
+            
+            if(prioridadesMap.hasOwnProperty(prioridadeCaso)) {
+              prioridadesMap[prioridadeCaso]++;
+            } else {
+              if(prioridadeCaso.includes("60")) prioridadesMap['ACIMA DE 60']++;
+              else if(prioridadeCaso.includes("80")) prioridadesMap['ACIMA DE 80']++;
+              else if(prioridadeCaso.includes("ESPEC")) prioridadesMap['ESPECIAIS']++;
+              else prioridadesMap.NORMAL++;
+            }
+
+            if(tipoCaso.includes("RETORNO") || tipoCaso.includes("MUDANÇA")) {
+              tiposMap['RETORNO']++;
+            } else {
+              tiposMap['1ª CONSULTA']++;
+            }
+
+            if(dataCaso) {
+              var partes = dataCaso.split("/");
+              if(partes.length === 3) {
+                var m = parseInt(partes[1], 10);
+                if(m >= 1 && m <= 12) mesesArray[m]++;
+                
+                var dtSolicit = new Date(parseInt(partes[2],10), parseInt(partes[1],10) - 1, parseInt(partes[0],10));
+                if(!isNaN(dtSolicit.getTime())) {
+                  var dias = Math.floor((hojeBI.getTime() - dtSolicit.getTime()) / (1000 * 60 * 60 * 24));
+                  if(dias < 0) dias = 0;
+                  if(dias <= 15) faixasEspera.Ate15Dias++;
+                  else if(dias <= 30) faixasEspera.De16A30Dias++;
+                  else if(dias <= 60) faixasEspera.De31A60Dias++;
+                  else faixasEspera.MaisDe60Dias++;
+                }
+              }
+            }
+          });
+
+          document.getElementById("lblG_Total").innerText = String(dados.length);
+          document.getElementById("lblG_Busca").innerText = String(cEmBusca);
+          document.getElementById("lblG_Agendado").innerText = String(cAgendado);
+          document.getElementById("lblG_Aguarda").innerText = String(cAguardando);
+          document.getElementById("lblG_Encerrado").innerText = String(cEncerrado);
+
+          // Renderização combinada (Gráficos de colunas verticais e barras horizontais estruturadas)
+          desenharBarras('chartBarras', ['ENDO GERAL', 'ENDO PED.', 'TIREOIDE', 'OUTROS'], [cGeral, cPed, cTireoide, cOutros], ['#1a73e8', '#e65100', '#1e8449', '#7928ca']);
+          desenharBarrasHorizontais('chartBarrasStatus', ['EM BUSCA', 'AGENDADO', 'AGUARDAR', 'ENCERRADO'], [cEmBusca, cAgendado, cAguardando, cEncerrado], ['#e65100', '#1e8449', '#2f80ed', '#7928ca']);
+          desenharPizza('chartSituacao', ['ELETIVA', 'URGÊNCIA'], [cEletiva, cUrgencia], ['#2f80ed', '#c5221f']);
+          desenharLinhas('chartLinhas', ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], [mesesArray[1], mesesArray[2], mesesArray[3], mesesArray[4], mesesArray[5], mesesArray[6], mesesArray[7], mesesArray[8], mesesArray[9], mesesArray[10], mesesArray[11], mesesArray[12]], '#1a73e8');
+          desenharPizza('chartPizza14', ['Até 15d', '16-30d', '31-60d', 'Crit (+60d)'], [faixasEspera.Ate15Dias, faixasEspera.De16A30Dias, faixasEspera.De31A60Dias, faixasEspera.MaisDe60Dias], ['#1a73e8', '#1e8449', '#e65100', '#c5221f']);
+          desenharBarras('chartBarras14', ['Aguardar', 'Em Busca', 'Agendado', 'Encerrado'], [cAguardando, cEmBusca, cAgendado, cEncerrado], ['#2f80ed', '#e65100', '#1e8449', '#7928ca']);
+          desenharBarrasHorizontais('chartPrioridade', ['NORMAL', '< 60', '< 80', 'ESPEC'], [prioridadesMap.NORMAL, prioridadesMap['ACIMA DE 60'], prioridadesMap['ACIMA DE 80'], prioridadesMap['ESPECIAIS']], ['#2f80ed', '#e65100', '#c5221f', '#7928ca']);
+          desenharPizza('chartTipo', ['1ª CONSULTA', 'RETORNO'], [tiposMap['1ª CONSULTA'], tiposMap['RETORNO']], ['#1e8449', '#1a73e8']);
+
+        } else { alert("Erro: " + res.erro); }
+      } catch (err) {
+        if(aviso) aviso.style.display = "none";
+        alert("Erro de rede ao carregar gráficos: " + err.message);
+      }
+    }
+
+   function GRAPH_imprimirPdfMasterGraficos() {
+      // Abre a janela de impressão nativa otimizada para salvar como PDF
+      window.print();
+    }
+  </script>
+</body>
+</html>

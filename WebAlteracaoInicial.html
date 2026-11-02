@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target='_top'>
+  <style>
+    body { 
+      font-family: 'Segoe UI', sans-serif; 
+      padding: 0 !important; 
+      margin: 0 !important; 
+      background-color: #e8f0fe !important; 
+      color: #202124; 
+      font-size: 12px; 
+      box-sizing: border-box; 
+      overflow-x: hidden !important; 
+      overflow-y: auto !important;   
+    }
+
+    .form-group { margin-bottom: 2px; position: relative; display: flex; flex-direction: column; } 
+    label { display: block; margin-bottom: 2px; font-weight: 800 !important; font-size: 11px !important; color: #000000 !important; text-transform: uppercase; letter-spacing: 0.5px; }
+    input, select { width: 100% !important; padding: 2px 10px !important; border: 2px solid #000000 !important; border-radius: 8px !important; box-sizing: border-box !important; font-size: 13px !important; height: 36px !important; background-color: #ffffff !important; color: #000000 !important; font-weight: bold !important; transition: all 0.15s ease-in-out !important; }
+    input:focus, select:focus { border-color: #ff0000 !important; background-color: #e9ecef !important; color: #000000 !important; outline: none !important; box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.15) !important; }
+    input[readonly] { background-color: #e9ecef !important; color: #202124 !important; cursor: not-allowed; border: 2px solid #000000 !important; }
+    input.campo-erro, select.campo-erro { border: 2px solid #d32f2f !important; background-color: #fce8e6 !important; color: #c5221f !important; }
+
+    .linha-flex { 
+      display: flex !important; 
+      gap: 8px; 
+      width: 100%; 
+      box-sizing: border-box; 
+      align-items: flex-end; 
+      margin-bottom: 2px; 
+      flex-wrap: wrap !important; 
+    }
+
+    .coluna { flex: 1 1 180px !important; min-width: 140px !important; }
+    .col-cpf { flex: 1 1 140px !important; min-width: 125px !important; } 
+    .col-carteira { flex: 1 1 155px !important; min-width: 135px !important; } 
+    .col-ddd { flex: 1 1 55px !important; min-width: 50px !important; }
+    .col-fone { flex: 1 1 115px !important; min-width: 105px !important; }
+    .col-id-travado { flex: 1 1 160px !important; min-width: 130px !important; }
+    
+    .btn-busca { background-color: #1a73e8 !important; color: white !important; padding: 0 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; height: 36px; box-shadow: 0 4px 6px rgba(26,115,232,0.15); transition: background 0.2s; }
+    .btn-busca:hover { background-color: #1557b0 !important; }
+    
+    .grupo-botoes-rodape { display: flex !important; gap: 16px !important; margin-top: 6px !important; width: 100% !important; box-sizing: border-box !important; align-items: center !important; flex-wrap: wrap !important; }
+    .grupo-botoes-rodape button { min-width: 180px; }
+
+    .btn-salvar { flex: 2 !important; background-color: #137333 !important; color: white !important; padding: 8px !important; font-size: 14px !important; height: 38px !important; border: none !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; box-shadow: 0 4px 8px rgba(19,115,51,0.2) !important; margin-top: 0 !important; }
+    .btn-salvar:hover { background-color: #0b5123 !important; }
+    
+    .btn-voltar-menu { flex: 1 !important; background-color: #5f6368 !important; color: white !important; padding: 8px !important; font-size: 14px !important; height: 38px !important; border: none !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important; transition: background 0.2s !important; display: block !important; margin: 0 !important; box-sizing: border-box !important; text-align: center; line-height: 22px; }
+    .btn-voltar-menu:hover { background-color: #3c4043 !important; }
+    
+    .secao-titulo { font-size: 11px !important; font-weight: 800; color: #ffffff; background-color: #1a73e8; margin: 4px 0 3px 0; padding: 2px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; border: none !important; width: 100%; box-sizing: border-box; }
+    .secao-busca { background-color: #fdfaf4 !important; padding: 5px 12px; border-radius: 12px; margin: 6px 12px 4px 12px; border: 2px solid #000000; position: relative; box-sizing: border-box; }
+    .cartao-resultado { background-color: #fdfaf4 !important; border: 2px solid #000000; padding: 5px 12px; margin: 0 12px 6px 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); box-sizing: border-box; display: none; }
+    
+    #msgStatusAlt { margin-top: 4px; text-align: center; font-size: 12px; font-weight: bold; padding: 4px; border-radius: 4px; display: none; }
+    .sucesso { color: #137333; background-color: #e6f4ea; border: 1px solid #b7e1cd; }
+    .erro { color: #c5221f; background-color: #fce8e6; border: 1px solid #fad2cf; }
+
+    .lista-sugestoes-autocomplete { position: absolute; top: 100%; left: 0; width: 100%; background-color: #ffffff !important; border: 2px solid #000000; border-radius: 0 0 8px 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 999999 !important; max-height: 200px !important; overflow-y: auto; margin: 1px 0 0 0; padding: 0; list-style: none; display: none; box-sizing: border-box; }
+    .lista-sugestoes-autocomplete li { padding: 6px 12px; font-weight: bold; font-size: 13px; color: #202124; cursor: pointer; border-bottom: 1px solid #f1f3f4; text-transform: uppercase; background-color: #ffffff !important; }
+    .lista-sugestoes-autocomplete li:hover, .lista-sugestoes-autocomplete li.selecionado { background-color: #e8f0fe !important; color: #1a73e8 !important; }
+
+    @keyframes cougarFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes cougarSlideFromRight { from { transform: translateX(120vw); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .modal-animado-fundo { animation: cougarFadeIn 0.2s ease-out forwards; }
+    .modal-animado-caixa { animation: cougarSlideFromRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; max-width: 100%; }
+  </style>
+</head>
+<body>
+
+  <div class="secao-busca">
+    <div class="linha-flex">
+      <div class="form-group coluna">
+        <label>🔎 Localizar Registro Por:</label>
+        <select id='altFiltro' onchange="ALTA_ajustarPlaceholder(this.value)">
+          <option value='nome'>👤 NOME COMPLETO DO PACIENTE</option>
+          <option value='carteira'>🪪 NÚMERO DA CARTEIRA</option>
+          <option value='CPF'>💳 NÚMERO DO CPF</option>
+          <option value='id'>🆔 NÚMERO DO ID EXCLUSIVO</option>
+        </select>
+      </div>
+      <div class="form-group coluna" style="flex: 2; position: relative;">
+        <label>Termo de Pesquisa para Retificação:</label>
+        <input type="text" id="altTermo" placeholder="✍️ Digite no mínimo 5 letras para buscar..." autocomplete="off" oninput="ALTA_interceptarTeclado(this)" onkeyup="LAB_monitorarTecladoAlt(event)">
+        <ul id="listaSugestoesAltDrop" class="lista-sugestoes-autocomplete"></ul>
+      </div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <button type="button" class="btn-busca" style="padding: 0 25px;" onclick="ALTA_executarBuscaInicialMestre()">🔍 Localizar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id='msgStatusAlt'></div>
+  <form id="formAlteracaoInicialReal" class="cartao-resultado" autocomplete="off">
+    <input type="hidden" id="altLinhaFisica">
+    
+   <div class='secao-titulo' style="margin-top: 0;">👤 Dados Cadastrais Iniciais (Correção de Digitação)</div>
+    <div class="linha-flex">
+      <div class="form-group coluna">
+        <label>📇 Nome Completo</label>
+        <input type='text' id='altNome' onblur="ALTA_VALIDAR_nome(this)">
+      </div>
+      <div class="form-group col-cpf">
+        <label>💳 CPF do Paciente</label>
+        <input type='text' id='altCPF' maxlength="14" style="text-align: center;" onblur="ALTA_VALIDAR_cpf(this); ALTA_SISTEMA_verificarDuplicidadeImediata();">
+      </div>
+      <div class="form-group col-carteira">
+        <label>🪪 Nº Carteira</label>
+        <input type='text' id='altCarteira' maxlength="16" style="text-align: center;" onblur="ALTA_VALIDAR_carteira(this)">
+      </div>
+      <div class="form-group col-ddd">
+        <label>📞 DDD</label>
+        <input type='text' id='altDDD' maxlength="2" style="text-align: center;" onblur="ALTA_VALIDAR_ddd(this)">
+      </div>
+      <div class="form-group col-fone">
+        <label>📱 Telefone</label>
+        <input type='text' id='altFone' maxlength="9" style="text-align: center;" onblur="ALTA_VALIDAR_telefone(this)">
+      </div>
+      <div class="form-group col-id-travado">
+        <label>🆔 ID Exclusivo 🔒</label>
+        <input type='text' id='altID' readonly style="text-align: center; font-weight: 800; color: #c5221f;">
+      </div>
+    </div>
+
+    <div class="secao-titulo">Configurações e Classificações da Ficha Inicial</div>
+    <div class="linha-flex">
+      <div class="form-group coluna">
+        <label>🩺 Especialidade</label>
+        <select id='altEspecialidade' onblur="ALTA_VALIDAR_select(this, 'Especialidade')" onchange="ALTA_VALIDAR_select(this, 'Especialidade')">
+          <option value=''>-- Selecione --</option><option value='ENDO GERAL'>ENDO GERAL</option><option value='ENDO PED.'>ENDO PED.</option><option value='TIREOIDE'>TIREOIDE</option><option value='OUTROS'>OUTROS</option>
+        </select>
+      </div>
+      <div class="form-group coluna">
+        <label>🚨 Prioridade</label>
+        <select id='altPrioridade' onblur="ALTA_VALIDAR_select(this, 'Prioridade')" onchange="ALTA_VALIDAR_select(this, 'Prioridade')">
+          <option value=''>-- Selecione --</option><option value='NORMAL'>NORMAL</option><option value='ACIMA DE 60'>ACIMA DE 60</option><option value='ACIMA DE 80'>ACIMA DE 80</option><option value="ESPECIAIS">ESPECIAIS</option>
+        </select>
+      </div>
+      <div class="form-group coluna">
+        <label>📌 Tipo Atendimento</label>
+        <select id='altTipoAtendimento' onblur="ALTA_VALIDAR_select(this, 'Tipo Atendimento')" onchange="ALTA_VALIDAR_select(this, 'Tipo Atendimento')">
+          <option value=''>-- Selecione --</option><option value='1ª CONSULTA'>1ª CONSULTA</option><option value='RETORNO/MUDANÇA DE MÉDICO'>RETORNO/MUDANÇA DE MÉDICO</option>
+        </select>
+      </div>
+      <div class="form-group coluna">
+        <label>⚡ Situação Caso</label>
+        <select id='altSituacaoCaso' onblur="ALTA_VALIDAR_select(this, 'Situação Caso')" onchange="ALTA_VALIDAR_select(this, 'Situação Caso')">
+          <option value=''>-- Selecione --</option><option value='ELETIVA'>ELETIVA</option><option value='URGENCIA'>URGENCIA</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="secao-titulo">📝 Observações Iniciais e Metadados do Registro</div>
+    <div class="linha-flex" style="margin-bottom: 4px;">
+      <div class="form-group coluna" style="width: 100% !important; flex: 100% !important;">
+        <label>📝 Observação</label>
+        <textarea id="altObservacao" placeholder="Digite ou altere as observações iniciais importantes aqui..." style="width: 100%; height: 62px; padding: 8px; font-size: 13px; font-weight: bold; border: 2px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; background-color: #ffffff; color: #000000; font-family: sans-serif; resize: vertical;"></textarea>
+      </div>
+    </div>
+
+    <!-- 🔒 CAMPOS INFORMATIVOS DE AUDITORIA (ATENDENTE E DATA CADASTRO) -->
+    <div class="linha-flex" style="margin-bottom: 12px;">
+      <div class="form-group" style="flex: 2 1 250px;">
+        <label>👤 Atendente Criador 🔒</label>
+        <input type='text' id='altAtendente' readonly style="text-align: left; padding-left: 10px; font-weight: 800; color: #1a73e8;">
+      </div>
+      <div class="form-group" style="flex: 1 1 180px;">
+        <label>📅 Data do Cadastro 🔒</label>
+        <input type='text' id='altDataCadastro' readonly style="text-align: center; font-weight: 800; color: #137333;">
+      </div>
+    </div>
+
+    <div class="grupo-botoes-rodape">
+      <button type="button" class="btn-voltar-menu" onclick="var f=document.getElementById('formAlteracaoInicialReal'); if(f) f.reset(); f.style.display='none'; var status=document.getElementById('msgStatusAlt'); if(status){ status.style.display='none'; status.innerHTML=''; } var t=document.getElementById('altTermo'); if(t) t.value='';">↩️ Menu Principal (Voltar)</button>
+      <button type="button" class="btn-salvar" id="btnGravarRetificacao" onclick="ALTA_salvarRetificacaoInicial()">💾 Salvar e Retificar Cadastro Inicial</button>
+    </div>
+  </form>
+
+  <!-- 🎯 LOUSA FLUTUANTE DE DUPLICIDADE (SHADOW SEARCH) -->
+  <div id="modalAltDuplicidadeMaster" class="modal-animado-fundo" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); z-index: 999999; align-items: center; justify-content: center; box-sizing: border-box;">
+    <div id="modalAltCaixaInterna" class="modal-animado-caixa" style="background-color: #fdfaf4 !important; border: 3px solid #000000 !important; border-radius: 12px; width: 460px; padding: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); box-sizing: border-box; text-align: left;">
+      <div id="lblAltModalTitulo" style="font-size: 12px !important; font-weight: 800; color: #ffffff !important; background-color: #c5221f !important; padding: 6px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; border: 2px solid #000000; text-align: center;">
+        ⚠️ ALERTA DE CONFLITO COM OUTRO PACIENTE! ⚠️
+      </div>
+      <div style="background: #ffffff !important; border: 2px solid #000000 !important; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 12px; color: #000000; line-height: 1.6; max-height: 190px; overflow-y: auto; box-sizing: border-box;">
+        <div style="font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #e0e0e0; padding-bottom: 4px; margin-bottom: 4px; color: #1a73e8;">=== Confronto de Dados Cadastrados ===</div>
+        • PACIENTE: <span id="lblAltAlfaNome" style="font-weight: bold;">-</span><br>
+        • DATA SOLICITAÇÃO: <span id="lblAltAlfaData" style="font-weight: bold; color: #137333;">-</span><br>
+        • CPF BANCO: <span id="lblAltAlfaCPF" style="font-weight: bold;">-</span><br>
+        • Nº CARTEIRA: <span id="lblAltAlfaCarteira" style="font-weight: bold;">-</span><br>
+        • ESPECIALIDADE: <span id="lblAltAlfaEsp" style="font-weight: bold;">-</span><br>
+        • STATUS FICHA: <span id="lblAltAlfaStatus" style="font-weight: bold;">-</span><br>
+        • ID EXCLUSIVO: <span id="lblAltAlfaID" style="font-weight: bold; color: #c5221f;">-</span>
+      </div>
+      <p style="margin: 10px 0; font-weight: 800; font-size: 12px; color: #ff0000; text-align: center; text-transform: uppercase; letter-spacing: 0.3px;">
+        Este CPF já pertence a outro prontuário ativo no banco!<br>Deseja realmente prosseguir com esta alteração?
+      </p>
+      <div style="display: flex; gap: 12px; width: 100%; box-sizing: border-box;">
+        <button type="button" onclick="ALTA_SISTEMA_respostaDuplicidade(false)" style="flex: 1; background-color: #5f6368 !important; color: white !important; padding: 8px !important; font-size: 13px !important; height: 38px !important; border: 2px solid #000000 !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; text-transform: uppercase;">❌ Não (Corrigir)</button>
+        <button type="button" onclick="ALTA_SISTEMA_respostaDuplicidade(true)" style="flex: 1; background-color: #137333 !important; color: white !important; padding: 8px !important; font-size: 13px !important; height: 38px !important; border: 2px solid #000000 !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; text-transform: uppercase; box-shadow: 0 4px 6px rgba(19,115,51,0.15);">✅ Sim (Prosseguir)</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var INDICE_SELECIONADO_KEYBOARD = -1;
+    var bloqueandoLoopBlurAlt = false;
+
+    function ALTA_VALIDAR_nome(campo) {
+      if (bloqueandoLoopBlurAlt) return;
+      var status = document.getElementById('msgStatusAlt');
+      var nomeLimpo = campo.value.trim().replace(/\s+/g, ' ');
+      var partes = nomeLimpo.split(' ');
+
+      if (campo.value.trim() === "" || partes.length < 2 || partes[0].trim() === "") {
+        bloqueandoLoopBlurAlt = true;
+        campo.classList.add("campo-erro");
+        if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ O Nome Completo é obrigatório e exige Nome e Sobrenome!'; }
+        setTimeout(function() {
+          campo.focus();
+          bloqueandoLoopBlurAlt = false;
+        }, 100);
+      } else {
+        campo.classList.remove("campo-erro");
+        if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+      }
+    }
+
+    function ALTA_VALIDAR_cpf(campo) {
+      if (bloqueandoLoopBlurAlt) return;
+      var status = document.getElementById('msgStatusAlt');
+      var numBrutos = campo.value.replace(/[^0-9]/g, "");
+
+      if (numBrutos.length !== 11) {
+        bloqueandoLoopBlurAlt = true;
+        campo.classList.add("campo-erro");
+        if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ O CPF é obrigatório e deve conter exatamente 11 dígitos.'; }
+        setTimeout(function() {
+          campo.focus();
+          bloqueandoLoopBlurAlt = false;
+        }, 100);
+      } else {
+        campo.classList.remove("campo-erro");
+        if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+      }
+    }
+
+    function ALTA_VALIDAR_carteira(campo) {
+      if (bloqueandoLoopBlurAlt) return;
+      var status = document.getElementById('msgStatusAlt');
+      var v = campo.value.replace(/[^0-9]/g, "");
+
+      if (v.length < 14 || v.length > 16) {
+        bloqueandoLoopBlurAlt = true;
+        campo.classList.add("campo-erro");
+        if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ A Carteira é obrigatória e exige entre 14 e 16 números!'; }
+        setTimeout(function() {
+          campo.focus();
+          bloqueandoLoopBlurAlt = false;
+        }, 100);
+      } else {
+        campo.classList.remove("campo-erro");
+        campo.value = v.toString().padStart(16, '0');
+        if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+      }
+    }
+
+    function ALTA_VALIDAR_ddd(campo) {
+      if (bloqueandoLoopBlurAlt) return;
+      var status = document.getElementById('msgStatusAlt');
+      var v = campo.value.replace(/[^0-9]/g, "");
+
+      if (v.length !== 2) {
+        bloqueandoLoopBlurAlt = true;
+        campo.classList.add("campo-erro");
+        if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ O DDD é obrigatório e precisa ter exatamente 2 dígitos!'; }
+        setTimeout(function() {
+          campo.focus();
+          bloqueandoLoopBlurAlt = false;
+        }, 100);
+      } else {
+        campo.classList.remove("campo-erro");
+        if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+      }
+    }
+
+    function ALTA_VALIDAR_telefone(campo) {
+      if (bloqueandoLoopBlurAlt) return;
+      var status = document.getElementById('msgStatusAlt');
+      var v = campo.value.replace(/[^0-9]/g, "");
+
+      if (v.length !== 8 && v.length !== 9) {
+        bloqueandoLoopBlurAlt = true;
+        campo.classList.add("campo-erro");
+        if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ O Telefone é obrigatório e deve conter 8 ou 9 dígitos!'; }
+        setTimeout(function() {
+          campo.focus();
+          bloqueandoLoopBlurAlt = false;
+        }, 100);
+      } else {
+        campo.classList.remove("campo-erro");
+        if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+      }
+    }
+
+    function ALTA_VALIDAR_select(campo, nomeCampo) {
+      if (bloqueandoLoopBlurAlt) return;
+      var status = document.getElementById('msgStatusAlt');
+
+      if (!campo.value || campo.value.trim() === "") {
+        bloqueandoLoopBlurAlt = true;
+        campo.classList.add("campo-erro");
+        if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ O campo ' + nomeCampo + ' é obrigatório e não pode ficar em branco!'; }
+        setTimeout(function() {
+          campo.focus();
+          bloqueandoLoopBlurAlt = false;
+        }, 100);
+      } else {
+        campo.classList.remove("campo-erro");
+        if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+      }
+    }
+
+    async function ALTA_SISTEMA_verificarDuplicidadeImediata() {
+      var campoCPF = document.getElementById('altCPF');
+      var idAtual = document.getElementById('altID').value;
+      if (campoCPF.classList.contains("campo-erro")) return;
+
+      var cpfDigitado = campoCPF.value.replace(/[^0-9]/g, '');
+      if (cpfDigitado.length === 11) {
+        var status = document.getElementById('msgStatusAlt');
+        if (status) { 
+          status.style.display = 'block'; status.className = ''; 
+          status.style.setProperty('color', '#c5221f', 'important');
+          status.style.setProperty('font-size', '14px', 'important');
+          status.style.setProperty('font-weight', '900', 'important');
+          status.innerHTML = '🚨🚨 🛑 VERIFICANDO SE O CPF PERTENCE A OUTRO PACIENTE... 🛑 🚨🚨'; 
+        }
+
+        try {
+          const respostaHTTP = await fetch('/api/pacientes/busca?cpf=' + cpfDigitado);
+          const res = await respostaHTTP.json();
+
+          if (status) { 
+            status.style.display = 'none'; status.innerHTML = ''; 
+            status.removeAttribute('style'); 
+          }
+          
+          if (!res || !res.sucesso || !res.dados) return;
+          
+          var d = res.dados;
+          var idBanco = String(d.id_exclusivo || d.id || "");
+
+          if (idBanco === idAtual) return;
+
+          var nomeBanco = String(d.nome || "").toUpperCase().trim();
+          if(document.getElementById('lblAltModalTitulo')) document.getElementById('lblAltModalTitulo').innerText = "⚠️ ATENÇÃO: ESTE CPF JÁ PERTENCE A OUTRO PACIENTE! ⚠️";
+          if(document.getElementById('lblAltAlfaNome')) document.getElementById('lblAltAlfaNome').innerText = nomeBanco;
+          if(document.getElementById('lblAltAlfaData')) document.getElementById('lblAltAlfaData').innerText = d.data_solicitacao || "";
+          if(document.getElementById('lblAltAlfaCPF')) document.getElementById('lblAltAlfaCPF').innerText = d.cpf || "";
+          if(document.getElementById('lblAltAlfaCarteira')) document.getElementById('lblAltAlfaCarteira').innerText = d.carteira || "";
+          if(document.getElementById('lblAltAlfaEsp')) document.getElementById('lblAltAlfaEsp').innerText = d.especialidade || "";
+          if(document.getElementById('lblAltAlfaStatus')) document.getElementById('lblAltAlfaStatus').innerText = d.status_atendimento || "";
+          if(document.getElementById('lblAltAlfaID')) document.getElementById('lblAltAlfaID').innerText = idBanco;
+          
+          var modal = document.getElementById('modalAltDuplicidadeMaster');
+          if (modal) modal.style.display = 'flex';
+        } catch (err) {
+          if (status) { status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '❌ Falha na conexão de varredura: ' + err.message; }
+        }
+      }
+    }
+
+    function ALTA_SISTEMA_respostaDuplicidade(prosseguirSoberano) {
+      var modal = document.getElementById('modalAltDuplicidadeMaster');
+      if (modal) modal.style.display = 'none';
+      var status = document.getElementById('msgStatusAlt');
+      
+      if (!prosseguirSoberano) {
+        document.getElementById('altCPF').focus();
+        if (status) {
+          status.style.display = 'block'; status.className = 'erro';
+          status.innerHTML = '❌ Operação pausada. Corrija o CPF para evitar conflito com outro cadastro.';
+          setTimeout(function() { status.style.display = 'none'; status.innerHTML = ''; }, 4000);
+        }
+      }
+    }
+
+    async function LAB_monitorarTecladoAlt(event) {
+      var filtro = document.getElementById("altFiltro").value;
+      var termo = document.getElementById("altTermo").value.trim().toUpperCase();
+      var list = document.getElementById("listaSugestoesAltDrop");
+      if (filtro !== "nome") { LAB_fecharDropdownSugestoesAlt(); return; }
+      var itens = list.getElementsByTagName("li");
+      
+      if (event.key === "ArrowDown") {
+        event.preventDefault(); INDICE_SELECIONADO_KEYBOARD++;
+        if (INDICE_SELECIONADO_KEYBOARD >= itens.length) INDICE_SELECIONADO_KEYBOARD = 0;
+        LAB_destacarItemDropdownAlt(itens); return;
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault(); INDICE_SELECIONADO_KEYBOARD--;
+        if (INDICE_SELECIONADO_KEYBOARD < 0) INDICE_SELECIONADO_KEYBOARD = itens.length - 1;
+        LAB_destacarItemDropdownAlt(itens); return;
+      } else if (event.key === "Enter") {
+        event.preventDefault();
+        if (INDICE_SELECIONADO_KEYBOARD > -1 && itens[INDICE_SELECIONADO_KEYBOARD]) { 
+          LAB_selecionarNomeDropdownAlt(itens[INDICE_SELECIONADO_KEYBOARD].innerText);
+        } else { ALTA_executarBuscaInicialMestre(); } return;
+      } else if (event.key === "Escape") { LAB_fecharDropdownSugestoesAlt(); return; }
+
+      INDICE_SELECIONADO_KEYBOARD = -1;
+      if (termo.length < 5) { LAB_fecharDropdownSugestoesAlt(); return; }
+
+      try {
+        const req = await fetch('/api/pacientes/sugestoes?termo=' + encodeURIComponent(termo));
+        const res = await req.json();
+        if (!res.sucesso || !res.sugestoes || res.sugestoes.length === 0) { LAB_fecharDropdownSugestoesAlt(); return; }
+        
+        var htmlDrop = "";
+        res.sugestoes.forEach(function(nome) {
+          htmlDrop += '<li onmousedown="LAB_selecionarNomeDropdownAlt(\'' + nome.replace(/'/g, "\\'") + '\')">' + nome + '</li>';
+        });
+        list.innerHTML = htmlDrop; list.style.display = "block";
+      } catch(err) {
+        console.error("Erro no autocomplete:", err);
+      }
+    }
+
+    function LAB_destacarItemDropdownAlt(itens) {
+      for (var i = 0; i < itens.length; i++) {
+        if (i === INDICE_SELECIONADO_KEYBOARD) itens[i].classList.add("selecionado");
+        else itens[i].classList.remove("selecionado");
+      }
+    }
+
+    function LAB_selecionarNomeDropdownAlt(nome) {
+      document.getElementById("altTermo").value = nome;
+      LAB_fecharDropdownSugestoesAlt(); ALTA_executarBuscaInicialMestre(); 
+    }
+
+    function LAB_fecharDropdownSugestoesAlt() {
+      var list = document.getElementById("listaSugestoesAltDrop");
+      if (list) { list.style.display = "none"; list.innerHTML = ""; }
+      INDICE_SELECIONADO_KEYBOARD = -1;
+    }
+
+    document.addEventListener("mousedown", function(e) {
+      var list = document.getElementById("listaSugestoesAltDrop");
+      if (e.target !== document.getElementById("altTermo") && e.target !== list && e.target.tagName !== "LI") LAB_fecharDropdownSugestoesAlt();
+    });
+
+    function ALTA_interceptarTeclado(campo) {
+      if (document.getElementById("altFiltro").value === "CPF") ALTA_MASCARA_cpf(campo);
+      else if (document.getElementById("altFiltro").value !== "id" && document.getElementById("altFiltro").value !== "carteira") campo.value = campo.value.toUpperCase();
+    }
+
+    function ALTA_MASCARA_cpf(campo) {
+      var v = campo.value.replace(/[^0-9]/g, "");
+      if (v.length > 3 && v.length <= 6) campo.value = v.substring(0,3) + "." + v.substring(3);
+      else if (v.length > 6 && v.length <= 9) campo.value = v.substring(0,3) + "." + v.substring(3,6) + "." + v.substring(6);
+      else if (v.length > 9) campo.value = v.substring(0,3) + "." + v.substring(3,6) + "." + v.substring(6,9) + "-" + v.substring(9,11);
+    }
+
+    function ALTA_ajustarPlaceholder(filtro) {
+      var txt = document.getElementById("altTermo"); txt.value = ""; LAB_fecharDropdownSugestoesAlt();
+      if (filtro === "CPF") { txt.placeholder = "000.000.000-00"; txt.maxLength = 14; }
+      else if (filtro === "carteira") { txt.placeholder = "Digite entre 14 e 16 números..."; txt.maxLength = 16; }
+      else if (filtro === "id") { txt.placeholder = "ID numérico..."; txt.maxLength = 15; }
+      else { txt.placeholder = "Digite no mínimo 5 letras para buscar..."; txt.removeAttribute("maxlength"); }
+    }
+
+    document.getElementById("altNome").addEventListener("input", function() { this.value = this.value.toUpperCase(); });
+    document.getElementById("altCPF").addEventListener("input", function() { ALTA_MASCARA_cpf(this); });
+    document.getElementById("altCarteira").addEventListener("input", function() { this.value = this.value.replace(/[^0-9]/g, ""); if(this.value.length > 16) this.value = this.value.substring(0,16); });
+    document.getElementById("altDDD").addEventListener("input", function() { this.value = this.value.replace(/[^0-9]/g, ""); });
+    document.getElementById("altFone").addEventListener("input", function() { this.value = this.value.replace(/[^0-9]/g, ""); });
+
+    async function ALTA_executarBuscaInicialMestre() {
+      var status = document.getElementById('msgStatusAlt');
+      var termoOriginal = document.getElementById('altTermo').value.trim();
+      var filtro = document.getElementById('altFiltro').value.trim();
+      
+      if(!termoOriginal) { status.style.display='block'; status.className='erro'; status.innerHTML='⚠️ Insira o termo para localizar o cadastro.'; return; }
+      if (filtro === "nome" && termoOriginal.length < 5) {
+        status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ Erro: A pesquisa por nome exige no mínimo 5 letras.'; return;
+      }
+      
+      status.style.display='block'; status.className=''; status.innerHTML='⚙️ Consultando base de dados Supabase...';
+      document.getElementById('formAlteracaoInicialReal').style.display = 'none';
+
+      var termoEnvio = termoOriginal;
+      if (filtro === "CPF" || filtro === "carteira") { 
+        var digitosPuros = termoOriginal.replace(/[^0-9]/g, "");
+        termoEnvio = (filtro === "carteira") ? digitosPuros.toString().padStart(16, '0') : digitosPuros;
+      }
+
+      try {
+        const req = await fetch('/api/pacientes/busca-completa?filtro=' + encodeURIComponent(filtro) + '&termo=' + encodeURIComponent(termoEnvio));
+        const res = await req.json();
+
+        if(res && res.sucesso && res.dados) {
+          status.style.display = 'none'; 
+          document.getElementById('formAlteracaoInicialReal').style.display = 'block';
+          
+          var d = res.dados;
+          document.getElementById('altLinhaFisica').value = d.id || "";
+          document.getElementById('altNome').value = d.nome || "";
+          document.getElementById('altCPF').value = d.cpf || "";
+          document.getElementById('altCarteira').value = d.carteira || "";
+          document.getElementById('altDDD').value = d.ddd || "";
+          document.getElementById('altFone').value = d.telefone || "";
+          document.getElementById('altID').value = d.id || "";
+          
+          // 🔒 Preenchimento dos novos campos de Auditoria Informacional
+          document.getElementById('altAtendente').value = d.atendente || "NÃO REGISTRADO";
+          document.getElementById('altDataCadastro').value = d.data_cadastro || "-";
+          
+          document.getElementById('altEspecialidade').value = (d.especialidade || "").toUpperCase();
+          document.getElementById('altPrioridade').value = (d.prioridade || "").toUpperCase();
+          document.getElementById('altTipoAtendimento').value = (d.tipo || "").toUpperCase();
+          document.getElementById('altSituacaoCaso').value = (d.situacao || "").toUpperCase();
+          document.getElementById('altObservacao').value = d.observacao || "";
+        } else {
+          status.style.display='block'; status.className='erro'; status.innerHTML = '⚠️ Nenhum registro localizado.';
+        }
+      } catch(err) {
+        status.style.display='block'; status.className='erro'; status.innerHTML='❌ Falha de rede: '+ err.message;
+      }
+    } 
+
+    async function ALTA_salvarRetificacaoInicial() {
+      var status = document.getElementById('msgStatusAlt'); 
+      status.style.display = 'block'; status.className = 'erro'; status.innerHTML = 'Processando...';
+      
+      var idRegistro = document.getElementById('altLinhaFisica').value;
+      var nomeCamp = document.getElementById('altNome'); 
+      var cpfCamp = document.getElementById('altCPF');
+      var cartCamp = document.getElementById('altCarteira'); 
+      var dddCamp = document.getElementById('altDDD');
+      var foneCamp = document.getElementById('altFone');
+      var obsCamp = document.getElementById('altObservacao');
+
+      var espCamp = document.getElementById('altEspecialidade');
+      var priCamp = document.getElementById('altPrioridade');
+      var tipCamp = document.getElementById('altTipoAtendimento');
+      var sitCamp = document.getElementById('altSituacaoCaso');
+      
+      var nomeLimpo = nomeCamp.value.trim().replace(/\s+/g, ' ');
+      var partesNome = nomeLimpo.split(' ');
+      var carteiraNumeros = cartCamp.value.replace(/[^0-9]/g, '');
+
+      [nomeCamp, cpfCamp, cartCamp, dddCamp, foneCamp, espCamp, priCamp, tipCamp, sitCamp].forEach(function(el) {
+        if(el) el.classList.remove('campo-erro');
+      });
+
+      if(!idRegistro) { status.innerHTML = '⚠️ Erro: Nenhum prontuário carregado.'; return; }
+      
+      if(nomeLimpo === "" || partesNome.length < 2) { 
+        status.innerHTML = '⚠️ Erro: Digite no mínimo o Nome e o Sobrenome completo.'; nomeCamp.classList.add('campo-erro'); nomeCamp.focus(); return; 
+      }
+      if(cpfCamp.value.replace(/[^0-9]/g, '').length !== 11) { 
+        status.innerHTML = '⚠️ O CPF deve conter exatamente 11 dígitos.'; cpfCamp.classList.add('campo-erro'); cpfCamp.focus(); return; 
+      }
+      if(carteiraNumeros.length < 14 || carteiraNumeros.length > 16) { 
+        status.innerHTML = '⚠️ A Carteira exige entre 14 e 16 números.'; cartCamp.classList.add('campo-erro'); cartCamp.focus(); return; 
+      }
+      if(dddCamp.value.replace(/[^0-9]/g, '').length !== 2) { 
+        status.innerHTML = '⚠️ O DDD precisa ter exatamente 2 dígitos.'; dddCamp.classList.add('campo-erro'); dddCamp.focus(); return; 
+      }
+      if(foneCamp.value.replace(/[^0-9]/g, '').length < 8) { 
+        status.innerHTML = '⚠️ O Telefone deve conter 8 ou 9 dígitos.'; foneCamp.classList.add('campo-erro'); foneCamp.focus(); return; 
+      }
+      
+      if(!espCamp.value || espCamp.value.trim() === "") {
+        status.innerHTML = '⚠️ A Especialidade é obrigatória e não pode ficar em branco!'; espCamp.classList.add('campo-erro'); espCamp.focus(); return;
+      }
+      if(!priCamp.value || priCamp.value.trim() === "") {
+        status.innerHTML = '⚠️ A Prioridade é obrigatória e não pode ficar em branco!'; priCamp.classList.add('campo-erro'); priCamp.focus(); return;
+      }
+      if(!tipCamp.value || tipCamp.value.trim() === "") {
+        status.innerHTML = '⚠️ O Tipo de Atendimento é obrigatório e não pode ficar em branco!'; tipCamp.classList.add('campo-erro'); tipCamp.focus(); return;
+      }
+      if(!sitCamp.value || sitCamp.value.trim() === "") {
+        status.innerHTML = '⚠️ A Situação do Caso é obrigatória e não pode ficar em branco!'; sitCamp.classList.add('campo-erro'); sitCamp.focus(); return;
+      }
+      
+      var carteiraFormatada16 = carteiraNumeros.toString().padStart(16, '0');
+
+      var payload = {
+        id: idRegistro,
+        operador: window.EMAIL_OPERADOR_REAL_WEB || 'Operador Web',
+        nivel: window.NIVEL_OPERADOR_REAL_WEB || 'OPERADOR',
+        nome: nomeLimpo.toUpperCase(),
+        cpf: cpfCamp.value,
+        carteira: carteiraFormatada16,
+        ddd: dddCamp.value.replace(/[^0-9]/g, ''),
+        telefone: foneCamp.value.replace(/[^0-9]/g, ''),
+        especialidade: espCamp.value,
+        prioridade: priCamp.value,
+        tipo: tipCamp.value,
+        situacao: sitCamp.value,
+        observacao: obsCamp.value.trim()
+      };
+
+      status.className = ''; status.innerHTML = 'Enviando retificações seguras...';
+
+      try {
+        const req = await fetch('/api/pacientes/atualizar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const res = await req.json();
+
+        if(res.sucesso) {
+          status.className = 'sucesso'; 
+          status.innerHTML = res.mensagem; 
+          document.getElementById('formAlteracaoInicialReal').reset();
+          document.getElementById('formAlteracaoInicialReal').style.display = 'none'; 
+          document.getElementById('altTermo').value = '';
+          setTimeout(function() { if (status) { status.style.display = 'none'; status.innerHTML = ''; } }, 4000);
+        } else {
+          status.className = 'erro'; 
+          status.innerHTML = '❌ ' + res.mensagem;
+        }
+      } catch(err) {
+        status.className = 'erro'; 
+        status.innerHTML = 'Erro de rede: ' + err.message;
+      }
+    }
+  </script>
+</body>
+</html>

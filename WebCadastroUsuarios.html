@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target='_top'>
+  <style>
+    body { 
+      font-family: 'Segoe UI', -apple-system, sans-serif; 
+      padding: 0 !important; 
+      margin: 0 !important; 
+      background-color: #e8f0fe !important; 
+      color: #202124; 
+      font-size: 13px; 
+      box-sizing: border-box; 
+      overflow-x: hidden !important; 
+      overflow-y: auto !important;   
+    }
+
+    .form-group { margin-bottom: 4px; position: relative; display: flex; flex-direction: column; }
+    label { display: block; margin-bottom: 2px; font-weight: 800 !important; font-size: 11px !important; color: #000000 !important; text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    input, select { width: 100% !important; padding: 2px 10px !important; border: 2px solid #000000 !important; border-radius: 8px !important; box-sizing: border-box !important; font-size: 13px !important; height: 36px !important; background-color: #ffffff !important; color: #000000 !important; font-weight: bold !important; transition: all 0.15s ease-in-out !important; }
+    
+    input:focus, select:focus { border-color: #ff0000 !important; background-color: #e9ecef !important; color: #000000 !important; outline: none !important; box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.15) !important; }
+    input[readonly] { background-color: #e9ecef !important; color: #202124 !important; cursor: not-allowed; border: 2px solid #000000 !important; }
+    
+    .linha-flex { display: flex !important; gap: 8px; width: 100%; box-sizing: border-box; align-items: flex-end; margin-bottom: 4px; flex-wrap: wrap !important; }
+    .coluna { flex: 1 1 200px !important; min-width: 150px !important; }
+    
+    .btn-acao { background-color: #137333 !important; color: white !important; padding: 0 25px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; height: 36px; box-shadow: 0 4px 6px rgba(19,115,51,0.2); transition: background 0.2s; }
+    .btn-acao:hover { background-color: #0b5123 !important; }
+    
+    .grupo-botoes-rodape { display: flex !important; gap: 16px !important; margin-top: 8px !important; width: 100% !important; box-sizing: border-box !important; align-items: center !important; justify-content: space-between !important; }
+    
+    .secao-titulo { font-size: 11px !important; font-weight: 800; color: #ffffff !important; background-color: #1a73e8 !important; margin: 4px 0 4px 0; padding: 3px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; border: none !important; width: 100%; box-sizing: border-box; }
+    .cartao-container { background-color: #fdfaf4 !important; padding: 8px 12px; border: 2px solid #000000 !important; border-radius: 12px !important; margin: 8px 12px; box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    
+    #statusUsuarios { margin-top: 4px; text-align: center; font-size: 12px; font-weight: bold; padding: 4px; border-radius: 4px; display: none; }
+    .sucesso { color: #137333; background-color: #e6f4ea; border: 1px solid #b7e1cd; }
+    .erro { color: #c5221f; background-color: #fce8e6; border: 1px solid #fad2cf; }
+
+    .area-tabela { width: 100%; max-height: 320px !important; overflow-y: auto; border: 2px solid #000000; border-radius: 8px; background-color: #ffffff; margin-top: 4px; box-sizing: border-box; }
+    .tabela-user { width: 100%; border-collapse: collapse; font-size: 12px; font-weight: bold; text-align: left; }
+    .tabela-user thead th { background-color: #137333; color: white; padding: 6px 10px; position: sticky; top: 0; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid #000000; }
+    .tabela-user tbody tr { border-bottom: 1px solid #cbd5e1; }
+    .tabela-user tbody td { padding: 6px 10px; color: #000000; }
+  </style>
+</head>
+<body>
+
+  <!-- FORMULÁRIO DE CADASTRO / EDIÇÃO DE USUÁRIO -->
+  <div class="cartao-container">
+    <div class='secao-titulo' style="margin-top: 0;">👥 Gerenciamento e Liberação de Usuários</div>
+    <form id="formCadastroUser" autocomplete="off" onsubmit="event.preventDefault(); USER_salvarRegistro();">
+      <input type="hidden" id="userIdFisico">
+      
+      <div class="linha-flex">
+        <div class="form-group coluna" style="flex: 2;">
+          <label>👤 Nome do Usuário</label>
+          <input type="text" id="userNome" placeholder="EX: NOME COMPLETO..." oninput="this.value = this.value.toUpperCase();" required>
+        </div>
+        <div class="form-group coluna" style="flex: 2;">
+          <label>📧 E-mail Corporativo</label>
+          <input type="email" id="userEmail" placeholder="usuario@gmail.com" style="text-transform: lowercase !important;" required>
+        </div>
+        <div class="form-group coluna" style="flex: 1.5;">
+          <label>🔑 Nível de Acesso</label>
+          <select id="userNivel" required>
+            <option value="OPERADOR_INCLUSAO">OPERADOR_INCLUSAO</option>
+            <option value="OPERADOR_BUSCA">OPERADOR_BUSCA</option>
+            <option value="OPERADOR_MISTO">OPERADOR_MISTO</option>
+            <option value="SUPERVISOR">SUPERVISOR</option>
+            <option value="MASTER">MASTER</option>
+          </select>
+        </div>
+        <div class="form-group coluna" style="flex: 1;">
+          <label>⚡ Status</label>
+          <select id="userStatus" required>
+            <option value="ATIVO">ATIVO</option>
+            <option value="PENDENTE">PENDENTE</option>
+            <option value="INATIVO">INATIVO</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grupo-botoes-rodape">
+        <button type="button" class="btn-acao" style="background-color: #5f6368 !important;" onclick="USER_limparFormulario()">🧹 Limpar / Novo</button>
+        <button type="submit" class="btn-acao">💾 Salvar Usuário</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="statusUsuarios"></div>
+
+  <!-- LISTAGEM / TABELA DE USUÁRIOS CADASTRADOS -->
+  <div class="cartao-container">
+    <div class='secao-titulo' style="background-color: #137333 !important; margin-top: 0;">📋 Operadores e Solicitações no Sistema</div>
+    <div class="area-tabela">
+      <table class="tabela-user">
+        <thead>
+          <tr>
+            <th>NOME</th>
+            <th>E-MAIL</th>
+            <th>NÍVEL</th>
+            <th style="width: 100px; text-align: center;">STATUS</th>
+            <th style="width: 80px; text-align: center;">AÇÃO</th>
+          </tr>
+        </thead>
+        <tbody id="corpoTabelaUsuarios">
+          <tr><td colspan="5" style="text-align: center; padding: 20px; color: #475569;">Carregando usuários...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    async function USER_carregarLista() {
+      var corpo = document.getElementById('corpoTabelaUsuarios');
+      try {
+        const req = await fetch('/api/usuarios/gerenciar');
+        const res = await req.json();
+        
+        if (res.sucesso && res.dados && res.dados.length > 0) {
+          var html = "";
+          res.dados.forEach(function(u) {
+            var corStatus = '#137333';
+            var bgStatus = '#e6f4ea';
+            if (u.status === 'PENDENTE') { corStatus = '#b06000'; bgStatus = '#fef3c7'; }
+            else if (u.status === 'INATIVO') { corStatus = '#c5221f'; bgStatus = '#fce8e6'; }
+
+            html += '<tr>';
+            html += '<td style="text-transform: uppercase;">' + (u.nome || '-') + '</td>';
+            html += '<td style="text-transform: lowercase;">' + (u.email || '-') + '</td>';
+            html += '<td><b>' + (u.nivel || '-') + '</b></td>';
+            html += '<td style="text-align: center;"><span style="background-color: ' + bgStatus + '; color: ' + corStatus + '; padding: 2px 8px; border-radius: 4px; font-size: 10px;">' + (u.status || 'ATIVO') + '</span></td>';
+            html += '<td style="text-align: center;"><button type="button" style="background-color: #1a73e8; color: white; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-weight: bold;" onclick="USER_editar(\'' + u.id + '\', \'' + (u.nome || '').replace(/'/g, "\\'") + '\', \'' + (u.email || '').toLowerCase() + '\', \'' + (u.nivel || 'OPERADOR_BUSCA') + '\', \'' + (u.status || 'ATIVO') + '\')">✏️ Editar</button></td>';
+            html += '</tr>';
+          });
+          corpo.innerHTML = html;
+        } else {
+          corpo.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #137333; font-weight: bold;">Nenhum usuário cadastrado.</td></tr>';
+        }
+      } catch (err) {
+        corpo.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #c5221f; font-weight: bold;">Erro ao carregar usuários.</td></tr>';
+      }
+    }
+
+    function USER_limparFormulario() {
+      document.getElementById('formCadastroUser').reset();
+      document.getElementById('userIdFisico').value = '';
+      document.getElementById('userNivel').value = 'OPERADOR_BUSCA';
+      document.getElementById('userStatus').value = 'ATIVO';
+    }
+
+    function USER_editar(id, nome, email, nivel, status) {
+      document.getElementById('userIdFisico').value = id;
+      document.getElementById('userNome').value = nome;
+      document.getElementById('userEmail').value = email;
+      document.getElementById('userNivel').value = nivel;
+      document.getElementById('userStatus').value = status;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function USER_salvarRegistro() {
+      var status = document.getElementById('statusUsuarios');
+      var id = document.getElementById('userIdFisico').value;
+      var nome = document.getElementById('userNome').value.trim().toUpperCase();
+      var email = document.getElementById('userEmail').value.trim().toLowerCase();
+      var nivel = document.getElementById('userNivel').value;
+      var statusUser = document.getElementById('userStatus').value;
+
+      if (!nome || !email) {
+        status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ Preencha o nome e o e-mail.';
+        return;
+      }
+
+      status.style.display = 'block'; status.className = ''; status.innerHTML = '💾 Salvando usuário no Supabase...';
+
+      var payload = { id: id, nome: nome, email: email, nivel: nivel, status: statusUser };
+
+      try {
+        const req = await fetch('/api/usuarios/salvar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const res = await req.json();
+
+        if (res.sucesso) {
+          status.style.display = 'block'; status.className = 'sucesso'; status.innerHTML = '🎯 ' + res.mensagem;
+          USER_limparFormulario();
+          USER_carregarLista();
+          setTimeout(function() { status.style.display = 'none'; }, 3500);
+        } else {
+          status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ ' + res.mensagem;
+        }
+      } catch (err) {
+        status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '❌ Erro de conexão: ' + err.message;
+      }
+    }
+
+   // 🚀 Execução imediata e segura para carregamentos dinâmicos via innerHTML
+    (function() {
+      setTimeout(function() {
+        USER_carregarLista();
+      }, 200);
+    })(); 
+  </script>
+</body>
+</html>

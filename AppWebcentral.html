@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target='_top'>
+  <link href="https://googleapis.com" rel="stylesheet">
+  
+  <script>
+    function NATIVO_maximizarJanela() {
+      try {
+        window.moveTo(0, 0);
+        window.resizeTo(screen.availWidth, screen.availHeight);
+      } catch (e) { console.log("Ajustando monitor..."); }
+    }
+    window.addEventListener("DOMContentLoaded", NATIVO_maximizarJanela);
+    window.addEventListener("load", NATIVO_maximizarJanela);
+  </script>
+
+  <style>
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; padding: 0 !important; margin: 0 !important; background-color: #dbeafe !important; color: #1a1a1a; font-size: 13px; display: flex; overflow: hidden; perspective: 3000px !important; }
+    .sidebar { width: 260px; background-color: #000000 !important; color: white; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; backface-visibility: hidden !important; transform-style: preserve-3d !important; transform-origin: left center !important; }
+    .sidebar-header { padding: 15px 10px; text-align: center; border-bottom: 1px solid #3c4043; background-color: transparent !important; }
+    .sidebar-header h4 { margin: 0; font-size: 15px; font-weight: 700; color: #1a73e8; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 8px; }
+    .user-info { padding: 12px 20px; background-color: transparent !important; font-size: 11px; border-bottom: 1px solid #3c4043; color: #eaebd0; }
+    .user-info span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 4px; }
+    .badge-nivel { background-color: #1a73e8; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 10px; display: inline-block; }
+    .nav-menu { padding: 15px 0; overflow-y: auto; background-color: transparent !important; }      
+    .nav-item-link { display: block; padding: 12px 20px; color: #bdc1c6; text-decoration: none; font-weight: 600; font-size: 13px; transition: all 0.2s; border-left: 4px solid transparent; cursor: pointer; }
+    .nav-item-link:hover { background-color: #303134; color: white; }
+    .nav-item-link.active { background-color: #35363a; color: white; border-left-color: #1a73e8; }
+    .sidebar-footer { position: sticky; top: 100%; bottom: 15px; padding: 15px; border-top: 1px solid #3c4043; background-color: transparent !important; box-sizing: border-box; margin-top: auto; margin-bottom: 20px; }
+    .btn-deslogar { width: 100%; padding: 10px; background-color: #c5221f; color: white; border: none; border-radius: 4px; font-weight: bold; font-size: 13px; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-deslogar:hover { background-color: #9e1c1a; }
+    .tela-login { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; padding-top: 50px !important; z-index: 9999; overflow: hidden !important; perspective: 2500px !important; }
+    .cartao-login { background-color: transparent !important; background-image: radial-gradient(circle at center, #ffffff 0%, #e8f0fe 45%, #9cb2d6 100%) !important; padding: 10px 35px 25px 35px !important; border-radius: 16px; width: 460px; margin-left: 120px !important; text-align: left; border: 2px solid #334155 !important; box-shadow: 0 35px 70px -15px rgba(15, 23, 42, 0.22), 0 15px 30px -10px rgba(0,0,0,0.1) !important; box-sizing: border-box; backface-visibility: hidden !important; transform-style: preserve-3d !important; transform-origin: center center !important; animation: ANIMACAO_malabaristica3D 1.8s cubic-bezier(0.19, 1, 0.22, 1) forwards !important; }
+    .sidebar.ativar-efeito-folha { animation: ANIMACAO_efeitoFolhaLivro 1.9s cubic-bezier(0.22, 1, 0.36, 1) forwards !important; }
+    .main-container.ativar-efeito-folha { animation: ANIMACAO_encontroInvertido 1.9s cubic-bezier(0.22, 1, 0.36, 1) forwards !important; }
+    @keyframes ANIMACAO_malabaristica3D { 0% { transform: perspective(2500px) translate3d(80px, 40px, -600px) rotateX(25deg) rotateY(-45deg) rotateZ(-10deg); opacity: 0; filter: brightness(0.6); } 100% { transform: perspective(2500px) translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg) rotateZ(0deg); opacity: 1; } }
+    @keyframes ANIMACAO_efeitoFolhaLivro { 0% { transform: rotateY(-90deg); opacity: 0; } 100% { transform: rotateY(0deg); opacity: 1; } }
+    @keyframes ANIMACAO_encontroInvertido { 0% { transform: rotateY(90deg); opacity: 0; } 100% { transform: rotateY(0deg); opacity: 1; } }
+    .cartao-login h2 { color: #1a73e8; margin-top: 0 !important; font-size: 24px; text-align: center; margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; }
+    .cartao-login label { font-size: 11px; font-weight: 800; color: #475569 !important; text-transform: uppercase; display: block; margin-top: 10px; letter-spacing: 0.7px; }
+    .cartao-login input, .cartao-login select { width: 100%; padding: 8px 14px; border: 2px solid #cbd5e1 !important; border-radius: 8px; box-sizing: border-box; font-size: 14px; margin-top: 5px; font-weight: bold; background-color: #ffffff !important; color: #000000; transition: all 0.2s; height: 42px !important; }
+    .cartao-login input:focus, .cartao-login select:focus { border-color: #1a73e8 !important; outline: none; box-shadow: 0 0 0 4px rgba(26,115,232,0.18) !important; }
+    .cartao-login #wrapperEmail, .cartao-login #wrapperSenha, .cartao-login button, .wrapper-logo-central { animation: ANIMACAO_surgirElementos 2.2s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
+    @keyframes ANIMACAO_surgirElementos { 0% { transform: translateZ(-20px) translateY(8px); opacity: 0; } 100% { transform: translateZ(0) translateY(0); opacity: 1; } }
+    #txtEmailLoginPortal, #txtSolEmail { text-transform: lowercase !important; font-weight: bold !important; }
+    .cartao-login button { width: 100%; padding: 10px; background-color: #1a73e8; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 24px; box-shadow: 0 4px 14px rgba(26,115,232,0.3); transition: background 0.2s; height: 44px; }
+    .cartao-login button:hover { background-color: #1557b0; }
+    .link-alternar-login { display: block; text-align: center; margin-top: 16px; color: #1a73e8; font-weight: bold; font-size: 13px; text-decoration: none; cursor: pointer; }
+    .link-alternar-login:hover { text-decoration: underline; color: #1557b0; }
+    .erro-login { color: #c5221f; font-size: 13px; margin-top: 12px; font-weight: bold; display: none; text-align: center; background-color: #fce8e6; padding: 10px; border-radius: 6px; border: 1px solid #fad2cf; }
+    .wrapper-logo-central { text-align: center; width: 100%; margin-bottom: 2px !important; }
+    .logo-jpg-oficial { max-width: 155px; height: auto; display: inline-block; object-fit: contain; }
+    .main-container { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; backface-visibility: hidden !important; transform-style: preserve-3d !important; transform-origin: right center !important; }
+    .top-bar { height: 56px; background-color: #000000 !important; border-bottom: 2px solid #ff0000; display: flex; align-items: center; padding: 0 25px; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .top-bar-title { font-size: 15px; font-weight: 700; color: #ff0000 !important; text-transform: uppercase; letter-spacing: 0.5px; }
+    .content-area { flex: 1; padding: 20px; overflow-y: auto; box-sizing: border-box; display: flex; flex-direction: column; }
+    .card-iframe-container { background: white; border: 1px solid #dadce0; border-radius: 8px; flex: 1; width: 100%; padding: 5px; overflow-y: auto; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .modal-saida-fundo { animation: cougarFadeIn 0.2s ease-out forwards; }
+    .modal-saida-caixa { animation: cougarSlideFromRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    @keyframes cougarFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes cougarSlideFromRight { from { transform: translateX(120vw); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .sidebar-header div, .sidebar-header span, .wrapper-logo-central, .logo-jpg-oficial { background-color: transparent !important; background: transparent !important; border: none !important; box-shadow: none !important; }
+  </style>
+</head>
+
+<body>
+  <div class="tela-login" id="blocoLoginPortal">
+    <div class="cartao-login" id="painelCredenciaisNormais" style="padding: 35px 35px 25px 35px !important;">
+      <div class="wrapper-logo-central" style="text-align: center; margin-bottom: 40px !important; font-family: 'Segoe UI', sans-serif; font-size: 52px; font-weight: 900; letter-spacing: -2px; text-transform: none !important; font-style: italic !important; position: relative; display: inline-block; width: 100%; line-height: 1 !important;">
+        <span style="color: #1a73e8 !important;">Ipes</span><span style="color: #c5221f !important;">a<span style="position: relative; display: inline-block; font-style: italic !important;">u<span style="color: #1a73e8 !important; font-size: 26px !important; font-weight: 900; position: absolute; top: -14px !important; left: 8px !important; font-style: normal !important; letter-spacing: normal; line-height: 1 !important;">+</span></span>de</span>
+      </div>
+
+      <h2 id="lblTituloPortal">🔒 Diabetes Pré-Agenda</h2>
+      <p id="lblSubtituloPortal" style="font-size: 13px; color: #000000 !important; text-align:center; margin:0; font-weight: 700;">Insira suas credenciais corporativas:</p>
+      
+      <div id="wrapperEmail">
+        <label>📧 E-mail Corporativo</label>
+        <input type="email" id="txtEmailLoginPortal" placeholder="usuario@gmail.com" autocomplete="off" onkeydown="if(event.key==='Enter') { var s=document.getElementById('txtSenhaLoginPortal'); if(s.disabled){EXEC_dispararHandshakeAcesso();}else{s.focus();} }">
+      </div>
+
+      <div id="wrapperSenha">
+        <label id="lblTextoSenha">✍️ Senha de Acesso</label>
+        <input type="password" id="txtSenhaLoginPortal" placeholder="••••" maxlength="15" autocomplete="off" onkeydown="if(event.key==='Enter') EXEC_dispararHandshakeAcesso()">
+      </div>
+      <input type="hidden" id="txtLinhaOcultaUser">
+      <button type="button" id="btnEntrarPortal" onclick="EXEC_dispararHandshakeAcesso()">Entrar no Sistema</button>
+      
+      <a class="link-alternar-login" onclick="INTERFACE_alternarFormularios('SOLICITAR')">⚠️ Não tenho login cadastrado</a>
+      <div class="erro-login" id="lblErroPortal"></div>
+      
+      <div style="text-align: center; margin-top: 12px; width: 100%;">
+        <p style="color: #c5221f; font-size: 13px; font-weight: bold; margin: 0; letter-spacing: 0.5px;">✨ Versão 2.1.8</p>
+      </div>
+    </div>
+
+    <div class="cartao-login" id="painelSolicitacaoNovoAcesso" style="display: none;">
+      <div class="wrapper-logo-central"><div class="texto-estilizado-logo"><span style="color: #1a73e8;">Ipes</span><span style="color: #c5221f;">aude</span></div></div>
+      <h2>📋 Solicitar Credenciais</h2>
+      <p style="font-size: 13px; color: #5f6368; text-align:center; margin:0; font-weight: 600;">Preencha para enviar ao Supervisor:</p>
+      
+      <div><label>Nome Completo</label><input type="text" id="txtSolNome" placeholder="DIGITE SEU NOME..." oninput="this.value = this.value.toUpperCase()"></div>
+      <div><label>E-mail Corporativo</label><input type="email" id="txtSolEmail" placeholder="seu-email@gmail.com"></div>
+      
+      <div>
+        <label>Status do Usuário</label>
+        <select id="txtSolSetor">
+          <option value="OPERADOR_INCLUSAO">👥 OPERADOR_INCLUSAO</option>
+          <option value="OPERADOR_BUSCA">👤 OPERADOR_BUSCA</option>
+        </select>
+      </div>
+      
+      <button type="button" id="btnEnviarSolicitacao" onclick="EXEC_dispararPedidoAcessoEmail()">Disparar Solicitação</button>
+      <a class="link-alternar-login" onclick="INTERFACE_alternarFormularios('VOLTAR')">⬅️ Voltar para a Tela de Login</a>
+      <div class="erro-login" id="lblErroSolicitacao"></div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="texto-estilizado-logo" style="font-size: 24px; padding: 2px 14px; margin-bottom: 8px; background-color: #111212; border: none; box-shadow: none;"><span style="color: #1a73e8;">Ipes</span><span style="color: #c5221f;">aude</span></div>
+      <h4>⚙️ Painel Central Web</h4>
+    </div>
+    <div class="nav-menu" id="menuAcessos"></div>
+
+    <div id="lblAvisoFecharX" style="display: block; width: 100%; padding: 8px 10px; background-color: #c5221f; color: #ffffff; border: 2px solid #000000; border-radius: 6px; font-weight: 800; font-size: 11px; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; box-sizing: border-box; margin: 10px 0;">
+      ⚠️ FECHE NO <span style="font-family: Arial, sans-serif; font-size: 13px; font-weight: 900; color: #ffffff !important; margin: 0 4px; display: inline-block; vertical-align: middle;">✖</span> SUPERIOR DA TELA PARA SAIR
+    </div>
+
+    <button type="button" id="btnSairLateralMestre" class="btn-deslogar" onclick="document.getElementById('modalConfirmacaoSaidaCompleta').style.display = 'flex'" style="display: none !important; width: calc(100% - 30px); margin: 15px auto 20px auto;">
+      🚪 Sair do Painel de Controle
+    </button>
+  </div>
+
+  <div class="main-container">
+    <div class="top-bar">
+      <div class="top-bar-title" id="txtTituloAba">Aguardando login...</div>
+      <div style="color: #5f6368; font-size: 12px; font-weight: bold;">Base: Agenda2026 | Versão 2.1.8</div>
+    </div>
+    <div class="content-area"><div class="card-iframe-container" id="boxConteudoDinamico"><div id="loaderView"><div class="spinner-local"></div><span>Aguardando autenticação eletrônica...</span></div></div></div>
+  </div>
+
+  <script>
+    var NIVEL_ACESSO_ATUAL = "BLOQUEADO";
+    window.EMAIL_OPERADOR_REAL_WEB = "Desconhecido";
+    var FLUXO_SITUACAO_ATUAL = "LOGIN_NORMAL";
+
+    try {
+      window.moveTo(0, 0);
+      window.resizeTo(screen.availWidth, screen.availHeight);
+    } catch(e){}
+
+    function INTERFACE_alternarFormularios(modo) {
+      document.getElementById("lblErroPortal").style.display = "none";
+      document.getElementById("lblErroSolicitacao").style.display = "none";
+      if(modo === 'SOLICITAR') {
+        document.getElementById("painelCredenciaisNormais").style.display = "none";
+        document.getElementById("painelSolicitacaoNovoAcesso").style.display = "block";
+      } else {
+        document.getElementById("painelSolicitacaoNovoAcesso").style.display = "none";
+        document.getElementById("painelCredenciaisNormais").style.display = "block";
+      }
+    }
+
+    // 1. MOTOR DE LOGIN (Atualizado para Node.js / Express)
+    async function EXEC_dispararHandshakeAcesso() {
+      var emailDigitado = document.getElementById("txtEmailLoginPortal").value.trim().toLowerCase();
+      var senhaDigitada = document.getElementById("txtSenhaLoginPortal").value.trim();
+      var btn = document.getElementById("btnEntrarPortal");
+      var lblErro = document.getElementById("lblErroPortal");
+      
+      if(emailDigitado === "") { lblErro.style.display = "block"; lblErro.innerHTML = "⚠️ Por favor, insira o seu e-mail."; return; }
+      
+      if (FLUXO_SITUACAO_ATUAL === "GRAVAR_NOVA_SENHA") {
+        if(senhaDigitada === "" || senhaDigitada.length < 4) { lblErro.style.display = "block"; lblErro.innerHTML = "⚠️ Crie uma senha com no mínimo 4 dígitos."; return; }
+        lblErro.style.display = "none";
+        btn.disabled = true; btn.innerHTML = "Gravando sua nova senha...";
+        
+        try {
+          const req = await fetch('/api/auth/primeiro-acesso', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: emailDigitado, novaSenha: senhaDigitada })
+          });
+          const res = await req.json();
+
+          if(res.sucesso) {
+            alert("🎉 Senha cadastrada com sucesso! Faça login agora usando sua nova senha.");
+            FLUXO_SITUACAO_ATUAL = "LOGIN_NORMAL";
+            document.getElementById("lblTituloPortal").innerHTML = "🔒 Diabetes Pré-Agenda";
+            document.getElementById("lblSubtituloPortal").innerHTML = "📧 Insira suas credenciais corporativas:";
+            document.getElementById("lblTextoSenha").innerHTML = "✍️ Senha de Acesso";
+            document.getElementById("txtSenhaLoginPortal").placeholder = "••••";
+            document.getElementById("txtSenhaLoginPortal").value = "";
+            document.getElementById("txtEmailLoginPortal").disabled = false;
+            btn.disabled = false; btn.innerHTML = "Entrar no Sistema";
+          } else {
+            btn.disabled = false; btn.innerHTML = "Cadastrar minha Senha";
+            lblErro.style.display = "block"; lblErro.innerHTML = res.mensagem;
+          }
+        } catch(err) {
+          btn.disabled = false; btn.innerHTML = "Cadastrar minha Senha";
+          lblErro.style.display = "block"; lblErro.innerHTML = "Erro de rede: " + err.message;
+        }
+        return;
+      }
+
+      if(senhaDigitada === "") { lblErro.style.display = "block"; lblErro.innerHTML = "⚠️ Por favor, insira a sua senha."; return; }
+      
+      lblErro.style.display = "none";
+      btn.disabled = true; btn.innerHTML = "✅ Acessando banco de dados...";
+
+      try {
+        const req = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: emailDigitado, senha: senhaDigitada })
+        });
+        const respostaAcesso = await req.json();
+
+        btn.disabled = false; btn.innerHTML = "Entrar no Sistema";
+          
+        if (respostaAcesso && respostaAcesso.autorizado) {
+          NIVEL_ACESSO_ATUAL = respostaAcesso.nivel;
+          window.EMAIL_OPERADOR_REAL_WEB = respostaAcesso.email;
+          
+          FLUXO_SITUACAO_ATUAL = "LOGADO"; 
+          
+          var elAvisoX = document.getElementById("lblAvisoFecharX");
+          var elBtnSair = document.getElementById("btnSairLateralMestre");
+          if (elAvisoX) elAvisoX.style.setProperty("display", "none", "important");
+          if (elBtnSair) elBtnSair.style.setProperty("display", "flex", "important");
+          
+          var elSidebar = document.querySelector(".sidebar");
+          var elMain = document.querySelector(".main-container");
+          if (elSidebar && elMain) {
+            elSidebar.classList.remove("ativar-efeito-folha");
+            elMain.classList.remove("ativar-efeito-folha");
+            void elSidebar.offsetWidth; void elMain.offsetWidth;
+            elSidebar.classList.add("ativar-efeito-folha");
+            elMain.classList.add("ativar-efeito-folha");
+          }
+          
+          document.getElementById("blocoLoginPortal").style.display = "none";
+          NATIVO_construirMenuInterface(respostaAcesso.nome, respostaAcesso.nivel);
+          try { window.resizeTo(screen.availWidth, screen.availHeight); } catch(ev){}
+        }
+        else if (respostaAcesso && respostaAcesso.statusAcesso === "PRIMEIRO_ACESSO") {
+          FLUXO_SITUACAO_ATUAL = "GRAVAR_NOVA_SENHA";
+          
+          document.getElementById("lblTituloPortal").innerHTML = "🌱 Primeiro Acesso Detectado!";
+          document.getElementById("lblSubtituloPortal").innerHTML = "📧 Defina sua credencial pessoal para os próximos acessos:";
+          document.getElementById("lblTextoSenha").innerHTML = "✍️ Crie sua Senha Secreta";
+          document.getElementById("txtSenhaLoginPortal").placeholder = "Mínimo 4 dígitos";
+          document.getElementById("txtSenhaLoginPortal").value = "";
+          document.getElementById("txtEmailLoginPortal").disabled = true;
+          document.getElementById("txtSenhaLoginPortal").focus();
+          
+          lblErro.style.display = "block";
+          lblErro.style.color = "#155724"; lblErro.style.backgroundColor = "#d4edda"; lblErro.style.borderColor = "#c3e6cb";
+          lblErro.innerHTML = "💡 E-mail localizado! Crie a sua senha na caixa acima.";
+        } else {
+          lblErro.style.display = "block";
+          lblErro.style.color = "#c5221f"; lblErro.style.backgroundColor = "#fce8e6"; lblErro.style.borderColor = "#fad2cf";
+          lblErro.innerHTML = "❌ E-mail ou Senha incorretos ou funcionário bloqueado!";
+          document.getElementById("txtSenhaLoginPortal").value = "";
+          document.getElementById("txtSenhaLoginPortal").focus();
+        }
+      } catch(err) {
+        btn.disabled = false; btn.innerHTML = "Entrar no Sistema";
+        lblErro.style.display = "block"; lblErro.innerHTML = "Erro de rede: " + err.message;
+      }
+    }
+
+    // 2. MOTOR DE SOLICITAÇÃO (Atualizado para Node.js)
+    async function EXEC_dispararPedidoAcessoEmail() {
+      var nome = document.getElementById("txtSolNome").value.trim().toUpperCase();
+      var email = document.getElementById("txtSolEmail").value.trim().toLowerCase();
+      var setor = document.getElementById("txtSolSetor").value; 
+      var btn = document.getElementById("btnEnviarSolicitacao");
+      var lblErr = document.getElementById("lblErroSolicitacao");
+      
+      if(!nome || !email || !setor) { lblErr.style.display = "block"; lblErr.style.color = "#c5221f"; lblErr.innerHTML = "⚠️ Preencha todos os campos do formulário."; return; }
+      
+      lblErr.style.display = "block"; lblErr.style.color = "#1a73e8"; lblErr.style.backgroundColor = "#e8f0fe"; lblErr.style.borderColor = "#dadce0";
+      lblErr.innerHTML = "⏳ Enviando solicitação para o servidor...";
+      btn.disabled = true;
+      
+      try {
+        const req = await fetch('/api/auth/solicitar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome: nome, email: email, setor: setor })
+        });
+        const res = await req.json();
+
+        btn.disabled = false;
+        if(res.sucesso) {
+          alert("✅ SOLICITAÇÃO ENVIADA COM SUCESSO!\n\nPor favor, aguarde o supervisor avaliar.");
+          document.getElementById("txtSolNome").value = "";
+          document.getElementById("txtSolEmail").value = "";
+          INTERFACE_alternarFormularios('VOLTAR');
+        } else {
+          lblErr.style.color = "#c5221f"; lblErr.style.backgroundColor = "#fce8e6"; lblErr.innerHTML = "❌ " + res.mensagem;
+        }
+      } catch(err) {
+        btn.disabled = false;
+        lblErr.style.color = "#c5221f"; lblErr.style.backgroundColor = "#fce8e6"; lblErr.innerHTML = "Erro de rede: " + err.message;
+      }
+    }
+
+    function NATIVO_construirMenuInterface(nomeUser, nivelUser) {
+      var menuBox = document.getElementById("menuAcessos");
+      var htmlMenu = "";
+      var cartaoVelho = document.getElementById("cartaoUserMaster");
+      if(cartaoVelho) { cartaoVelho.remove(); }
+      document.querySelector(".sidebar-header").insertAdjacentHTML('afterend', '<div class="user-info" id="cartaoUserMaster"><span>👤 Usuário: <b>'+nomeUser+'</b></span><span>🔑 Permissão: <span class="badge-nivel">'+nivelUser+'</span></span></div>');
+
+      // 1. OPERADOR_INCLUSAO
+      if (nivelUser === "OPERADOR_INCLUSAO") {
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebInclusao\', \'📝 1. Novo Cadastro (Inclusão)\', this)">📝 Inclusão Inicial</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebAlteracaoInicial\', \'Alteração Inicial\', this)">👤 Alteração Inicial</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebConsulta\', \'Consulta Geral\', this)">🔍 Consulta Geral</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebConsultaAlfabetica\', \'Consulta Alfabética\', this)">📚 Consulta Alfabética</div>';
+      }
+      
+      // 2. OPERADOR_BUSCA
+      else if (nivelUser === "OPERADOR_BUSCA") {
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebBuscas\', \'Busca Direta de Acionamentos\', this)">🔍 Busca Direta</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebBuscasdrop\', \'Fila Cronológica Buscas\', this)">⏳ Fila Cronológica Buscas</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebConsulta\', \'Consulta Geral\', this)">📋 Consulta Geral</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebConsultaAlfabetica\', \'Consulta Alfabética\', this)">📚 Consulta Alfabética</div>';
+      }
+      
+      // 3. OPERADOR_MISTO
+      else if (nivelUser === "OPERADOR_MISTO") {
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebInclusao\', \'📝 1. Novo Cadastro (Inclusão)\', this)">📝 Inclusão Inicial</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebAlteracaoInicial\', \'Alteração Inicial\', this)">👤 Alteração Inicial</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebBuscas\', \'Busca Direta de Acionamentos\', this)">🔍 Busca Direta</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebBuscasdrop\', \'Fila Cronológica Buscas\', this)">⏳ Fila Cronológica Buscas</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebConsulta\', \'Consulta Geral\', this)">📋 Consulta Geral</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebConsultaAlfabetica\', \'Consulta Alfabética\', this)">📚 Consulta Alfabética</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebRelatoriosOperacional\', \'Relatórios Operacionais\', this)">📊 Relatórios Operacionais</div>';
+      }
+      
+      // 4. MASTER e SUPERVISOR (Menu Completo + Gestão de Profissionais e Usuários)
+      else if (nivelUser === "MASTER" || nivelUser === "SUPERVISOR") {
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebInclusao\', \'📝 1. Novo Cadastro (Inclusão)\', this)">📝 Inclusão Inicial</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebAlteracaoInicial\', \'Alteração Inicial\', this)">👤 Alteração Inicial</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebBuscas\', \'Busca Direta de Acionamentos\', this)">🔍 Busca Direta</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebBuscasdrop\', \'Fila Cronológica Buscas\', this)">⏳ Fila Cronológica Buscas</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebConsulta\', \'Consulta Geral\', this)">📋 Consulta Geral</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebConsultaAlfabetica\', \'Consulta Alfabética\', this)">📚 Consulta Alfabética</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebRelatorios\', \'Central de Relatórios\', this)">📈 Central de Relatórios</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebRelatoriosOperacional\', \'Relatórios Operacionais\', this)">📊 Relatórios Operacionais</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebGraficos\', \'Painel de Gráficos\', this)">📉 Painel de Gráficos</div>';
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebMaster\', \'Gerenciamento Master\', this)">⚙️ Gerenciamento Master</div>';
+        
+        // 🩺 GERENCIAMENTO EXCLUSIVO DE PROFISSIONAIS E ESPECIALISTAS
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebCadastroProfissionais\', \'Gestão de Profissionais\', this)">🩺 Gestão de Profissionais</div>';
+        
+        // 👥 GERENCIAMENTO EXCLUSIVO DE USUÁRIOS E ACESSOS
+        htmlMenu += '<div class="nav-item-link" onclick="NATIVO_carregarAbaWeb(\'WebCadastroUsuarios\', \'Gerenciamento de Usuários\', this)">👥 Gerenciamento de Usuários</div>';
+      }
+
+      menuBox.innerHTML = htmlMenu;
+
+      var primeiroItem = menuBox.querySelector(".nav-item-link");
+      if (primeiroItem) { primeiroItem.click(); }
+    }
+
+    // 3. MOTOR DE CARREGAMENTO DE ABAS (Atualizado para Node.js / Express)
+    async function NATIVO_carregarAbaWeb(nomeArquivoHtml, tituloAba, elementoClique) {
+      var links = document.querySelectorAll(".nav-item-link");
+      links.forEach(function(l) { l.classList.remove("active"); });
+      if(elementoClique) elementoClique.classList.add("active");
+      
+      document.getElementById("txtTituloAba").innerHTML = tituloAba;
+      var box = document.getElementById("boxConteudoDinamico");
+      box.innerHTML = '<div id="loaderView"><div class="spinner-local"></div><span>Buscando dados no servidor...</span></div>';
+      
+      try {
+        const req = await fetch('/' + nomeArquivoHtml + '.html');
+        if (!req.ok) throw new Error("Aba não encontrada (" + req.status + ")");
+        
+        const htmlConteudo = await req.text();
+        box.innerHTML = htmlConteudo; 
+        
+        var divFicticia = document.createElement('div'); 
+        divFicticia.innerHTML = htmlConteudo; 
+        var scriptsExtraidos = divFicticia.getElementsByTagName("script"); 
+        for (var i = 0; i < scriptsExtraidos.length; i++) { 
+          var codigoTexto = scriptsExtraidos[i].text || scriptsExtraidos[i].textContent; 
+          if (codigoTexto.trim() !== "") { 
+            try { window.eval(codigoTexto); } catch (errEval) { console.error(errEval); } 
+          } 
+        }
+      } catch(err) {
+        box.innerHTML = '<div style="color:#c5221f; padding:15px; font-weight:bold;">❌ Falha na renderização local: ' + err.message + '</div>';
+      }
+    }
+
+    function INTERFACE_respostaSaidaCustomizada(confirmouDesconexao) {
+      var modal = document.getElementById("modalConfirmacaoSaidaCompleta"); 
+      if (modal) modal.style.display = "none";
+      
+      if (confirmouDesconexao) {
+        FLUXO_SITUACAO_ATUAL = "LOGIN_NORMAL";
+        NIVEL_ACESSO_ATUAL = "BLOQUEADO"; 
+        window.EMAIL_OPERADOR_REAL_WEB = "Desconhecido";
+        
+        var elAvisoX = document.getElementById("lblAvisoFecharX");
+        var elBtnSair = document.getElementById("btnSairLateralMestre");
+        if (elAvisoX) elAvisoX.style.setProperty("display", "block", "important");
+        if (elBtnSair) elBtnSair.style.setProperty("display", "none", "important");
+        
+        var box = document.getElementById("boxConteudoDinamico");
+        if (box) { box.innerHTML = '<div id="loaderView"><div class="spinner-local"></div><span>Aguardando autenticação eletrônica...</span></div>'; }
+        
+        var txtTitulo = document.getElementById("txtTituloAba");
+        if (txtTitulo) txtTitulo.innerHTML = "Aguardando login...";
+        
+        var menuAcessos = document.getElementById("menuAcessos");
+        if (menuAcessos) menuAcessos.innerHTML = "";
+        
+        var cartaoUserMaster = document.getElementById("cartaoUserMaster"); 
+        if (cartaoUserMaster) { cartaoUserMaster.remove(); }
+        
+        var campoEmail = document.getElementById("txtEmailLoginPortal"); 
+        var campoSenha = document.getElementById("txtSenhaLoginPortal"); 
+        var lblErro = document.getElementById("lblErroPortal");
+        
+        if (campoEmail) { campoEmail.value = ""; campoEmail.disabled = false; }
+        if (campoSenha) { campoSenha.value = ""; campoSenha.disabled = false; }
+        if (lblErro) { lblErro.style.display = "none"; }
+
+        var blocoLogin = document.getElementById("blocoLoginPortal"); 
+        if (blocoLogin) { blocoLogin.style.display = "flex"; }
+      }
+    }
+
+    var SEGUNDOS_TETO = 600; 
+    var segundosRestantes = SEGUNDOS_TETO;
+    var relogioIntervaloSegundo;
+
+    function MOTOR_iniciarContagemInatividade() {
+      if (relogioIntervaloSegundo) clearInterval(relogioIntervaloSegundo);
+      segundosRestantes = SEGUNDOS_TETO;
+
+      relogioIntervaloSegundo = setInterval(function() {
+        segundosRestantes--;
+        var minutos = Math.floor(segundosRestantes / 60);
+        var segundos = segundosRestantes % 60;
+        var textoMinutos = minutos < 10 ? "0" + minutos : minutos;
+        var textoSegundos = segundos < 10 ? "0" + segundos : segundos;
+        var tempoFormatado = textoMinutos + ":" + textoSegundos;
+
+        var telaLogin = document.getElementById("blocoLoginPortal");
+        var visor = document.getElementById("cronometroInatividadeFlutuante");
+        var isLoginVisivel = false;
+
+        if (telaLogin && (telaLogin.style.display === "flex" || window.getComputedStyle(telaLogin).display === "flex")) {
+          isLoginVisivel = true;
+        }
+
+        if (visor) {
+          if (isLoginVisivel) {
+            visor.style.color = "#1a73e8"; visor.style.borderColor = "#1a73e8";
+            visor.innerHTML = "RENOVAÇÃO CACHE: " + tempoFormatado;
+          } else {
+            visor.style.color = "#ff0000"; visor.style.borderColor = "#ff0000";
+            visor.innerHTML = "SESSÃO EXPIRA EM: " + tempoFormatado;
+          }
+        }
+
+        if (segundosRestantes <= 0) {
+          clearInterval(relogioIntervaloSegundo);
+          if (isLoginVisivel) {
+            if (telaLogin) telaLogin.style.display = "none";
+            document.getElementById("txtEmailLoginPortal").value = "";
+            document.getElementById("txtSenhaLoginPortal").value = "";
+            var cartao = document.getElementById("painelCredenciaisNormais");
+            if (cartao) { cartao.style.animation = 'none'; void cartao.offsetWidth; cartao.style.animation = 'ANIMACAO_efeitoFolhaLivro 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards'; }
+            setTimeout(function() { if (telaLogin) telaLogin.style.display = "flex"; MOTOR_iniciarContagemInatividade(); }, 50);
+          } else {
+            INTERFACE_respostaSaidaCustomizada(true);
+            setTimeout(function() { MOTOR_iniciarContagemInatividade(); }, 50);
+          }
+        }
+      }, 1000); 
+    }
+
+    function MOTOR_resetarCronometro() {
+      if (segundosRestantes < SEGUNDOS_TETO) {
+        MOTOR_iniciarContagemInatividade();
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      MOTOR_iniciarContagemInatividade(); 
+      document.body.addEventListener("mousemove", MOTOR_resetarCronometro);
+      document.body.addEventListener("keydown", MOTOR_resetarCronometro);
+      document.body.addEventListener("click", MOTOR_resetarCronometro);
+    });
+  </script>
+  
+  <div id="modalConfirmacaoSaidaCompleta" class="modal-saida-fundo" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); z-index: 9999999; align-items: center; justify-content: center; box-sizing: border-box;">
+    <div class="modal-saida-caixa" style="background-color: #fdfaf4 !important; border: 3px solid #000000 !important; border-radius: 12px; width: 440px; padding: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); box-sizing: border-box; text-align: left;">
+      <div style="font-size: 12px !important; font-weight: 800; color: #ffffff !important; background-color: #c5221f !important; padding: 6px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; border: 2px solid #000000; text-align: center;">
+        ⚠️ ENCERRAMENTO DE SESSÃO CORPORATIVA ⚠️
+      </div>
+      <p style="margin: 15px 0; font-weight: 800; font-size: 13px; color: #000000; text-align: center; text-transform: uppercase; letter-spacing: 0.3px; line-height: 1.4;">
+        Deseja realmente sair do login e encerrar a sessão atual do portal?
+      </p>
+      <div style="display: flex; gap: 12px; width: 100%; box-sizing: border-box;">
+        <button type="button" onclick="INTERFACE_respostaSaidaCustomizada(false)" style="flex: 1; background-color: #5f6368 !important; color: white !important; padding: 8px !important; font-size: 13px !important; height: 38px !important; border: 2px solid #000000 !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; text-transform: uppercase; margin: 0 !important; width: auto !important;">❌ Cancelar</button>
+        <button type="button" onclick="INTERFACE_respostaSaidaCustomizada(true)" style="flex: 1; background-color: #137333 !important; color: white !important; padding: 8px !important; font-size: 13px !important; height: 38px !important; border: 2px solid #000000 !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; text-transform: uppercase; margin: 0 !important; width: auto !important; box-shadow: 0 4px 6px rgba(19,115,51,0.15);">✅ OK (Sair)</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="cronometroInatividadeFlutuante" style="position: fixed; bottom: 10px; right: 10px; background-color: #000000; color: #ff0000; padding: 4px 10px; border-radius: 6px; font-family: monospace; font-size: 11px; font-weight: bold; border: 1px solid #ff0000; z-index: 99999999 !important; box-shadow: 0 2px 6px rgba(0,0,0,0.3); opacity: 0.8; letter-spacing: 0.5px; pointer-events: none;">Sessão: 10:00</div>
+</body>
+</html>

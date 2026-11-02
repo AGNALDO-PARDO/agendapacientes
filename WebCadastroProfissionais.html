@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target='_top'>
+  <style>
+    body { 
+      font-family: 'Segoe UI', -apple-system, sans-serif; 
+      padding: 0 !important; 
+      margin: 0 !important; 
+      background-color: #e8f0fe !important; 
+      color: #202124; 
+      font-size: 13px; 
+      box-sizing: border-box; 
+      overflow-x: hidden !important; 
+      overflow-y: auto !important;   
+    }
+
+    .form-group { margin-bottom: 4px; position: relative; display: flex; flex-direction: column; }
+    label { display: block; margin-bottom: 2px; font-weight: 800 !important; font-size: 11px !important; color: #000000 !important; text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    input, select { width: 100% !important; padding: 2px 10px !important; border: 2px solid #000000 !important; border-radius: 8px !important; box-sizing: border-box !important; font-size: 13px !important; height: 36px !important; background-color: #ffffff !important; color: #000000 !important; font-weight: bold !important; transition: all 0.15s ease-in-out !important; }
+    
+    input:focus, select:focus { border-color: #ff0000 !important; background-color: #e9ecef !important; color: #000000 !important; outline: none !important; box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.15) !important; }
+    input.campo-erro { border: 2px solid #d32f2f !important; background-color: #fce8e6 !important; color: #c5221f !important; }
+    
+    .linha-flex { display: flex !important; gap: 8px; width: 100%; box-sizing: border-box; align-items: flex-end; margin-bottom: 4px; flex-wrap: wrap !important; }
+    .coluna { flex: 1 1 200px !important; min-width: 150px !important; }
+    
+    .btn-acao { background-color: #137333 !important; color: white !important; padding: 0 25px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; height: 36px; box-shadow: 0 4px 6px rgba(19,115,51,0.2); transition: background 0.2s; }
+    .btn-acao:hover { background-color: #0b5123 !important; }
+    
+    .grupo-botoes-rodape { display: flex !important; gap: 16px !important; margin-top: 8px !important; width: 100% !important; box-sizing: border-box !important; align-items: center !important; justify-content: space-between !important; }
+    
+    .secao-titulo { font-size: 11px !important; font-weight: 800; color: #ffffff !important; background-color: #1a73e8 !important; margin: 4px 0 4px 0; padding: 3px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; border: none !important; width: 100%; box-sizing: border-box; }
+    .cartao-container { background-color: #fdfaf4 !important; padding: 8px 12px; border: 2px solid #000000 !important; border-radius: 12px !important; margin: 8px 12px; box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    
+    #statusProfissionais { margin-top: 4px; text-align: center; font-size: 12px; font-weight: bold; padding: 4px; border-radius: 4px; display: none; }
+    .sucesso { color: #137333; background-color: #e6f4ea; border: 1px solid #b7e1cd; }
+    .erro { color: #c5221f; background-color: #fce8e6; border: 1px solid #fad2cf; }
+
+    .area-tabela { width: 100%; max-height: 320px !important; overflow-y: auto; border: 2px solid #000000; border-radius: 8px; background-color: #ffffff; margin-top: 4px; box-sizing: border-box; }
+    .tabela-prof { width: 100%; border-collapse: collapse; font-size: 12px; font-weight: bold; text-align: left; }
+    .tabela-prof thead th { background-color: #137333; color: white; padding: 6px 10px; position: sticky; top: 0; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid #000000; }
+    .tabela-prof tbody tr { border-bottom: 1px solid #cbd5e1; }
+    .tabela-prof tbody td { padding: 6px 10px; color: #000000; }
+  </style>
+</head>
+<body>
+
+  <!-- FORMULÁRIO DE CADASTRO / INCLUSÃO -->
+  <div class="cartao-container">
+    <div class='secao-titulo' style="margin-top: 0;">🩺 Cadastro e Inclusão de Profissionais / Especialistas</div>
+    <form id="formCadastroProf" autocomplete="off" onsubmit="event.preventDefault(); PROF_salvarRegistro();">
+      <input type="hidden" id="profIdFisico">
+      
+      <div class="linha-flex">
+        <div class="form-group coluna" style="flex: 2;">
+          <label>👤 Nome do Profissional</label>
+          <input type="text" id="profNome" placeholder="Ex: DR. JOÃO CARLOS..." oninput="this.value = this.value.toUpperCase();" required>
+        </div>
+        <div class="form-group coluna" style="flex: 2;">
+          <label>🩺 Especialidade / Área</label>
+          <input type="text" id="profEspecialidade" placeholder="Ex: TIREOIDE / CARDIOLOGIA..." oninput="this.value = this.value.toUpperCase();" required>
+        </div>
+        <div class="form-group coluna" style="flex: 1;">
+          <label>⚡ Status</label>
+          <select id="profStatus" required>
+            <option value="ATIVO">ATIVO</option>
+            <option value="INATIVO">INATIVO</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grupo-botoes-rodape">
+        <button type="button" class="btn-acao" style="background-color: #5f6368 !important;" onclick="PROF_limparFormulario()">🧹 Limpar / Novo</button>
+        <button type="submit" class="btn-acao">💾 Salvar Profissional</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="statusProfissionais"></div>
+
+  <!-- LISTAGEM / TABELA DE PROFISSIONAIS CADASTRADOS -->
+  <div class="cartao-container">
+    <div class='secao-titulo' style="background-color: #137333 !important; margin-top: 0;">📋 Profissionais Cadastrados no Banco</div>
+    <div class="area-tabela">
+      <table class="tabela-prof">
+        <thead>
+          <tr>
+            <th>NOME DO PROFISSIONAL</th>
+            <th>ESPECIALIDADE / ÁREA</th>
+            <th style="width: 100px; text-align: center;">STATUS</th>
+            <th style="width: 80px; text-align: center;">AÇÃO</th>
+          </tr>
+        </thead>
+        <tbody id="corpoTabelaProfissionais">
+          <tr><td colspan="4" style="text-align: center; padding: 20px; color: #475569;">Carregando profissionais...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    async function PROF_carregarLista() {
+      var corpo = document.getElementById('corpoTabelaProfissionais');
+      try {
+        const req = await fetch('/api/profissionais/gerenciar');
+        const res = await req.json();
+        
+        if (res.sucesso && res.dados && res.dados.length > 0) {
+          var html = "";
+          res.dados.forEach(function(p) {
+            html += '<tr>';
+            html += '<td style="text-transform: uppercase;">' + (p.nome || '-') + '</td>';
+            html += '<td style="text-transform: uppercase;">' + (p.especialidade || '-') + '</td>';
+            html += '<td style="text-align: center;"><span style="background-color: ' + (p.status === 'ATIVO' ? '#e6f4ea; color: #137333;' : '#fce8e6; color: #c5221f;') + ' padding: 2px 8px; border-radius: 4px; font-size: 10px;">' + (p.status || 'ATIVO') + '</span></td>';
+            html += '<td style="text-align: center;"><button type="button" style="background-color: #1a73e8; color: white; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-weight: bold;" onclick="PROF_editar(\'' + p.id + '\', \'' + (p.nome || '').replace(/'/g, "\\'") + '\', \'' + (p.especialidade || '').replace(/'/g, "\\'") + '\', \'' + (p.status || 'ATIVO') + '\')">✏️ Editar</button></td>';
+            html += '</tr>';
+          });
+          corpo.innerHTML = html;
+        } else {
+          corpo.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #137333; font-weight: bold;">Nenhum profissional cadastrado.</td></tr>';
+        }
+      } catch (err) {
+        corpo.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #c5221f; font-weight: bold;">Erro ao carregar lista.</td></tr>';
+      }
+    }
+
+    function PROF_limparFormulario() {
+      document.getElementById('formCadastroProf').reset();
+      document.getElementById('profIdFisico').value = '';
+      document.getElementById('profStatus').value = 'ATIVO';
+    }
+
+    function PROF_editar(id, nome, especialidade, status) {
+      document.getElementById('profIdFisico').value = id;
+      document.getElementById('profNome').value = nome;
+      document.getElementById('profEspecialidade').value = especialidade;
+      document.getElementById('profStatus').value = status;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function PROF_salvarRegistro() {
+      var status = document.getElementById('statusProfissionais');
+      var id = document.getElementById('profIdFisico').value;
+      var nome = document.getElementById('profNome').value.trim().toUpperCase();
+      var especialidade = document.getElementById('profEspecialidade').value.trim().toUpperCase();
+      var statusProf = document.getElementById('profStatus').value;
+
+      if (!nome || !especialidade) {
+        status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ Preencha o nome e a especialidade.';
+        return;
+      }
+
+      status.style.display = 'block'; status.className = ''; status.innerHTML = '💾 Salvando profissional no Supabase...';
+
+      var payload = { id: id, nome: nome, especialidade: especialidade, status: statusProf };
+
+      try {
+        const req = await fetch('/api/profissionais/salvar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const res = await req.json();
+
+        if (res.sucesso) {
+          status.style.display = 'block'; status.className = 'sucesso'; status.innerHTML = '🎯 ' + res.mensagem;
+          PROF_limparFormulario();
+          PROF_carregarLista();
+          setTimeout(function() { status.style.display = 'none'; }, 3500);
+        } else {
+          status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '⚠️ ' + res.mensagem;
+        }
+      } catch (err) {
+        status.style.display = 'block'; status.className = 'erro'; status.innerHTML = '❌ Erro de conexão: ' + err.message;
+      }
+    }
+
+   // 🚀 Execução imediata e segura para carregamentos dinâmicos via innerHTML
+    (function() {
+      setTimeout(function() {
+        PROF_carregarLista();
+      }, 200);
+    })();
+  </script>
+</body>
+</html>
