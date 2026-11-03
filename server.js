@@ -159,8 +159,8 @@ app.post('/api/auth/solicitar', async (req, res) => {
 
     // 3. Disparar o e-mail automático para você (Desenvolvedor/Supervisor)
     const mailOptions = {
-      from: 'seu-email-desenvolvedor@gmail.com',
-      to: 'seu-email-desenvolvedor@gmail.com', // E-mail onde você deseja receber o alerta
+      from: 'agnaldoribeiropardo@gmail.com',
+      to: 'agnaldoribeiropardo@gmail.com', // E-mail onde você deseja receber o alerta
       subject: '🚨 Nova Solicitação de Acesso - Diabetes Pré-Agenda',
       text: `Olá Agnaldo,\n\nUm novo usuário solicitou acesso ao sistema:\n\n` +
             `👤 Nome: ${nome.toUpperCase()}\n` +
