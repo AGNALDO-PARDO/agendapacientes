@@ -859,26 +859,71 @@
 
       tabelaCorpo.innerHTML = htmlRows;
     }
-
-    // Funções de Exportação Baseadas no Resultado Filtrado Atual
+// 📄 EXPORTAR CSV DOS DADOS FILTRADOS
     function CRONO_exportarCSV() {
-      alert("📥 Preparando exportação CSV dos dados filtrados...");
+      var linhas = document.querySelectorAll("#corpoFilaCronologicaAberta tr");
+      if (linhas.length === 0 || linhas[0].innerText.includes("Nenhum registo") || linhas[0].innerText.includes("Fila zerada")) {
+        alert("⚠️ Nenhum registo filtrado para exportar.");
+        return;
+      }
+
+      var csv = [];
+      csv.push("NOME;DATA CADASTRO;CARTEIRA;CPF;TELEFONE;DIAS ESPERA;ID EXCLUSIVO;STATUS");
+
+      linhas.forEach(function(tr) {
+        var cols = tr.querySelectorAll("td");
+        if (cols.length >= 8) {
+          var nome = cols[0].innerText.replace(/;/g, "");
+          var dataCad = cols[1].innerText.replace(/;/g, "");
+          var carteira = cols[2].innerText.replace(/;/g, "");
+          var cpf = cols[3].innerText.replace(/;/g, "");
+          var fone = cols[4].innerText.replace(/;/g, "");
+          var dias = cols[5].innerText.replace(/;/g, "");
+          var id = cols[6].innerText.replace(/;/g, "");
+          var status = cols[7].innerText.replace(/;/g, "");
+          csv.push('"' + nome + '";"' + dataCad + '";"' + carteira + '";"' + cpf + '";"' + fone + '";"' + dias + '";"' + id + '";"' + status + '"');
+        }
+      });
+
+      var csvContent = "data:text/csv;charset=utf-8,\uFEFF" + csv.join("\n");
+      var encodedUri = encodeURI(csvContent);
+      var link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "fila_cronologica_filtrada.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
+
+    // 📊 EXPORTAR EXCEL
     function CRONO_exportarExcel() {
-      alert("📊 Preparando exportação Excel dos dados filtrados...");
+      CRONO_exportarCSV();
     }
+
+    // 📑 GERAR PDF DOS DADOS FILTRADOS (Abre a pré-visualização para salvar como PDF)
     function CRONO_exportarPDF() {
-      alert("📑 Gerando relatório PDF dos dados filtrados...");
+      var tabelaHtml = document.querySelector(".area-fila-exposta").innerHTML;
+      if (!tabelaHtml || tabelaHtml.includes("Nenhum registo") || tabelaHtml.includes("Fila zerada")) {
+        alert("⚠️ Nenhum registo para gerar PDF.");
+        return;
+      }
+
+      var janelaPrint = window.open('', '', 'height=600,width=900');
+      janelaPrint.document.write('<html><head><title>Relatório - Fila Cronológica</title>');
+      janelaPrint.document.write('<style>body{font-family:Arial,sans-serif;padding:20px;} table{width:100%;border-collapse:collapse;} th,td{border:1px solid #000;padding:6px 8px;font-size:11px;text-align:left;} th{background-color:#137333;color:#fff;}</style>');
+      janelaPrint.document.write('</head><body>');
+      janelaPrint.document.write('<h2>Relatório Operacional - Fila Cronológica Filtrada</h2>');
+      janelaPrint.document.write('<table>' + tabelaHtml + '</table>');
+      janelaPrint.document.write('</body></html>');
+      janelaPrint.document.close();
+      janelaPrint.focus();
+      
+      setTimeout(function() {
+        janelaPrint.print();
+        janelaPrint.close();
+      }, 400);
     }
 
-    window.addEventListener('DOMContentLoaded', function() {
-      INTERFACE_AJUSTAR_placeholderBusca('nome');
-      COMP_recalibrarCoresSelects();
-      CRONO_recarregarListaFilaExposta();
-      COMP_carregarProfissionais();
-    });
-
-    COMP_carregarProfissionais();
   </script>
 </body>
 </html>

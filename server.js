@@ -646,7 +646,11 @@ app.get('/api/pacientes/fila-cronologica', async (req, res) => {
         carteira: p.CARTEIRA || '',
         telefone: p.FONE || '',
         status: p.STATUS || 'PENDENTE',
-        dataCadastro: dataStr || '-', // Vai exibir exatamente a data limpa do campo DATA
+        prioridade: p.PRIORIDADE || '',         // <--- Adicionado para o filtro funcionar
+        especialidade: p.ESPECIALIDADE || '',   // <--- Adicionado para o filtro funcionar
+        tipo: p.TIPO || '',                     // <--- Adicionado para o filtro funcionar
+        situacao: p.SITUAÇÃO || p.SITUACAO || '', // <--- Adicionado para o filtro funcionar
+        dataCadastro: dataStr || '-', 
         dataObj: dataObj,
         diasEspera: diasEspera
       };
