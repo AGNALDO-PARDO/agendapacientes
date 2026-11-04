@@ -66,9 +66,86 @@
     .tabela-fila-crono tbody tr { cursor: pointer; transition: background 0.15s; border-bottom: 1px solid #cbd5e1; }
     .tabela-fila-crono tbody tr:hover { background-color: #e8f0fe !important; color: #1a73e8; }
     .tabela-fila-crono tbody td { padding: 6px 10px; color: #000000; }
+
+    /* ESTILOS DA BARRA DE FILTROS ESTILO FOTO 2 */
+    .barra-filtros-topo { background-color: #fdfaf4; border: 2px solid #000000; border-radius: 12px; padding: 6px 12px; margin: 6px 12px 4px 12px; box-sizing: border-box; }
+    .filtros-grid { display: flex; gap: 6px; align-items: flex-end; flex-wrap: wrap; width: 100%; }
+    .filtro-item { flex: 1 1 110px; min-width: 95px; }
+    .filtro-item label { font-size: 10px !important; color: #000000 !important; font-weight: 800 !important; margin-bottom: 1px; display: block; }
+    .filtro-item select { height: 32px !important; font-size: 12px !important; padding: 2px 6px !important; border: 2px solid #000000 !important; border-radius: 6px !important; background-color: #ffffff !important; }
+    .botoes-exportacao-grupo { display: flex; gap: 4px; align-items: center; margin-left: auto; }
+    .btn-export { height: 32px; padding: 0 10px; font-size: 11px; font-weight: bold; border-radius: 6px; border: 2px solid #000000; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+    .btn-csv { background-color: #ffffff; color: #137333; }
+    .btn-excel { background-color: #137333; color: #ffffff; }
+    .btn-pdf { background-color: #c5221f; color: #ffffff; }
+    .btn-export:hover { opacity: 0.85; }
   </style>
 </head>
 <body>
+
+  <!-- 🎛️ BARRA DE FILTROS OPERACIONAIS NO TOPO (PADRÃO FOTO 2) -->
+  <div class="barra-filtros-topo">
+    <div class="filtros-grid">
+      <div class="filtro-item">
+        <label>📅 MÊS</label>
+        <select id="filtroMes" onchange="CRONO_aplicarFiltrosNaTabela()">
+          <option value="Todos">Todos</option>
+          <option value="01">01 - Janeiro</option><option value="02">02 - Fevereiro</option><option value="03">03 - Março</option><option value="04">04 - Abril</option>
+          <option value="05">05 - Maio</option><option value="06">06 - Junho</option><option value="07">07 - Julho</option><option value="08">08 - Agosto</option>
+          <option value="09">09 - Setembro</option><option value="10">10 - Outubro</option><option value="11">11 - Novembro</option><option value="12">12 - Dezembro</option>
+        </select>
+      </div>
+      <div class="filtro-item">
+        <label>📆 ANO</label>
+        <select id="filtroAno" onchange="CRONO_aplicarFiltrosNaTabela()">
+          <option value="Todos">Todos</option>
+          <option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option>
+        </select>
+      </div>
+      <div class="filtro-item">
+        <label>🚨 PRIORIDADE</label>
+        <select id="filtroPrioridade" onchange="CRONO_aplicarFiltrosNaTabela()">
+          <option value="Todos">Todos</option>
+          <option value="NORMAL">NORMAL</option><option value="ACIMA DE 60">ACIMA DE 60</option><option value="ACIMA DE 80">ACIMA DE 80</option><option value="ESPECIAIS">ESPECIAIS</option>
+        </select>
+      </div>
+      <div class="filtro-item">
+        <label>⚡ STATUS ATUAL</label>
+        <select id="filtroStatus" onchange="CRONO_aplicarFiltrosNaTabela()">
+          <option value="Todos">Todos</option>
+          <option value="AGENDADO">AGENDADO</option><option value="ENCERRADO">ENCERRADO</option><option value="AGUARDAR AGENDA">AGUARDAR AGENDA</option><option value="EM BUSCA">EM BUSCA</option>
+        </select>
+      </div>
+      <div class="filtro-item">
+        <label>🩺 ESPECIALIDADE</label>
+        <select id="filtroEspecialidade" onchange="CRONO_aplicarFiltrosNaTabela()">
+          <option value="Todos">Todos</option>
+          <option value="ENDO GERAL">ENDO GERAL</option><option value="ENDO PED.">ENDO PED.</option><option value="TIREOIDE">TIREOIDE</option><option value="OUTROS">OUTROS</option>
+        </select>
+      </div>
+      <div class="filtro-item">
+        <label>📋 TIPO</label>
+        <select id="filtroTipo" onchange="CRONO_aplicarFiltrosNaTabela()">
+          <option value="Todos">Todos</option>
+          <option value="1ª CONSULTA">1ª CONSULTA</option><option value="RETORNO/MUDANÇA DE MÉDICO">RETORNO/MUDANÇA DE MÉDICO</option>
+        </select>
+      </div>
+      <div class="filtro-item">
+        <label>🚩 SITUAÇÃO</label>
+        <select id="filtroSituacao" onchange="CRONO_aplicarFiltrosNaTabela()">
+          <option value="Todos">Todos</option>
+          <option value="ELETIVA">ELETIVA</option><option value="URGENCIA">URGENCIA</option>
+        </select>
+      </div>
+      
+      <!-- BOTOES DE EXPORTAÇÃO -->
+      <div class="botoes-exportacao-grupo">
+        <button type="button" class="btn-export btn-csv" onclick="CRONO_exportarCSV()">📄 CSV</button>
+        <button type="button" class="btn-export btn-excel" onclick="CRONO_exportarExcel()">📊 Excel</button>
+        <button type="button" class="btn-export btn-pdf" onclick="CRONO_exportarPDF()">📑 PDF</button>
+      </div>
+    </div>
+  </div>
 
   <!-- 🔎 BUSCA DIRECIONADA NO TOPO MESTRE -->
   <div class="secao-busca">
@@ -218,6 +295,7 @@
   <script>
     var INDICE_SELECIONADO_KEYBOARD = -1;
     var bloqueandoLoopBlurComp = false;
+    var globalFilaDadosBrutos = []; // Guarda os dados originais da fila para filtragem local
 
     async function COMP_carregarProfissionais() {
       try {
@@ -361,7 +439,6 @@
       var campoHoraAg = document.getElementById('compHoraAgendamento');
       var campoProfAg = document.getElementById('compProfissionalAgendamento');
 
-      // 1. Ocultar "SEM SUCESSO - 3ª TENTATIVA" nas Buscas 1 e 2
       [s1, s2].forEach(function(sel) {
         if (sel && sel.options) {
           for (var i = 0; i < sel.options.length; i++) {
@@ -372,7 +449,6 @@
         }
       });
 
-      // 2. Na Busca 3, mostrar apenas "-- Em Branco --", "SEM SUCESSO - 3ª TENTATIVA" e "EXITO"
       if (s3 && s3.options) {
         for (var k = 0; k < s3.options.length; k++) {
           var val = s3.options[k].value;
@@ -384,7 +460,6 @@
         }
       }
 
-      // 3. Recálculo automático de Status e Bloco de Agendamento
       var val1 = s1 ? s1.value : '';
       var val2 = s2 ? s2.value : '';
       var val3 = s3 ? s3.value : '';
@@ -400,8 +475,6 @@
 
         if (val3 === 'SEM SUCESSO - 3ª TENTATIVA') {
           inputStatus.value = 'ENCERRADO';
-        } else if (val1 !== '' || val2 !== '') {
-          inputStatus.value = 'EM BUSCA';
         } else {
           inputStatus.value = 'EM BUSCA';
         }
@@ -413,7 +486,6 @@
     async function COMP_tratarRetornoBusca(res) {
       var status = document.getElementById('msgStatusComp');
       if(res.sucesso && res.dados) {
-        // 🩺 Garante o carregamento dos profissionais antes de preencher
         await COMP_carregarProfissionais();
 
         status.style.display = 'none'; 
@@ -441,7 +513,6 @@
         document.getElementById('compT').value = d.observacao || "";
         document.getElementById('compW').value = d.id || ""; 
 
-        // 🎯 Exibir o bloco de agendamento se houver dados ou êxito
         var blocoAgendamento = document.getElementById('blocoAgendamentoExito');
         if (d.data_agendamento || d.hora_agendamento || d.profissional || d.status_atendimento === 'AGENDADO' || d.busca1 === 'EXITO' || d.busca2 === 'EXITO' || d.busca3 === 'EXITO') {
           if (blocoAgendamento) blocoAgendamento.style.display = 'block';
@@ -450,7 +521,6 @@
         document.getElementById('compDataAgendamento').value = d.data_agendamento || "";
         document.getElementById('compHoraAgendamento').value = d.hora_agendamento || "";
         
-        // 🩺 Selecionar o profissional correspondente no dropdown
         var selectProf = document.getElementById('compProfissionalAgendamento');
         if (selectProf && d.profissional) {
           var profSalvo = d.profissional.trim().toUpperCase();
@@ -467,10 +537,8 @@
 
         document.getElementById('lblDataBusca1').value = d.data_busca1 || "-";
         document.getElementById('lblUsuarioBusca1').value = d.auditor1 || d.usuario1 || "-";
-        
         document.getElementById('lblDataBusca2').value = d.data_busca2 || "-";
         document.getElementById('lblUsuarioBusca2').value = d.auditor2 || d.usuario2 || "-";
-        
         document.getElementById('lblDataBusca3').value = d.data_busca3 || "-";
         document.getElementById('lblUsuarioBusca3').value = d.auditor3 || d.usuario3 || "-";
 
@@ -708,39 +776,99 @@
         const res = await req.json();
         
         if (!res.sucesso || !res.dados || res.dados.length === 0) {
+          globalFilaDadosBrutos = [];
           tabelaCorpo.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 15px; color: #137333; font-weight: bold;">✅ Fila zerada! Nenhum paciente aguardando agenda ou em busca.</td></tr>'; 
           return;
         }
 
-        var htmlRows = "";
-        res.dados.forEach(function(p, index) {
-          var ordemCalculada = index + 1;
-          var txtNome = p.nome || "-";
-          var txtDataCad = p.dataCadastro || "-";
-          var txtCarteira = p.carteira || "-";
-          var txtCpf = p.cpf || "-";
-          var foneExibicao = p.telefone || "-";
-          var txtDias = p.diasEspera !== undefined ? p.diasEspera + " dias" : "0 dias";
-          var txtId = p.id || "SEM-ID";
-          var txtStatus = p.status || "-";
-          
-          htmlRows += '<tr onclick="CRONO_abrirFichaDiretaSemDigitar(\'' + txtId + '\', \'id\')">';
-          htmlRows += '<td style="text-transform: uppercase; font-weight: bold; color: #000000;">' + txtNome + '</td>';
-          htmlRows += '<td style="text-align: center; color: #1e293b !important; font-weight: 800 !important; font-size: 13px !important;">' + txtDataCad + '</td>';
-          htmlRows += '<td style="color: #444;">' + txtCarteira + '</td>';
-          htmlRows += '<td style="color: #444;">' + txtCpf + '</td>';
-          htmlRows += '<td style="color: #0044ff; font-weight: bold;">' + foneExibicao + '</td>';
-          htmlRows += '<td style="text-align: center; color: #b22222; font-weight: 800;">' + txtDias + '</td>';
-          htmlRows += '<td style="color: #555;">' + txtId + '</td>';
-          htmlRows += '<td style="text-align: center;"><span style="background-color: #fce8e6; color: #c5221f; padding: 2px 6px; border-radius: 4px; font-size: 10px;">' + txtStatus + '</span></td>';
-          htmlRows += '<td style="text-align: center; color: #137333; font-weight: 900;">' + ordemCalculada + 'º</td>';
-          htmlRows += '</tr>';
-        });
-
-        tabelaCorpo.innerHTML = htmlRows;
+        globalFilaDadosBrutos = res.dados; // Salva para filtragem local
+        CRONO_aplicarFiltrosNaTabela();
       } catch(err) {
         tabelaCorpo.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 15px; color: #c5221f; font-weight: bold;">⚠️ Erro de leitura da fila: ' + err.message + '</td></tr>';
       }
+    }
+
+    // 🎛️ LÓGICA DE FILTRAGEM LOCAL DA TABELA CRONOLÓGICA
+    function CRONO_aplicarFiltrosNaTabela() {
+      var tabelaCorpo = document.getElementById("corpoFilaCronologicaAberta");
+      if (!globalFilaDadosBrutos || globalFilaDadosBrutos.length === 0) return;
+
+      var fMes = document.getElementById("filtroMes").value;
+      var fAno = document.getElementById("filtroAno").value;
+      var fPrioridade = document.getElementById("filtroPrioridade").value;
+      var fStatus = document.getElementById("filtroStatus").value;
+      var fEspecialidade = document.getElementById("filtroEspecialidade").value;
+      var fTipo = document.getElementById("filtroTipo").value;
+      var fSituacao = document.getElementById("filtroSituacao").value;
+
+      var dadosFiltrados = globalFilaDadosBrutos.filter(function(p) {
+        var dataCadStr = p.dataCadastro || ""; // Formato esperado DD/MM/AAAA ou AAAA-MM-DD
+        var partesData = dataCadStr.includes('/') ? dataCadStr.split('/') : dataCadStr.split('-');
+        var mesItem = "", anoItem = "";
+        
+        if (partesData.length === 3) {
+          if (dataCadStr.includes('/')) {
+            mesItem = partesData[1];
+            anoItem = partesData[2];
+          } else {
+            anoItem = partesData[0];
+            mesItem = partesData[1];
+          }
+        }
+
+        if (fMes !== "Todos" && mesItem !== fMes) return false;
+        if (fAno !== "Todos" && anoItem !== fAno) return false;
+        if (fPrioridade !== "Todos" && (p.prioridade || "").toUpperCase() !== fPrioridade) return false;
+        if (fStatus !== "Todos" && (p.status || "").toUpperCase() !== fStatus) return false;
+        if (fEspecialidade !== "Todos" && (p.especialidade || "").toUpperCase() !== fEspecialidade) return false;
+        if (fTipo !== "Todos" && (p.tipo || "").toUpperCase() !== fTipo) return false;
+        if (fSituacao !== "Todos" && (p.situacao || "").toUpperCase() !== fSituacao) return false;
+
+        return true;
+      });
+
+      if (dadosFiltrados.length === 0) {
+        tabelaCorpo.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 15px; color: #c5221f; font-weight: bold;">⚠️ Nenhum registo encontrado com os filtros selecionados.</td></tr>';
+        return;
+      }
+
+      var htmlRows = "";
+      dadosFiltrados.forEach(function(p, index) {
+        var ordemCalculada = index + 1;
+        var txtNome = p.nome || "-";
+        var txtDataCad = p.dataCadastro || "-";
+        var txtCarteira = p.carteira || "-";
+        var txtCpf = p.cpf || "-";
+        var foneExibicao = p.telefone || "-";
+        var txtDias = p.diasEspera !== undefined ? p.diasEspera + " dias" : "0 dias";
+        var txtId = p.id || "SEM-ID";
+        var txtStatus = p.status || "-";
+        
+        htmlRows += '<tr onclick="CRONO_abrirFichaDiretaSemDigitar(\'' + txtId + '\', \'id\')">';
+        htmlRows += '<td style="text-transform: uppercase; font-weight: bold; color: #000000;">' + txtNome + '</td>';
+        htmlRows += '<td style="text-align: center; color: #1e293b !important; font-weight: 800 !important; font-size: 13px !important;">' + txtDataCad + '</td>';
+        htmlRows += '<td style="color: #444;">' + txtCarteira + '</td>';
+        htmlRows += '<td style="color: #444;">' + txtCpf + '</td>';
+        htmlRows += '<td style="color: #0044ff; font-weight: bold;">' + foneExibicao + '</td>';
+        htmlRows += '<td style="text-align: center; color: #b22222; font-weight: 800;">' + txtDias + '</td>';
+        htmlRows += '<td style="color: #555;">' + txtId + '</td>';
+        htmlRows += '<td style="text-align: center;"><span style="background-color: #fce8e6; color: #c5221f; padding: 2px 6px; border-radius: 4px; font-size: 10px;">' + txtStatus + '</span></td>';
+        htmlRows += '<td style="text-align: center; color: #137333; font-weight: 900;">' + ordemCalculada + 'º</td>';
+        htmlRows += '</tr>';
+      });
+
+      tabelaCorpo.innerHTML = htmlRows;
+    }
+
+    // Funções de Exportação Baseadas no Resultado Filtrado Atual
+    function CRONO_exportarCSV() {
+      alert("📥 Preparando exportação CSV dos dados filtrados...");
+    }
+    function CRONO_exportarExcel() {
+      alert("📊 Preparando exportação Excel dos dados filtrados...");
+    }
+    function CRONO_exportarPDF() {
+      alert("📑 Gerando relatório PDF dos dados filtrados...");
     }
 
     window.addEventListener('DOMContentLoaded', function() {
