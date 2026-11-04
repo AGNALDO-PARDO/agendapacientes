@@ -485,20 +485,25 @@ app.post('/api/pacientes/salvar-master', async (req, res) => {
         "BUSCA 1" = $11, "DATA BUSCA 1" = $12, "USUARIO 1" = $13,
         "BUSCA 2" = $14, "DATA BUSCA 2" = $15, "USUARIO 2" = $16,
         "BUSCA 3" = $17, "DATA BUSCA 3" = $18, "USUARIO 3" = $19,
-        "OBSERVAÇÃO" = $20, "CPF" = $21
-      WHERE "ID" = $22;
+        "OBSERVAÇÃO" = $20, "CPF" = $21,
+        "DATA AGENDAMENTO" = $22, "HORA AGENDAMENTO" = $23, "PROFISSIONAL" = $24
+      WHERE "ID" = $25;
     `;
 
     const paramsSQL = [
       dados.colA, dados.colB, dados.colC, dados.colD, dados.colE,
       dados.colF, dados.colG, dados.colH, dados.colI, dados.colJ,
-      dados.colK,                 // $11: BUSCA 1
+      dados.colK,                     // $11: BUSCA 1
       dados.colL, dados.colM,     // $12: DATA BUSCA 1, $13: USUARIO 1 (Operador 1)
-      dados.colN,                 // $14: BUSCA 2
+      dados.colN,                     // $14: BUSCA 2
       dados.colO, dados.colP,     // $15: DATA BUSCA 2, $16: USUARIO 2 (Operador 2)
-      dados.colQ,                 // $17: BUSCA 3
+      dados.colQ,                     // $17: BUSCA 3
       dados.colR, dados.colS,     // $18: DATA BUSCA 3, $19: USUARIO 3 (Operador 3)
-      dados.colT, dados.colX, dados.id // $20: OBSERVAÇÃO, $21: CPF, $22: ID
+      dados.colT, dados.colX,     // $20: OBSERVAÇÃO, $21: CPF
+      dados.dataAgendamento,          // $22: DATA AGENDAMENTO
+      dados.horaAgendamento,          // $23: HORA AGENDAMENTO
+      dados.profissional,             // $24: PROFISSIONAL
+      dados.id                        // $25: ID EXCLUSIVO
     ];
 
     await db.query(querySQLFinal, paramsSQL);
